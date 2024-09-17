@@ -1,0 +1,19 @@
+/* Asegurar que la vista esté alineada horizontalmente */
+.profesor-container {
+    display: flex;
+    min-height: 100vh; /* Asegura que ocupe toda la altura de la pantalla */
+}
+
+.main-content {
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.highlight {
+    border: 2px solid red;
+}
+
+
+

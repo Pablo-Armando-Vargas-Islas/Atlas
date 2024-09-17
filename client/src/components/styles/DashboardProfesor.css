@@ -1,0 +1,53 @@
+.dashboard-profesor {
+    padding: 20px;
+}
+
+.search-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.list-view .list-item {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Para que las tarjetas tengan un tamaño uniforme */
+.grid-view .card {
+    height: auto; /* Permite que la tarjeta crezca con el contenido */
+    min-height: 300px; /* Asegura que las tarjetas tengan un tamaño mínimo */
+    padding: 15px; /* Añade un poco más de padding para dar espacio al contenido */
+    background-color: #f9f9f9;
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Aumentar la altura mínima de las tarjetas para contener más texto */
+.grid-view .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px; /* Incrementa la altura mínima */
+}
+
+/* Ajuste del tamaño del texto */
+.grid-view .card-title {
+    font-size: 1.1rem; /* Un poco más pequeño que el tamaño normal */
+}
+
+.grid-view .card-text {
+    font-size: 0.85rem; /* Texto más pequeño para mostrar más información */
+    line-height: 1.2; /* Reducimos el espaciado entre líneas */
+    white-space: normal; /* Permite que el texto se divida en varias líneas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Para el hover: más grande cuando se pasa el ratón */
+.grid-view .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+

@@ -1,0 +1,137 @@
+-- Creación de la tabla de roles
+CREATE TABLE roles (
+  id smallint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  nombre_rol text UNIQUE NOT NULL
+);
+
+-- Inserción de roles iniciales
+INSERT INTO roles (nombre_rol) VALUES
+('super_administrador'),
+('docente'),
+('alumno');
+
+-- Creación de la tabla de usuarios
+CREATE TABLE usuarios (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  nombre text NOT NULL,
+  correo_institucional text UNIQUE NOT NULL,
+  "contraseña" text NOT NULL,
+  rol_id smallint REFERENCES roles (id),
+  status_usuario text DEFAULT 'activo' CHECK (status_usuario IN ('activo', 'inactivo')),
+  fecha_creacion timestamptz DEFAULT now(),
+  fecha_actualizacion timestamptz DEFAULT now(),
+  debe_cambiar_contrasena boolean DEFAULT true
+);
+
+-- Creación de la tabla de proyectos
+CREATE TABLE proyectos (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  titulo text NOT NULL,
+  descripcion text,
+  ruta_archivo_comprimido text,
+  descripcion_licencia text,
+  necesita_licencia boolean DEFAULT false, -- Nuevo campo para indicar si necesita licencia
+  fecha_hora timestamptz DEFAULT now(),
+  tipo text CHECK (tipo IN ('grado', 'aula')) NOT NULL,
+  codigo_curso text,
+  formato_aprobacion text,
+  usuario_id bigint REFERENCES usuarios (id) -- Quién subió el proyecto
+);
+
+-- Creación de la tabla de autores
+CREATE TABLE proyectos_autores (
+  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  proyecto_id BIGINT REFERENCES proyectos(id),  -- Referencia al ID del proyecto
+  nombre_autor TEXT NOT NULL  -- Almacena el nombre del autor
+);
+
+-- Creación de la tabla de cursos
+CREATE TABLE cursos (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  nombre_curso text NOT NULL,
+  descripcion text,
+  profesor_id bigint REFERENCES usuarios (id), -- Referencia al profesor
+  periodo text NOT NULL,
+  fecha_inicio date NOT NULL,
+  fecha_fin date NOT NULL,
+  codigo_curso text UNIQUE NOT NULL
+);
+
+-- Creación de la tabla de inscripciones para estudiantes en cursos
+CREATE TABLE inscripciones (
+  curso_id bigint REFERENCES cursos (id),
+  estudiante_id bigint REFERENCES usuarios (id),
+  fecha_inscripcion date DEFAULT current_date,
+  PRIMARY KEY (curso_id, estudiante_id)
+);
+
+-- Creación de la tabla de solicitudes (para pedir acceso a proyectos)
+CREATE TABLE solicitudes (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  proyecto_id bigint REFERENCES proyectos (id),
+  solicitante_id bigint REFERENCES usuarios (id),
+  motivo text,
+  status_solicitud text CHECK (status_solicitud IN ('pendiente', 'aceptada', 'rechazada')),
+  fecha_solicitud timestamptz DEFAULT now(),
+  respuesta_admin_id bigint REFERENCES usuarios (id),
+  fecha_respuesta timestamptz,
+  comentarios text
+);
+
+-- Creación de la tabla de tecnologías
+CREATE TABLE tecnologias (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  nombre text UNIQUE NOT NULL,
+  icono bytea
+);
+
+-- Inserción inicial de tecnologías
+INSERT INTO tecnologias (nombre) VALUES
+('Python'), ('JavaScript'), ('Java'), ('C++'), ('Ruby'), ('PHP'), ('Swift'), ('Kotlin'),
+('HTML'), ('CSS'), ('SQL'), ('NoSQL'), ('React'), ('Angular'), ('Vue.js'), ('Django'),
+('Flask'), ('Spring'), ('Node.js'), ('Express.js');
+
+-- Creación de la tabla de categorías
+CREATE TABLE categorias (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  nombre text UNIQUE NOT NULL
+);
+
+-- Inserción inicial de categorías
+INSERT INTO categorias (nombre) VALUES
+('Educación'), ('Salud'), ('Videojuegos'), ('Finanzas'), ('E-commerce'), ('Redes Sociales'),
+('Inteligencia Artificial'), ('Desarrollo Web'), ('Desarrollo Móvil'), ('Ciencia de Datos'),
+('Frontend'), ('Backend'), ('Fullstack'), ('Machine Learning'), ('DevOps'), ('Cybersecurity'),
+('Cloud Computing'), ('Blockchain'), ('Internet of Things (IoT)'), ('Augmented Reality'), ('Virtual Reality');
+
+-- Creación de la tabla de relación proyectos_tecnologias (muchos a muchos)
+CREATE TABLE proyectos_tecnologias (
+  proyecto_id bigint REFERENCES proyectos (id),
+  tecnologia_id bigint REFERENCES tecnologias (id),
+  PRIMARY KEY (proyecto_id, tecnologia_id)
+);
+
+-- Creación de la tabla de relación proyectos_categorias (muchos a muchos)
+CREATE TABLE proyectos_categorias (
+  proyecto_id bigint REFERENCES proyectos (id),
+  categoria_id bigint REFERENCES categorias (id),
+  PRIMARY KEY (proyecto_id, categoria_id)
+);
+
+
+-- Índices para proyectos
+CREATE INDEX idx_proyectos_titulo ON proyectos (titulo);
+CREATE INDEX idx_proyectos_usuario ON proyectos (usuario_id);
+CREATE INDEX idx_proyectos_tipo ON proyectos (tipo);
+
+-- Índice para autores
+CREATE INDEX idx_proyectos_autores_nombre_autor ON proyectos_autores (nombre_autor);
+
+-- Índices para las tablas intermedias
+CREATE INDEX idx_proyectos_tecnologias_tecnologia_id ON proyectos_tecnologias (tecnologia_id);
+CREATE INDEX idx_proyectos_categorias_categoria_id ON proyectos_categorias (categoria_id);
+
+-- Índices para solicitudes
+CREATE INDEX idx_solicitudes_proyecto_id ON solicitudes (proyecto_id);
+CREATE INDEX idx_solicitudes_solicitante_id ON solicitudes (solicitante_id);
+
