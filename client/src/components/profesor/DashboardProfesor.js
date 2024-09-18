@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Row, Col, Form, InputGroup, Nav } from "react-bootstrap";
 import { FaList, FaThLarge } from "react-icons/fa";
-import Sidebar from "./Sidebar";
+import Sidebar from "../Sidebar";
 import { jwtDecode as jwt_decode } from "jwt-decode"; 
 import '../styles/DashboardProfesor.css'; 
 

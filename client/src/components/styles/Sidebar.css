@@ -1,186 +1,184 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Inter:100,200,300,regular,500,600,700,800,900');
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
 }
 
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+body {
+  background-color: #dbe2f4;
 }
 
-
-.wrapper {
-    display: flex;
-    min-height: 100vh;
+.container {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
 }
 
-.main {
-    min-height: 100vh;
-    width: 100%;
-    overflow: hidden;
-    background-color: #fafbfe;
+.sidebar {
+  position: sticky;
+  width: 230px; 
+  top: 0; 
+  height: 100vh; 
+  flex-direction: column;
+  gap: 20px;
+  background-color: #fff;
+  padding: 24px;
+  transition: all 0.3s ease;
 }
 
-/* Sidebar */
-#sidebar {
-    position: fixed; /* Fijo para que no se desplace con el contenido */
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 70px;
-    background-color: #28537E;
-    display: flex;
-    flex-direction: column;
-    z-index: 1;
-    transition: width 0.25s ease-in-out;
-    padding-top: 20px;
-    overflow-x: hidden;
+.sidebar.active {
+  width: 80px;
 }
 
-
-/* Sidebar expandido */
-#sidebar.expand {
-    width: 260px;
+.head {
+  display: flex;
+  align-items: center; /* Alinear verticalmente la imagen y el nombre */
+  gap: 10px; /* Espacio entre la imagen y el nombre */
+  padding-bottom: 20px;
+  border-bottom: 1px solid #78767631;
 }
 
-/* Ajuste del contenido principal */
-.main-content {
-    margin-left: 70px; /* Espacio para el sidebar colapsado */
-    padding: 20px;
-    transition: margin-left 0.25s ease-in-out;
-    min-height: 100vh; /* Asegura que el contenido principal ocupe toda la altura */
-    overflow: auto; /* Añade scroll al contenido principal si es necesario */
+.user-img {
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
 }
 
-/* Cuando el sidebar está expandido */
-#sidebar.expand ~ .main-content {
-    margin-left: 260px; /* Ajusta el margen cuando el sidebar está expandido */
-    transition: margin-left 0.25s ease-in-out;
+.user-img img {
+  width: 100%;
+  object-fit: cover;
 }
 
-
-.toggle-btn {
-    background-color: transparent;
-    cursor: pointer;
-    border: 0;
-    padding: 1rem 1.5rem;
+/* Espaciado adicional para que el título Menú no choque con la imagen */
+.menu .title {
+  font-size: 10px;
+  font-weight: 500;
+  color: #757575;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  margin-top: 10px; /* Mover el título Menú más abajo */
 }
 
-.toggle-btn i {
-    font-size: 1.5rem;
-    color: #FFF;
+.user-details {
+  display: flex;
+  flex-direction: row; /* Poner el nombre a la derecha de la imagen */
+  align-items: center;
 }
 
-.sidebar-title {
-    color: #FFF;
-    font-size: 1.2rem;
-    font-weight: 600;
-    padding: 1rem;
-    white-space: nowrap;
+.user-details .name {
+  font-size: 14px;
+  font-weight: 500;
 }
 
-#sidebar:not(.expand) .sidebar-title {
-    display: none;
+/* Estilos generales para listas */
+.menu ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 
-.sidebar-nav {
-    padding: 2rem 0;
-    flex: 1 1 auto;
+.menu ul li {
+  list-style: none;
+  margin-bottom: 5px;
+  padding-left: 0;
 }
 
-a.sidebar-link {
-    padding: 0.625rem 1.625rem;
-    color: #FFF;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    border-left: 3px solid transparent;
-    transition: all .25s ease-in-out;
-    border-radius: 5px;
+/* Aseguramos que los iconos y textos estén bien centrados */
+.menu ul li a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #757575;
+  text-decoration: none;
+  padding: 12px 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.sidebar-link i {
-    font-size: 1.2rem;
-    margin-right: 1rem;
-    transition: all .25s ease-in-out;
+.menu ul li a:hover,
+.menu ul li.active a {
+  color: #000;
+  background-color: #f6f6f6;
 }
 
-#sidebar:not(.expand) a.sidebar-link {
-    justify-content: center;
-    padding: 0.625rem 0;
+/* Centrar iconos cuando el sidebar está retraído */
+.sidebar.active .menu ul li a {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
 }
 
-#sidebar:not(.expand) a.sidebar-link span {
-    display: none;
+/* Ocultar el texto en el sidebar retraído */
+.sidebar.active .text {
+  display: none;
 }
 
-#sidebar:not(.expand) a.sidebar-link i {
-    margin-right: 0;
+.sidebar.active .user-details {
+  display: none;
 }
 
-a.sidebar-link:hover {
-    background-color: rgba(255, 255, 255, .075);
-    border-left: 3px solid #3b7ddd;
-    transition: all .25s ease-in-out;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+.menu-btn {
+  position: absolute;
+  right: -14px;
+  top: 3.5%;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #757575;
+  border: 2px solid #f6f6f6;
+  background-color: #fff;
 }
 
-a.sidebar-link:active,
-a.sidebar-link:focus {
-    outline: none;
-    background-color: rgba(255, 255, 255, .1);
+.menu-btn:hover i {
+  color: #000;
 }
 
-.sidebar-footer {
-    padding: 1rem 1.625rem;
-    display: flex;
-    align-items: center;
+.menu-btn i {
+  transition: all 0.3s ease;
 }
 
-#sidebar:not(.expand) .sidebar-footer {
-    justify-content: center;
+.sidebar.active .menu-btn i {
+  transform: rotate(180deg);
 }
 
-.btn-logout {
-    background: transparent;
-    border: none;
-    color: #FFF;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 0;
-    border-left: 3px solid transparent;
-    transition: all .25s ease-in-out;
-    border-radius: 5px;
-}
-
-.btn-logout i {
-    font-size: 1.2rem;
-    margin-right: 0.75rem;
-    transition: all .25s ease-in-out;
-}
-
-#sidebar:not(.expand) .btn-logout {
-    justify-content: center;
-}
-
-#sidebar:not(.expand) .btn-logout span {
-    display: none;
-}
-
-.btn-logout:hover {
-    background-color: rgba(255, 255, 255, .075);
-    border-left: 3px solid #ff4b5c;
-    transition: all .25s ease-in-out;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+/* Tooltip personalizado con data-tooltip */
+.sidebar.active ul li a:hover::after {
+  content: attr(data-tooltip); /* Usar data-tooltip para mostrar los tooltips */
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 100;
 }
 
 
+.sidebar.active ul li a {
+  position: relative;
+}
 
+.head, .menu .title, .user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mover el botón de logout a la parte inferior */
+.menu.logout-menu {
+  margin-top: auto; /* Empuja el botón hacia abajo */
+  padding-top: 315px; /* Ajusta la distancia manualmente desde el contenido superior */
+}
