@@ -65,26 +65,30 @@ router.post("/subir", async (req, res) => {
             descripcion_licencia,
             necesita_licencia,
             tipo,
+            codigo_curso,
             usuario_id,  // Usuario que sube el proyecto
             tecnologias, // Array de IDs de tecnologías
             categorias,   // Array de IDs de categorías
             autores
         } = req.body;
 
+        // Depuración de los datos recibidos
+        console.log("Datos recibidos:", req.body);
+
         if (!usuario_id) {
             return res.status(400).json({ error: "El campo 'Usuario' no existe" });
         }
-        // Primero, registrar el proyecto
+
+        // Registrar el proyecto
         const newProject = await pool.query(
-            `INSERT INTO proyectos 
-            (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-            [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id]
+            `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
         );
 
         const proyectoId = newProject.rows[0].id;
 
-        // Segundo, asociar las tecnologías al proyecto
+        // Asociar tecnologías
         if (tecnologias && tecnologias.length > 0) {
             for (const tecnologiaId of tecnologias) {
                 await pool.query(
@@ -95,7 +99,7 @@ router.post("/subir", async (req, res) => {
             }
         }
 
-        // Tercero, asociar las categorías al proyecto
+        // Asociar categorías
         if (categorias && categorias.length > 0) {
             for (const categoriaId of categorias) {
                 await pool.query(
@@ -106,7 +110,7 @@ router.post("/subir", async (req, res) => {
             }
         }
 
-        // Insertar los autores en la tabla 'proyectos_autores'
+        // Insertar autores
         if (autores && autores.length > 0) {
             for (const autor of autores) {
                 await pool.query(
@@ -118,11 +122,11 @@ router.post("/subir", async (req, res) => {
 
         res.json(newProject.rows[0]);
     } catch (err) {
-        console.error(err.message);
+        console.error("Error en el servidor:", err.message); // Depuración del error
         res.status(500).send("Error del servidor");
     }
-}
-);
+});
+
 
         
 

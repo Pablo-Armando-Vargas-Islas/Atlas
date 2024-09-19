@@ -11,7 +11,7 @@ body {
   background-color: #dbe2f4;
 }
 
-.container {
+.sidebar-container {
   display: flex;
   gap: 1rem;
   align-items: flex-start;

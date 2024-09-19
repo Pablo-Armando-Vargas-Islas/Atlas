@@ -3,13 +3,17 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Home from "./components/Home";
 import DashboardProfesor from "./components/profesor/DashboardProfesor";
 import SubirProyectoProfesor from "./components/profesor/SubirProyectoProfesor";
 import DashboardAdmin from "./components/admin/DashboardAdmin";
 import GestionUsuarios from "./components/admin/GestionUsuarios";
 import DashboardAlumno from "./components/alumno/DashboardAlumno";
 import MisProyectos from "./components/alumno/MisProyectos";
+import CrearCursoProfesor from './components/profesor/cursos/CrearCursoProfesor';
+import GestionCursosProfesor from './components/profesor/cursos/GestionCursosProfesor';
+import VerProyectosCurso from './components/profesor/cursos/VerProyectosCurso';
+
+
 
 function App() {
     return (
@@ -28,6 +32,10 @@ function App() {
                         {/* Rutas de Profesor */}
                         <Route path="/profesor/dashboard" element={<DashboardProfesor />} />
                         <Route path="/profesor/SubirProyectoProfesor" element={<SubirProyectoProfesor />} />
+                        <Route path="/profesor/crearCurso" element={<CrearCursoProfesor />} />
+                        <Route path="/profesor/cursos" element={<GestionCursosProfesor />} />
+                        <Route path="/profesor/curso/:cursoId/proyectos" element={<VerProyectosCurso />} />
+
 
                         {/* Rutas de Alumno */}
                         <Route path="/alumno/dashboard" element={<DashboardAlumno />} />

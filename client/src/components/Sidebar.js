@@ -27,13 +27,13 @@ const Sidebar = () => {
           <p className="title">Menú</p>
           <ul>
             <li>
-              <a href="#" data-tooltip="Inicio">
+              <a href="/profesor/cursos" data-tooltip="Ver cursos">
                 <HouseSimple size={24} />
-                <span className="text">Inicio</span>
+                <span className="text">Ver cursos</span>
               </a>
             </li>
             <li>
-              <a href="#" data-tooltip="Proyectos">
+              <a href="/profesor/SubirProyectoProfesor" data-tooltip="Subir proyecto">
                 <FolderSimple size={24} />
                 <span className="text">Proyectos</span>
               </a>
@@ -45,9 +45,9 @@ const Sidebar = () => {
               </a>
             </li>
             <li>
-              <a href="#" data-tooltip="Configuración">
-                <Gear size={24} />
-                <span className="text">Configuración</span>
+              <a href="/profesor/crearCurso" data-tooltip="Cursos">
+                <FolderSimple size={24} />
+                <span className="text">Cursos</span>
               </a>
             </li>
           </ul>

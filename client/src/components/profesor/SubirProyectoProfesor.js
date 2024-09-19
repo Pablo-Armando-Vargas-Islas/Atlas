@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Modal, Button } from "react-bootstrap";
@@ -14,15 +14,17 @@ const SubirProyectoProfesor = () => {
     const [linkGithub, setLinkGithub] = useState("");
     const [archivoComprimido, setArchivoComprimido] = useState(null);
     const [tipo, setTipo] = useState(""); // Valor inicial vacío
+    const [codigoCurso, setCodigoCurso] = useState(""); // Código del curso
+    const [cursoValido, setCursoValido] = useState(false); // Para saber si el curso es válido
+    const [cursoNombre, setCursoNombre] = useState(""); // Nombre del curso validado
     const [autores, setAutores] = useState([""]);
     const [tecnologias, setTecnologias] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [selectedTecnologias, setSelectedTecnologias] = useState([]);
     const [selectedCategorias, setSelectedCategorias] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(""); // Estado para mensaje de error
-    const [missingFields, setMissingFields] = useState([]); // Estado para campos faltantes
-
+    const [errorMessage, setErrorMessage] = useState("");
+    const [missingFields, setMissingFields] = useState([]);
     const navigate = useNavigate();
 
     // Recuperar el token del localStorage y decodificarlo
@@ -117,20 +119,36 @@ const SubirProyectoProfesor = () => {
         }
     };
 
-
-    const onSubmitForm = (e) => {
-        e.preventDefault();
-        if (validateFields()) {
-            setShowModal(true);
+    // Validar el código del curso
+    const validarCodigoCurso = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/cursos/validarCodigo/${codigoCurso}`);
+            const data = await response.json();
+            if (response.ok) {
+                setCursoValido(true);
+                setCursoNombre(data.nombre_curso);
+                alert(`Te has unido al curso de ${data.nombre_curso}`);
+            } else {
+                setCursoValido(false);
+                setErrorMessage("El código del curso no existe.");
+                alert("El código del curso no existe.");
+            }
+        } catch (error) {
+            console.error("Error al validar el código del curso:", error);
+            setErrorMessage("Error en la validación del curso.");
         }
     };
 
+    const onSubmitForm = (e) => {
+        e.preventDefault();
+        if (tipo === "aula" && !cursoValido) {
+            setErrorMessage("Debes validar el código del curso antes de continuar.");
+            return;
+        }
+        setShowModal(true); // Mostrar la ventana de confirmación si todo está validado
+    };
+
     const handleConfirm = async () => {
-        console.log("User ID:", userId); // depuración
-        console.log("Tecnologías seleccionadas:", selectedTecnologias); 
-        console.log("Categorías seleccionadas:", selectedCategorias); 
-
-
         try {
             const body = {
                 titulo,
@@ -139,12 +157,15 @@ const SubirProyectoProfesor = () => {
                 descripcion_licencia: necesitaLicencia ? descripcionLicencia : null,
                 necesita_licencia: necesitaLicencia,
                 tipo,
+                codigo_curso: tipo === "aula" ? codigoCurso : null, // Enviar el código del curso si es aula
                 usuario_id: userId, 
                 tecnologias: selectedTecnologias.map(tecnologia => tecnologia.id), 
                 categorias: selectedCategorias.map(categoria => categoria.id),
                 autores 
             };
             
+            console.log("Datos enviados:", body);
+
             const response = await fetch("http://localhost:5000/api/proyectos/subir", {
                 method: "POST",
                 headers: {
@@ -154,8 +175,7 @@ const SubirProyectoProfesor = () => {
             });
 
             if (response.ok) {
-                console.log("Proyecto registrado correctamente");
-                setShowModal(false);
+                alert("Proyecto registrado correctamente");
                 navigate("/profesor/dashboard");
             } else {
                 const errorData = await response.json();
@@ -177,10 +197,12 @@ const SubirProyectoProfesor = () => {
                     {errorMessage && (
                         <div className="alert alert-danger">{errorMessage}</div>
                     )}
+
+                    {/* Selección del tipo de proyecto */}
                     <div className="form-group">
                         <label>Tipo de Proyecto</label>
                         <select
-                            className={`form-control ${missingFields.includes("tipo") ? "border-danger" : ""}`}
+                            className="form-control"
                             value={tipo}
                             onChange={(e) => setTipo(e.target.value)}
                             required
@@ -190,135 +212,162 @@ const SubirProyectoProfesor = () => {
                             <option value="aula">Aula</option>
                         </select>
                     </div>
-                    <div className="form-group">
-                        <label>Título</label>
-                        <input
-                            type="text"
-                            className={`form-control ${missingFields.includes("titulo") ? "border-danger" : ""}`}
-                            value={titulo}
-                            onChange={(e) => setTitulo(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Descripción</label>
-                        <textarea
-                            className={`form-control ${missingFields.includes("descripcion") ? "border-danger" : ""}`}
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                    <label>Autores</label>
-                        {autores.map((autor, index) => (
-                            <div key={index} className="d-flex mb-2">
+
+                    {/* Campo para validar el código del curso si es aula */}
+                    {tipo === "aula" && (
+                        <div className="form-group">
+                            <label>Código del Curso</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={codigoCurso}
+                                onChange={(e) => setCodigoCurso(e.target.value)}
+                                required
+                            />
+                            <Button
+                                variant="primary"
+                                onClick={validarCodigoCurso}
+                                className="mt-2"
+                            >
+                                Validar Código
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* Los demás campos se habilitan solo si el curso es válido o si es un proyecto de grado */}
+                    {(cursoValido || tipo === "grado") && (
+                        <>
+                            <div className="form-group">
+                                <label>Título</label>
                                 <input
                                     type="text"
-                                    className={`form-control ${missingFields.includes("autores") ? "border-danger" : ""}`}
-                                    value={autor}
-                                    onChange={(e) => handleAutorChange(index, e.target.value)}
+                                    className={`form-control ${missingFields.includes("titulo") ? "border-danger" : ""}`}
+                                    value={titulo}
+                                    onChange={(e) => setTitulo(e.target.value)}
                                     required
                                 />
-                                <button type="button" className="btn btn-primary ml-2" onClick={addAutorField}>+</button>
-                                {index > 0 && (
-                                    <button type="button" className="btn btn-danger ml-2" onClick={() => removeAutorField(index)}>-</button>
-                                )}
                             </div>
-                        ))}
-                    </div>
-                    <div className="form-group">
-                        <label>¿Necesita alguna licencia?</label>
-                        <div className="form-check">
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id="licenciaSi"
-                                name="licencia"
-                                value="si"
-                                checked={necesitaLicencia}
-                                onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
-                            />
-                            <label className="form-check-label" htmlFor="licenciaSi">
-                                Sí
-                            </label>
-                        </div>
-                        <div className="form-check">
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id="licenciaNo"
-                                name="licencia"
-                                value="no"
-                                checked={!necesitaLicencia}
-                                onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
-                            />
-                            <label className="form-check-label" htmlFor="licenciaNo">
-                                No
-                            </label>
-                        </div>
-
-                        {necesitaLicencia && (
-                            <div className="form-group mt-3">
-                                <label>Descripción de la Licencia</label>
+                            <div className="form-group">
+                                <label>Descripción</label>
                                 <textarea
-                                    className="form-control"
-                                    value={descripcionLicencia}
-                                    onChange={(e) => setDescripcionLicencia(e.target.value)}
+                                    className={`form-control ${missingFields.includes("descripcion") ? "border-danger" : ""}`}
+                                    value={descripcion}
+                                    onChange={(e) => setDescripcion(e.target.value)}
+                                    required
                                 />
                             </div>
-                        )}
-                    </div>
+                            <div className="form-group">
+                            <label>Autores</label>
+                                {autores.map((autor, index) => (
+                                    <div key={index} className="d-flex mb-2">
+                                        <input
+                                            type="text"
+                                            className={`form-control ${missingFields.includes("autores") ? "border-danger" : ""}`}
+                                            value={autor}
+                                            onChange={(e) => handleAutorChange(index, e.target.value)}
+                                            required
+                                        />
+                                        <button type="button" className="btn btn-primary ml-2" onClick={addAutorField}>+</button>
+                                        {index > 0 && (
+                                            <button type="button" className="btn btn-danger ml-2" onClick={() => removeAutorField(index)}>-</button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="form-group">
+                                <label>¿Necesita alguna licencia?</label>
+                                <div className="form-check">
+                                    <input
+                                        type="radio"
+                                        className="form-check-input"
+                                        id="licenciaSi"
+                                        name="licencia"
+                                        value="si"
+                                        checked={necesitaLicencia}
+                                        onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
+                                    />
+                                    <label className="form-check-label" htmlFor="licenciaSi">
+                                        Sí
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <input
+                                        type="radio"
+                                        className="form-check-input"
+                                        id="licenciaNo"
+                                        name="licencia"
+                                        value="no"
+                                        checked={!necesitaLicencia}
+                                        onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
+                                    />
+                                    <label className="form-check-label" htmlFor="licenciaNo">
+                                        No
+                                    </label>
+                                </div>
 
-                    <div className="form-group">
-                        <label>Link de GitHub</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={linkGithub}
-                            onChange={(e) => setLinkGithub(e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Archivo Comprimido</label>
-                        <input
-                            type="file"
-                            className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
-                            onChange={(e) => setArchivoComprimido(e.target.files[0])}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Tecnologías</label>
-                        <div className={`${missingFields.includes("tecnologias") ? "border border-danger p-2" : ""}`}>
-                            {tecnologias.map((tecnologia) => (
-                                <button
-                                    type="button"
-                                    key={tecnologia.id}
-                                    className={`btn m-1 ${selectedTecnologias.includes(tecnologia) ? "btn-primary" : "btn-outline-primary"}`}
-                                    onClick={() => toggleTecnologia(tecnologia)}
-                                >
-                                    {tecnologia.nombre}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label>Categorías</label>
-                        <div className={`${missingFields.includes("categorias") ? "border border-danger p-2" : ""}`}>
-                            {categorias.map((categoria) => (
-                                <button
-                                    type="button"
-                                    key={categoria.id}
-                                    className={`btn m-1 ${selectedCategorias.includes(categoria) ? "btn-success" : "btn-outline-success"}`}
-                                    onClick={() => toggleCategoria(categoria)}
-                                >
-                                    {categoria.nombre}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <button className="btn btn-success mt-3">Registrar</button>
+                                {necesitaLicencia && (
+                                    <div className="form-group mt-3">
+                                        <label>Descripción de la Licencia</label>
+                                        <textarea
+                                            className="form-control"
+                                            value={descripcionLicencia}
+                                            onChange={(e) => setDescripcionLicencia(e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="form-group">
+                                <label>Link de GitHub</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={linkGithub}
+                                    onChange={(e) => setLinkGithub(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Archivo Comprimido</label>
+                                <input
+                                    type="file"
+                                    className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
+                                    onChange={(e) => setArchivoComprimido(e.target.files[0])}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Tecnologías</label>
+                                <div className={`${missingFields.includes("tecnologias") ? "border border-danger p-2" : ""}`}>
+                                    {tecnologias.map((tecnologia) => (
+                                        <button
+                                            type="button"
+                                            key={tecnologia.id}
+                                            className={`btn m-1 ${selectedTecnologias.includes(tecnologia) ? "btn-primary" : "btn-outline-primary"}`}
+                                            onClick={() => toggleTecnologia(tecnologia)}
+                                        >
+                                            {tecnologia.nombre}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Categorías</label>
+                                <div className={`${missingFields.includes("categorias") ? "border border-danger p-2" : ""}`}>
+                                    {categorias.map((categoria) => (
+                                        <button
+                                            type="button"
+                                            key={categoria.id}
+                                            className={`btn m-1 ${selectedCategorias.includes(categoria) ? "btn-success" : "btn-outline-success"}`}
+                                            onClick={() => toggleCategoria(categoria)}
+                                        >
+                                            {categoria.nombre}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <Button type="submit" className="btn btn-success mt-3">Registrar</Button>
+                        </>
+                    )}
                 </form>
 
                 {/* Modal de confirmación */}

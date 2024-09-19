@@ -118,6 +118,10 @@ CREATE TABLE proyectos_categorias (
   PRIMARY KEY (proyecto_id, categoria_id)
 );
 
+ALTER TABLE cursos
+ADD COLUMN estado text DEFAULT 'abierto' CHECK (estado IN ('abierto', 'cerrado'));
+
+
 
 -- Índices para proyectos
 CREATE INDEX idx_proyectos_titulo ON proyectos (titulo);

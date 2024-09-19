@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const proyectosRoutes = require("./routes/proyectos");
+const cursosRoutes = require('./routes/cursos');
 require('dotenv').config();
 
 // Middleware
@@ -14,6 +15,7 @@ app.use("/api/auth", authRoutes);
 
 // Rutas protegidas
 app.use("/api/proyectos", proyectosRoutes);
+app.use('/api/cursos', cursosRoutes);
 
 // Endpoint de Login
 app.post("/api/auth/login", async (req, res) => {
