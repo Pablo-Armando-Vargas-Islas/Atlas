@@ -8,7 +8,7 @@ const CrearCursoProfesor = () => {
     const [periodo, setPeriodo] = useState('');
     const [fechaLimite, setFechaLimite] = useState('');
     const [codigoCurso, setCodigoCurso] = useState('');
-    const [entregasLibres, setEntregasLibres] = useState(true);
+    const [entregasLibres] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
@@ -96,26 +96,15 @@ const CrearCursoProfesor = () => {
                     </Form.Group>
 
                     <Form.Group>
-                        <Form.Check
-                            type="checkbox"
-                            label="Entregas Libres (Sin Fecha Límite)"
-                            checked={entregasLibres}
-                            onChange={(e) => setEntregasLibres(e.target.checked)}
+                        <Form.Label>Fecha Límite</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={fechaLimite}
+                            onChange={(e) => setFechaLimite(e.target.value)}
+                            required
                         />
                     </Form.Group>
-
-                    {!entregasLibres && (
-                        <Form.Group>
-                            <Form.Label>Fecha Límite</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={fechaLimite}
-                                onChange={(e) => setFechaLimite(e.target.value)}
-                                required={!entregasLibres}
-                            />
-                        </Form.Group>
-                    )}
-
+                    
                     <Form.Group className="d-flex align-items-center">
                         <Button variant="primary" onClick={generarCodigoCurso}>
                             Generar Código de Curso

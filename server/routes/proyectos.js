@@ -66,17 +66,24 @@ router.post("/subir", async (req, res) => {
             necesita_licencia,
             tipo,
             codigo_curso,
-            usuario_id,  // Usuario que sube el proyecto
-            tecnologias, // Array de IDs de tecnologías
-            categorias,   // Array de IDs de categorías
+            usuario_id,  
+            tecnologias, 
+            categorias,   
             autores
         } = req.body;
 
-        // Depuración de los datos recibidos
-        console.log("Datos recibidos:", req.body);
+        // Verificar si el curso está cerrado
+        const curso = await pool.query(
+            `SELECT estado FROM cursos WHERE codigo_curso = $1`,
+            [codigo_curso]
+        );
 
-        if (!usuario_id) {
-            return res.status(400).json({ error: "El campo 'Usuario' no existe" });
+        if (curso.rows.length === 0) {
+            return res.status(404).json({ error: "Curso no encontrado" });
+        }
+
+        if (curso.rows[0].estado === 'cerrado') {
+            return res.status(400).json({ error: "El curso ya está cerrado y no permite más entregas" });
         }
 
         // Registrar el proyecto
@@ -122,10 +129,11 @@ router.post("/subir", async (req, res) => {
 
         res.json(newProject.rows[0]);
     } catch (err) {
-        console.error("Error en el servidor:", err.message); // Depuración del error
+        console.error("Error en el servidor:", err.message);
         res.status(500).send("Error del servidor");
     }
 });
+
 
 
         

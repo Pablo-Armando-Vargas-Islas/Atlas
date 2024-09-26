@@ -27,27 +27,27 @@ const Sidebar = () => {
           <p className="title">Menú</p>
           <ul>
             <li>
-              <a href="/profesor/cursos" data-tooltip="Ver cursos">
+              <a href="/profesor/dashboard" data-tooltip="Ver cursos">
                 <HouseSimple size={24} />
-                <span className="text">Ver cursos</span>
+                <span className="text">Inicio</span>
               </a>
             </li>
             <li>
               <a href="/profesor/SubirProyectoProfesor" data-tooltip="Subir proyecto">
                 <FolderSimple size={24} />
-                <span className="text">Proyectos</span>
+                <span className="text">Subir proyecto</span>
               </a>
             </li>
             <li>
-              <a href="#" data-tooltip="Clases">
+              <a href="/profesor/cursos" data-tooltip="Clases">
                 <ChalkboardTeacher size={24} />
-                <span className="text">Clases</span>
+                <span className="text">Ver cursos</span>
               </a>
             </li>
             <li>
               <a href="/profesor/crearCurso" data-tooltip="Cursos">
                 <FolderSimple size={24} />
-                <span className="text">Cursos</span>
+                <span className="text">Crear nuevo curso</span>
               </a>
             </li>
           </ul>

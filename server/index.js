@@ -5,6 +5,8 @@ const authRoutes = require("./routes/auth");
 const proyectosRoutes = require("./routes/proyectos");
 const cursosRoutes = require('./routes/cursos');
 require('dotenv').config();
+require('./cronJobs');
+
 
 // Middleware
 app.use(cors());

@@ -13,10 +13,10 @@ const SubirProyectoProfesor = () => {
     const [descripcionLicencia, setDescripcionLicencia] = useState("");
     const [linkGithub, setLinkGithub] = useState("");
     const [archivoComprimido, setArchivoComprimido] = useState(null);
-    const [tipo, setTipo] = useState(""); // Valor inicial vacío
-    const [codigoCurso, setCodigoCurso] = useState(""); // Código del curso
-    const [cursoValido, setCursoValido] = useState(false); // Para saber si el curso es válido
-    const [cursoNombre, setCursoNombre] = useState(""); // Nombre del curso validado
+    const [tipo, setTipo] = useState(""); 
+    const [codigoCurso, setCodigoCurso] = useState(""); 
+    const [cursoValido, setCursoValido] = useState(false); 
+    const [cursoNombre, setCursoNombre] = useState(""); 
     const [autores, setAutores] = useState([""]);
     const [tecnologias, setTecnologias] = useState([]);
     const [categorias, setCategorias] = useState([]);
@@ -25,6 +25,7 @@ const SubirProyectoProfesor = () => {
     const [showModal, setShowModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [missingFields, setMissingFields] = useState([]);
+    const [cursoEstado, setCursoEstado] = useState("");
     const navigate = useNavigate();
 
     // Recuperar el token del localStorage y decodificarlo
@@ -124,10 +125,18 @@ const SubirProyectoProfesor = () => {
         try {
             const response = await fetch(`http://localhost:5000/api/cursos/validarCodigo/${codigoCurso}`);
             const data = await response.json();
+    
             if (response.ok) {
-                setCursoValido(true);
                 setCursoNombre(data.nombre_curso);
-                alert(`Te has unido al curso de ${data.nombre_curso}`);
+                setCursoEstado(data.estado); // Guardar el estado del curso (abierto o cerrado)
+    
+                if (data.estado === "cerrado") {
+                    setCursoValido(false); // El curso no es válido para subir proyectos
+                    alert(`El curso de ${data.nombre_curso} ya no está recibiendo más trabajos.`);
+                } else {
+                    setCursoValido(true); // El curso está abierto y permite entregas
+                    alert(`Te has unido al curso de ${data.nombre_curso}`);
+                }
             } else {
                 setCursoValido(false);
                 setErrorMessage("El código del curso no existe.");
@@ -235,7 +244,7 @@ const SubirProyectoProfesor = () => {
                     )}
 
                     {/* Los demás campos se habilitan solo si el curso es válido o si es un proyecto de grado */}
-                    {(cursoValido || tipo === "grado") && (
+                    {(cursoValido || tipo === "grado") && cursoEstado !== "cerrado" && (
                         <>
                             <div className="form-group">
                                 <label>Título</label>

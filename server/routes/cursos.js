@@ -28,16 +28,25 @@ router.get('/cursos', verifyToken, async (req, res) => {
     const profesorId = req.user.id;
 
     try {
+        // Actualizar automáticamente el estado de los cursos si ha pasado la fecha límite
+        await pool.query(
+            `UPDATE cursos 
+             SET estado = 'cerrado' 
+             WHERE fecha_fin < NOW() AND estado = 'abierto'`
+        );
+
         const cursos = await pool.query(
-            `SELECT * FROM cursos WHERE profesor_id = $1 AND estado = 'abierto'`,
+            `SELECT * FROM cursos WHERE profesor_id = $1`,
             [profesorId]
         );
+
         res.json(cursos.rows);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ error: 'Error al obtener los cursos' });
     }
 });
+
 
 // Ruta para cerrar un curso
 router.post('/cerrarCurso/:cursoId', verifyToken, async (req, res) => {
@@ -61,7 +70,6 @@ router.get('/curso/:cursoId/proyectos', verifyToken, async (req, res) => {
     const profesorId = req.user.id;
 
     try {
-        // Verificar que el curso pertenezca al profesor
         const curso = await pool.query(
             `SELECT * FROM cursos WHERE id = $1 AND profesor_id = $2`,
             [cursoId, profesorId]
@@ -71,11 +79,18 @@ router.get('/curso/:cursoId/proyectos', verifyToken, async (req, res) => {
             return res.status(403).json({ error: 'No tienes acceso a este curso' });
         }
 
-        // Obtener los proyectos del curso
+        // Obtener los proyectos del curso con tecnologías y categorías
         const proyectos = await pool.query(
-            `SELECT p.*, array_agg(a.nombre_autor) as autores 
+            `SELECT p.*, 
+                    array_agg(DISTINCT a.nombre_autor) as autores,
+                    array_agg(DISTINCT t.nombre) as tecnologias,
+                    array_agg(DISTINCT c.nombre) as categorias
              FROM proyectos p
              LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+             LEFT JOIN categorias c ON pc.categoria_id = c.id
              WHERE p.codigo_curso = $1
              GROUP BY p.id`,
             [curso.rows[0].codigo_curso]
@@ -88,26 +103,26 @@ router.get('/curso/:cursoId/proyectos', verifyToken, async (req, res) => {
     }
 });
 
-// Validar código del curso
-router.get('/validarCodigo/:codigoCurso', async (req, res) => {
-    const { codigoCurso } = req.params;
 
+// Validar código del curso
+router.get("/validarCodigo/:codigoCurso", async (req, res) => {
     try {
         const curso = await pool.query(
-            'SELECT * FROM cursos WHERE codigo_curso = $1',
-            [codigoCurso]
+            `SELECT nombre_curso, estado FROM cursos WHERE codigo_curso = $1`,
+            [req.params.codigoCurso]
         );
 
         if (curso.rows.length === 0) {
-            return res.status(404).json({ error: 'El curso no existe' });
+            return res.status(404).json({ error: "Curso no encontrado" });
         }
 
-        res.json(curso.rows[0]); // Devuelve el nombre del curso
+        res.json(curso.rows[0]); // Devolver el nombre y estado del curso
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Error del servidor');
+        res.status(500).send("Error del servidor");
     }
 });
+
 
 
 

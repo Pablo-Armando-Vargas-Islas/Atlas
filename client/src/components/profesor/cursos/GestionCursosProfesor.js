@@ -39,7 +39,7 @@ const GestionCursosProfesor = () => {
         if (confirmacion) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:5000/api/profesores/cerrarCurso/${cursoId}`, {
+                const response = await fetch(`http://localhost:5000/api/cursos/cerrarCurso/${cursoId}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -48,7 +48,11 @@ const GestionCursosProfesor = () => {
                 });
                 if (response.ok) {
                     alert('Curso cerrado exitosamente.');
-                    setCursos(cursos.filter(curso => curso.id !== cursoId)); // Actualizar lista de cursos
+                    
+                    // Actualizar solo el estado del curso a 'cerrado' sin eliminarlo
+                    setCursos(cursos.map(curso => 
+                        curso.id === cursoId ? { ...curso, estado: 'cerrado' } : curso
+                    ));
                 } else {
                     alert('Error al cerrar el curso.');
                 }
@@ -57,6 +61,7 @@ const GestionCursosProfesor = () => {
             }
         }
     };
+    
 
     return (
         <div className="profesor-container">
@@ -72,6 +77,7 @@ const GestionCursosProfesor = () => {
                                 <th>Nombre del Curso</th>
                                 <th>Periodo Escolar</th>
                                 <th>Código del Curso</th>
+                                <th>Fecha de cierre</th> 
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -87,6 +93,7 @@ const GestionCursosProfesor = () => {
                                             Copiar Código
                                         </Button>
                                     </td>
+                                    <td>{curso.fecha_fin ? curso.fecha_fin.split('T')[0] : 'N/A'}</td>
                                     <td>{curso.estado === 'abierto' ? 'Recibiendo Entregas' : 'Cerrado'}</td>
                                     <td>
                                         <Button
