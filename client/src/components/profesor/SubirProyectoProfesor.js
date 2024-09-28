@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Modal, Button } from "react-bootstrap";
-import Sidebar from "../Sidebar";
 import "../styles/SubirProyectoProfesor.css";
 
 const SubirProyectoProfesor = () => {
@@ -199,7 +198,6 @@ const SubirProyectoProfesor = () => {
 
     return (
         <div className="profesor-container">
-            <Sidebar />
             <div className="main-content">
                 <h1 className="text-center mt-5">Registrar Proyecto</h1>
                 <form className="mt-5" onSubmit={onSubmitForm}>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Table, Button, Modal } from 'react-bootstrap';
-import Sidebar from '../../Sidebar';
+import { useParams, useNavigate } from 'react-router-dom'; // Agregar useNavigate para la redirección
+import { Table, Button, Modal, Form } from 'react-bootstrap';
 
 const VerProyectosCurso = () => {
     const { cursoId } = useParams();
@@ -9,7 +8,9 @@ const VerProyectosCurso = () => {
     const [curso, setCurso] = useState({});
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false); // Estado para el indicador de carga
+    const [loading, setLoading] = useState(false);
+    const [motivo, setMotivo] = useState(''); // Motivo de la solicitud
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProyectos = async () => {
@@ -31,25 +32,47 @@ const VerProyectosCurso = () => {
         fetchProyectos();
     }, [cursoId]);
 
-    // Función para abrir el modal con la información del proyecto seleccionado
     const verDetalles = (proyecto) => {
-        setLoading(true); 
-        setShowModal(true); 
-    
-        // Guardar el proyecto seleccionado en el estado
+        setLoading(true);
+        setShowModal(true);
         setProyectoSeleccionado(proyecto);
-        setLoading(false); // Cambiar el estado de carga a falso
+        setLoading(false);
     };
-    
 
     const cerrarModal = () => {
         setShowModal(false);
         setProyectoSeleccionado(null);
     };
 
+    // Función para manejar la solicitud de acceso
+    const solicitarAcceso = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    proyecto_id: proyectoSeleccionado.id,
+                    motivo: motivo,
+                }),
+            });
+
+            if (response.ok) {
+                alert('Solicitud enviada con éxito');
+                setShowModal(false);
+            } else {
+                alert('Error al enviar la solicitud');
+            }
+        } catch (error) {
+            console.error('Error al enviar la solicitud:', error);
+        }
+    };
+
     return (
         <div className="profesor-container">
-            <Sidebar />
             <div className="main-content">
                 <h1 className="text-center mt-5">Proyectos en {curso.nombre_curso}</h1>
                 {proyectos.length === 0 ? (
@@ -83,32 +106,34 @@ const VerProyectosCurso = () => {
                 )}
             </div>
 
-            {/* Modal para mostrar los detalles del proyecto */}
             <Modal show={showModal} onHide={cerrarModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Detalles del Proyecto</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {loading ? (
-                        <p>Cargando...</p> 
+                        <p>Cargando...</p>
                     ) : (
                         proyectoSeleccionado && (
                             <>
                                 <p><strong>Título:</strong> {proyectoSeleccionado.titulo}</p>
                                 <p><strong>Descripción:</strong> {proyectoSeleccionado.descripcion}</p>
-                                <p><strong>¿Necesita licencia?:</strong> {proyectoSeleccionado.necesita_licencia ? "Sí" : "No"}</p>
-                                {proyectoSeleccionado.necesita_licencia && (
-                                    <p><strong>Descripción de la licencia:</strong> {proyectoSeleccionado.descripcion_licencia}</p>
-                                )}
-                                <p><strong>Autores:</strong> {proyectoSeleccionado.autores ? proyectoSeleccionado.autores.join(', ') : 'N/A'}</p>
-                                <p><strong>Tecnologías:</strong> {proyectoSeleccionado.tecnologias ? proyectoSeleccionado.tecnologias.join(', ') : 'N/A'}</p>
-                                <p><strong>Categorías:</strong> {proyectoSeleccionado.categorias ? proyectoSeleccionado.categorias.join(', ') : 'N/A'}</p>
+                                {/* Aquí va el formulario para solicitar acceso */}
+                                <Form.Group controlId="motivoSolicitud">
+                                    <Form.Label>Motivo de la solicitud</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={motivo}
+                                        onChange={(e) => setMotivo(e.target.value)}
+                                        placeholder="Escribe el motivo..."
+                                    />
+                                </Form.Group>
                             </>
                         )
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary">Solicitar Acceso al Código</Button>
+                    <Button variant="primary" onClick={solicitarAcceso}>Solicitar Acceso al Código</Button>
                     <Button variant="secondary" onClick={cerrarModal}>Cerrar</Button>
                 </Modal.Footer>
             </Modal>

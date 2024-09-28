@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const proyectosRoutes = require("./routes/proyectos");
 const cursosRoutes = require('./routes/cursos');
+const solicitudesRouter = require('./routes/solicitudes');
 require('dotenv').config();
 require('./cronJobs');
 
@@ -18,6 +19,7 @@ app.use("/api/auth", authRoutes);
 // Rutas protegidas
 app.use("/api/proyectos", proyectosRoutes);
 app.use('/api/cursos', cursosRoutes);
+app.use('/api/solicitudes', solicitudesRouter);
 
 // Endpoint de Login
 app.post("/api/auth/login", async (req, res) => {

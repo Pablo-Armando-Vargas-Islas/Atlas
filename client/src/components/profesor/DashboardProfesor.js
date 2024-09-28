@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Row, Col, Form, InputGroup, Nav } from "react-bootstrap";
 import { FaList, FaThLarge } from "react-icons/fa";
-import Sidebar from "../Sidebar";
 import { jwtDecode as jwt_decode } from "jwt-decode"; 
 import '../styles/DashboardProfesor.css'; 
 
@@ -80,28 +79,21 @@ const DashboardProfesor = () => {
         proyecto.titulo.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
-    };
-
     return (
         <div className="d-flex">
-            {/* Sidebar */}
-            <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-
             {/* Main content */}
-            <div className={`main-content ${sidebarOpen ? "expanded" : ""}`}>
+            <div className= "main-content">
                 {/* Navegación por pestañas (estilo carpetas) */}
                 <Nav variant="tabs" activeKey={activeTab} onSelect={(selectedTab) => setActiveTab(selectedTab)}>
                     <Nav.Item>
                         <Nav.Link eventKey="misProyectos">Mis Proyectos</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
+                     </Nav.Item>
+                    {/* <Nav.Item>
                         <Nav.Link eventKey="misCursos">Cursos</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="buscarAtlas">Atlas</Nav.Link>
-                    </Nav.Item>
+                    </Nav.Item> */}
                 </Nav>
 
                 {/* Contenido según la pestaña activa */}
@@ -113,7 +105,7 @@ const DashboardProfesor = () => {
                                 <InputGroup className="search-bar">
                                     <Form.Control
                                         type="text"
-                                        placeholder="Buscar proyectos..."
+                                        placeholder="Buscar en mis proyectos"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className="search-input"
@@ -128,7 +120,7 @@ const DashboardProfesor = () => {
                             {/* Contenedor de proyectos con selector de vista */}
                             <div className="projects-container">
                                 <div className="projects-header d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="mb-0">Mis Proyectos</h5>
+                                    <h5 className="mb-0"></h5>
                                     <div className="view-toggle">
                                         <Button
                                             variant={viewMode === "list" ? "primary" : "outline-primary"}
@@ -158,7 +150,7 @@ const DashboardProfesor = () => {
                         </>
                     )}
 
-                    {activeTab === "misCursos" && (
+                    {/* {activeTab === "misCursos" && (
                         <div>
                             <h5>Proyectos en mis Cursos</h5>
                             <p>Aquí se mostrarán los proyectos de los cursos que has creado.</p>
@@ -170,7 +162,7 @@ const DashboardProfesor = () => {
                             <h5>Buscar proyecto en Atlas</h5>
                             <p>Esta sección mostrará los proyectos más populares, y permitirá buscar en el catálogo de proyectos de Atlas.</p>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>

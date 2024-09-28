@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
-import Sidebar from '../../Sidebar';
 
 const CrearCursoProfesor = () => {
     const [nombreCurso, setNombreCurso] = useState('');
@@ -66,7 +65,6 @@ const CrearCursoProfesor = () => {
 
     return (
         <div className="profesor-container">
-            <Sidebar />
             <div className="main-content">
                 <h1 className="text-center mt-5">Crear Curso</h1>
                 <Form onSubmit={crearCurso} className="mt-5">

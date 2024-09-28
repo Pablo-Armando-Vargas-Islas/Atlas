@@ -27,8 +27,6 @@ export const AuthProvider = ({ children }) => {
     
             if (response.ok) {
                 const data = await response.json();
-                console.log("Datos del login:", data); // VerificaCión de que el ID está presente
-    
                 setToken(data.token);
                 setRol(data.usuario.rol_id);
                 setUserId(parseInt(data.usuario.id)); 
@@ -40,7 +38,7 @@ export const AuthProvider = ({ children }) => {
                 } else if (data.usuario.rol_id === 2) {
                     navigate("/profesor/dashboard");
                 } else if (data.usuario.rol_id === 3) {
-                    navigate("/home");
+                    navigate("/alumno/dashboard");
                 }
     
                 return { ok: true, token: data.token };

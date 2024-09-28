@@ -1,0 +1,10 @@
+.mis-solicitudes-container {
+    display: flex;
+    height: 100vh; /* Asegúrate de que ocupe toda la altura */
+}
+
+.solicitudes-content {
+    flex: 1; /* Esto asegura que el contenido ocupe el resto del espacio */
+    padding: 20px; /* Añade algo de padding para separar el contenido del borde */
+    overflow-y: auto; /* Permite desplazamiento si el contenido es largo */
+}

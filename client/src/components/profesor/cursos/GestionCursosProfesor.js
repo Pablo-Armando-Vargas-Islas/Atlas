@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../Sidebar';
 
 const GestionCursosProfesor = () => {
     const [cursos, setCursos] = useState([]);
@@ -65,7 +64,6 @@ const GestionCursosProfesor = () => {
 
     return (
         <div className="profesor-container">
-            <Sidebar />
             <div className="main-content">
                 <h1 className="text-center mt-5">Gestionar Cursos Activos</h1>
                 {cursos.length === 0 ? (
