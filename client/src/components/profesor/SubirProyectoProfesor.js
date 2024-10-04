@@ -165,7 +165,7 @@ const SubirProyectoProfesor = () => {
                 descripcion_licencia: necesitaLicencia ? descripcionLicencia : null,
                 necesita_licencia: necesitaLicencia,
                 tipo,
-                codigo_curso: tipo === "aula" ? codigoCurso : null, // Enviar el código del curso si es aula
+                codigo_curso: tipo === "aula" ? codigoCurso : null,
                 usuario_id: userId, 
                 tecnologias: selectedTecnologias.map(tecnologia => tecnologia.id), 
                 categorias: selectedCategorias.map(categoria => categoria.id),

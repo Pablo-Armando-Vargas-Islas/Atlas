@@ -32,6 +32,28 @@ router.get("/", verifyToken, async (req, res) => {
     }
 });
 
+// Ruta para obtener todos los proyectos
+router.get("/atlas", verifyToken, async (req, res) => {
+    try {
+        const proyectos = await pool.query(
+            `SELECT p.*, 
+                    array_agg(DISTINCT a.nombre_autor) as autores, 
+                    array_agg(DISTINCT t.nombre) as tecnologias 
+             FROM proyectos p 
+             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
+             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
+             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id 
+             GROUP BY p.id`
+        );
+
+        res.json(proyectos.rows);
+    } catch (err) {
+        console.error("Error en el servidor:", err.message);
+        res.status(500).send("Error del servidor");
+    }
+});
+
+
 
 // Ruta para obtener tecnologías
 router.get("/tecnologias", async (req, res) => {
@@ -72,26 +94,39 @@ router.post("/subir", async (req, res) => {
             autores
         } = req.body;
 
-        // Verificar si el curso está cerrado
-        const curso = await pool.query(
-            `SELECT estado FROM cursos WHERE codigo_curso = $1`,
-            [codigo_curso]
-        );
+        let newProject;
 
-        if (curso.rows.length === 0) {
-            return res.status(404).json({ error: "Curso no encontrado" });
+        if (tipo === "aula") {
+            // Verificar si el curso está cerrado
+            const curso = await pool.query(
+                `SELECT estado FROM cursos WHERE codigo_curso = $1`,
+                [codigo_curso]
+            );
+
+            if (curso.rows.length === 0) {
+                return res.status(404).json({ error: "Curso no encontrado" });
+            }
+
+            if (curso.rows[0].estado === 'cerrado') {
+                return res.status(400).json({ error: "El curso ya está cerrado y no permite más entregas" });
+            }
+
+            // Registrar el proyecto de aula
+            newProject = await pool.query(
+                `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+                [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
+            );
+        } else if (tipo === "grado") {
+            // Registrar el proyecto de grado
+            newProject = await pool.query(
+                `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id)
+                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+                [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id]
+            );
+        } else {
+            return res.status(400).json({ error: "Tipo de proyecto no válido" });
         }
-
-        if (curso.rows[0].estado === 'cerrado') {
-            return res.status(400).json({ error: "El curso ya está cerrado y no permite más entregas" });
-        }
-
-        // Registrar el proyecto
-        const newProject = await pool.query(
-            `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
-        );
 
         const proyectoId = newProject.rows[0].id;
 

@@ -1,15 +1,14 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext'; // Importamos el AuthContext
 import './styles/Navbar.css'; // Asegúrate de importar el archivo CSS
 
 const Navbar = () => {
-    const { rol } = useContext(AuthContext);
+    const { rol, logout } = useContext(AuthContext); // Extraemos logout del AuthContext
 
     return (
         <nav className="navbar navbar-expand-lg custom-navbar">
-            <div className="container-fluid justify-content-center"> {/* Centramos los links */}
-                {/* Cambiar texto a ATLAS */}
+            <div className="container-fluid justify-content-center">
                 <a className="navbar-brand navbar-logo" href="#">ATLAS</a>
 
                 {/* Botón del navbar para pantallas pequeñas */}
@@ -21,19 +20,22 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
                     <ul className="navbar-nav navbar-links">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/profesor/dashboard">Inicio</Link>
+                            <Link className="nav-link" to="/profesor/dashboard">Buscador</Link>
                         </li>
 
                         {rol === 2 && (
                             <>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/profesor/SubirProyectoProfesor">Subir Proyecto</Link>
+                                    <Link className="nav-link" to="/profesor/cursos">Mis Cursos</Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/profesor/misSolicitudes">Mis Solicitudes</Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/profesor/crearCurso">Crear Curso</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/profesor/misSolicitudes">Mis Solicitudes</Link>
+                                    <Link className="nav-link" to="/profesor/SubirProyectoProfesor">Subir Proyecto</Link>
                                 </li>
                             </>
                         )}
@@ -50,6 +52,11 @@ const Navbar = () => {
                             </li>
                         )}
                     </ul>
+                    
+                    {/* Botón de Cerrar Sesión */}
+                    <button className="btn btn-danger ms-3" onClick={logout}>
+                        Cerrar Sesión
+                    </button>
                 </div>
             </div>
         </nav>

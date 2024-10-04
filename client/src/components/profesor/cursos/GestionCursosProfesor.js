@@ -65,7 +65,7 @@ const GestionCursosProfesor = () => {
     return (
         <div className="profesor-container">
             <div className="main-content">
-                <h1 className="text-center mt-5">Gestionar Cursos Activos</h1>
+                <h1 className="text-center mt-5">Cursos</h1>
                 {cursos.length === 0 ? (
                     <p className="text-center">No tienes cursos activos en este momento.</p>
                 ) : (
