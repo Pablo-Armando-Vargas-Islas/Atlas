@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-
-
 const DashboardAdmin = () => {
     const [solicitudes, setSolicitudes] = useState([]);
 
@@ -82,16 +80,18 @@ const DashboardAdmin = () => {
                     <p>No hay solicitudes pendientes.</p>
                 ) : (
                     <ul>
-                        {solicitudes.map((solicitud) => (
-                            <li key={solicitud.id}>
-                                <p><strong>Proyecto:</strong> {solicitud.titulo}</p>
-                                <p><strong>Solicitante:</strong> {solicitud.nombre}</p>
-                                <p><strong>Motivo:</strong> {solicitud.motivo}</p>
-                                <p><strong>Status:</strong> {solicitud.status_solicitud}</p>
-                                <button onClick={() => aceptarSolicitud(solicitud.id)}>Aceptar</button>
-                                <button onClick={() => rechazarSolicitud(solicitud.id)}>Rechazar</button>
-                            </li>
-                        ))}
+                        {solicitudes
+                            .filter(solicitud => solicitud.status_solicitud === 'pendiente') // Filtrar solo las pendientes
+                            .map((solicitud) => (
+                                <li key={solicitud.id}>
+                                    <p><strong>Proyecto:</strong> {solicitud.titulo}</p>
+                                    <p><strong>Solicitante:</strong> {solicitud.nombre}</p>
+                                    <p><strong>Motivo:</strong> {solicitud.motivo}</p>
+                                    <p><strong>Status:</strong> {solicitud.status_solicitud}</p>
+                                    <button onClick={() => aceptarSolicitud(solicitud.id)}>Aceptar</button>
+                                    <button onClick={() => rechazarSolicitud(solicitud.id)}>Rechazar</button>
+                                </li>
+                            ))}
                     </ul>
                 )}
             </div>

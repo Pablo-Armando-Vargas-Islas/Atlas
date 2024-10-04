@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Row, Col, Form, InputGroup, Nav, Modal } from "react-bootstrap";
+import { Card, Button, Row, Col, Form, InputGroup, Nav } from "react-bootstrap";
 import { FaList, FaThLarge } from "react-icons/fa";
 import { jwtDecode as jwt_decode } from "jwt-decode";
+import ProyectoModal from '../ProyectoModal'; // Importar el componente del modal
 import '../styles/DashboardProfesor.css';
 
 const DashboardProfesor = () => {
@@ -14,7 +15,6 @@ const DashboardProfesor = () => {
     const [userId, setUserId] = useState(null);
     const [showModal, setShowModal] = useState(false); // Estado para mostrar el modal
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null); // Proyecto seleccionado
-    const [motivo, setMotivo] = useState(""); // Motivo de la solicitud
 
     // Obtener ID del usuario desde el token almacenado
     useEffect(() => {
@@ -114,7 +114,7 @@ const DashboardProfesor = () => {
     };
 
     // Función para manejar la solicitud de acceso
-    const solicitarAcceso = async () => {
+    const enviarSolicitud = async (proyectoId, motivo) => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
@@ -124,7 +124,7 @@ const DashboardProfesor = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    proyecto_id: proyectoSeleccionado.id,
+                    proyecto_id: proyectoId,
                     motivo: motivo,
                 }),
             });
@@ -266,35 +266,15 @@ const DashboardProfesor = () => {
                                 </div>
                             </div>
 
-                            {/* Modal de detalles del proyecto */}
-                            <Modal show={showModal} onHide={cerrarModal}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Detalles del Proyecto</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    {proyectoSeleccionado && (
-                                        <>
-                                            <p><strong>Título:</strong> {proyectoSeleccionado.titulo}</p>
-                                            <p><strong>Descripción:</strong> {proyectoSeleccionado.descripcion}</p>
-                                            <p><strong>Autores:</strong> {proyectoSeleccionado.autores.join(", ")}</p>
-                                            <p><strong>Tecnologías:</strong> {proyectoSeleccionado.tecnologias.join(", ")}</p>
-                                            <Form.Group controlId="motivoSolicitud">
-                                                <Form.Label>Motivo de la solicitud</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    value={motivo}
-                                                    onChange={(e) => setMotivo(e.target.value)}
-                                                    placeholder="Escribe el motivo..."
-                                                />
-                                            </Form.Group>
-                                        </>
-                                    )}
-                                </Modal.Body>
-                                <Modal.Footer>
-                                    <Button variant="primary" onClick={solicitarAcceso}>Solicitar Acceso al Código</Button>
-                                    <Button variant="secondary" onClick={cerrarModal}>Cerrar</Button>
-                                </Modal.Footer>
-                            </Modal>
+                            {/* Modal reutilizable para mostrar detalles del proyecto */}
+                            {proyectoSeleccionado && (
+                                <ProyectoModal
+                                    show={showModal}
+                                    handleClose={cerrarModal}
+                                    proyecto={proyectoSeleccionado}
+                                    enviarSolicitud={enviarSolicitud}
+                                />
+                            )}
                         </>
                     )}
                 </div>

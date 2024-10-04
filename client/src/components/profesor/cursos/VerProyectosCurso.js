@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Agregar useNavigate para la redirección
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import { Table, Button } from 'react-bootstrap';
+import ProyectoModal from '../../ProyectoModal'; // Importar el componente del modal reutilizable
 
 const VerProyectosCurso = () => {
     const { cursoId } = useParams();
     const [proyectos, setProyectos] = useState([]);
     const [curso, setCurso] = useState({});
-    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [motivo, setMotivo] = useState(''); // Motivo de la solicitud
-    const navigate = useNavigate();
+    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null); // Proyecto seleccionado para el modal
+    const [showModal, setShowModal] = useState(false); // Controlar la visibilidad del modal
 
     useEffect(() => {
         const fetchProyectos = async () => {
@@ -32,20 +30,20 @@ const VerProyectosCurso = () => {
         fetchProyectos();
     }, [cursoId]);
 
+    // Función para abrir el modal con los detalles del proyecto seleccionado
     const verDetalles = (proyecto) => {
-        setLoading(true);
-        setShowModal(true);
         setProyectoSeleccionado(proyecto);
-        setLoading(false);
+        setShowModal(true);
     };
 
+    // Función para cerrar el modal
     const cerrarModal = () => {
         setShowModal(false);
         setProyectoSeleccionado(null);
     };
 
-    // Función para manejar la solicitud de acceso
-    const solicitarAcceso = async () => {
+    // Función para enviar la solicitud de acceso
+    const enviarSolicitud = async (proyectoId, motivo) => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
@@ -55,7 +53,7 @@ const VerProyectosCurso = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    proyecto_id: proyectoSeleccionado.id,
+                    proyecto_id: proyectoId,
                     motivo: motivo,
                 }),
             });
@@ -106,37 +104,15 @@ const VerProyectosCurso = () => {
                 )}
             </div>
 
-            <Modal show={showModal} onHide={cerrarModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Detalles del Proyecto</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {loading ? (
-                        <p>Cargando...</p>
-                    ) : (
-                        proyectoSeleccionado && (
-                            <>
-                                <p><strong>Título:</strong> {proyectoSeleccionado.titulo}</p>
-                                <p><strong>Descripción:</strong> {proyectoSeleccionado.descripcion}</p>
-                                {/* Aquí va el formulario para solicitar acceso */}
-                                <Form.Group controlId="motivoSolicitud">
-                                    <Form.Label>Motivo de la solicitud</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={motivo}
-                                        onChange={(e) => setMotivo(e.target.value)}
-                                        placeholder="Escribe el motivo..."
-                                    />
-                                </Form.Group>
-                            </>
-                        )
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={solicitarAcceso}>Solicitar Acceso al Código</Button>
-                    <Button variant="secondary" onClick={cerrarModal}>Cerrar</Button>
-                </Modal.Footer>
-            </Modal>
+            {/* Modal reutilizable para mostrar detalles del proyecto */}
+            {proyectoSeleccionado && (
+                <ProyectoModal
+                    show={showModal}
+                    handleClose={cerrarModal}
+                    proyecto={proyectoSeleccionado}
+                    enviarSolicitud={enviarSolicitud}
+                />
+            )}
         </div>
     );
 };
