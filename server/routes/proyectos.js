@@ -1,7 +1,45 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 const pool = require("../db");
 const { verifyToken } = require("../middleware/authMiddleware"); 
+
+// Crear la carpeta si no existe
+const createDirectoryIfNotExists = (directory) => {
+    if (!fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true });
+    }
+};
+
+// Configurar Multer para almacenar archivos en carpetas por fecha
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear().toString();  // Convertir año a cadena
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');  // Convertir mes a cadena con ceros
+        const day = currentDate.getDate().toString().padStart(2, '0');  // Convertir día a cadena con ceros
+
+        // Ruta absoluta en Windows con estructura año/mes/día
+        const dir = path.join('C:\\Users\\pavip\\Documents\\Server', year, month, day); // Añadir día a la estructura
+
+        // Crear la carpeta si no existe
+        createDirectoryIfNotExists(dir);
+
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+
+
+
+const upload = multer({ storage: storage });
+
 
 // Ruta para obtener proyectos por usuario_id
 router.get("/", verifyToken, async (req, res) => {
@@ -77,23 +115,28 @@ router.get("/categorias", async (req, res) => {
     }
 });
 
-// Crear un nuevo proyecto (pueden hacerlo estudiantes o docentes)
-router.post("/subir", async (req, res) => {
+// Ruta para subir un archivo comprimido (para proyectos)
+router.post("/subir", verifyToken, upload.single('archivoComprimido'), async (req, res) => {
     try {
         const {
             titulo,
             descripcion,
-            ruta_archivo_comprimido,
             descripcion_licencia,
             necesita_licencia,
             tipo,
             codigo_curso,
-            usuario_id,  
-            tecnologias, 
-            categorias,   
+            usuario_id,
+            tecnologias,
+            categorias,
             autores
         } = req.body;
 
+        const rutaArchivoComprimido = req.file ? req.file.path : null;
+
+        // Verificar que tecnologías, categorías y autores sean arrays válidos
+        const tecnologiasArray = JSON.parse(tecnologias);  // Convertir a arreglo
+        const categoriasArray = JSON.parse(categorias);    // Convertir a arreglo
+        const autoresArray = JSON.parse(autores);          // Convertir a arreglo
         let newProject;
 
         if (tipo === "aula") {
@@ -115,14 +158,14 @@ router.post("/subir", async (req, res) => {
             newProject = await pool.query(
                 `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-                [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
+                [titulo, descripcion, rutaArchivoComprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
             );
         } else if (tipo === "grado") {
             // Registrar el proyecto de grado
             newProject = await pool.query(
                 `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id)
                 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-                [titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id]
+                [titulo, descripcion, rutaArchivoComprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id]
             );
         } else {
             return res.status(400).json({ error: "Tipo de proyecto no válido" });
@@ -130,9 +173,9 @@ router.post("/subir", async (req, res) => {
 
         const proyectoId = newProject.rows[0].id;
 
-        // Asociar tecnologías
-        if (tecnologias && tecnologias.length > 0) {
-            for (const tecnologiaId of tecnologias) {
+        // Asociar tecnologías y categorías en la base de datos (igual que antes)
+        if (tecnologias && tecnologiasArray.length > 0) {
+            for (const tecnologiaId of tecnologiasArray) {
                 await pool.query(
                     `INSERT INTO proyectos_tecnologias (proyecto_id, tecnologia_id)
                     VALUES ($1, $2)`,
@@ -141,9 +184,8 @@ router.post("/subir", async (req, res) => {
             }
         }
 
-        // Asociar categorías
-        if (categorias && categorias.length > 0) {
-            for (const categoriaId of categorias) {
+        if (categorias && categoriasArray.length > 0) {
+            for (const categoriaId of categoriasArray) {
                 await pool.query(
                     `INSERT INTO proyectos_categorias (proyecto_id, categoria_id)
                     VALUES ($1, $2)`,
@@ -152,9 +194,8 @@ router.post("/subir", async (req, res) => {
             }
         }
 
-        // Insertar autores
-        if (autores && autores.length > 0) {
-            for (const autor of autores) {
+        if (autores && autoresArray.length > 0) {
+            for (const autor of autoresArray) {
                 await pool.query(
                     `INSERT INTO proyectos_autores (proyecto_id, nombre_autor) VALUES ($1, $2)`,
                     [proyectoId, autor]
@@ -168,9 +209,5 @@ router.post("/subir", async (req, res) => {
         res.status(500).send("Error del servidor");
     }
 });
-
-
-
-        
 
 module.exports = router;

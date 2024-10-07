@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const pool = require('./db'); 
+const pool = require('../db'); 
 
 // Tarea diaria a las 11:59 PM para cerrar cursos que hayan pasado la fecha límite
 cron.schedule('59 23 * * *', async () => {

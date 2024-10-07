@@ -158,43 +158,51 @@ const SubirProyectoProfesor = () => {
 
     const handleConfirm = async () => {
         try {
-            const body = {
-                titulo,
-                descripcion,
-                ruta_archivo_comprimido: archivoComprimido ? archivoComprimido.name : null,
-                descripcion_licencia: necesitaLicencia ? descripcionLicencia : null,
-                necesita_licencia: necesitaLicencia,
-                tipo,
-                codigo_curso: tipo === "aula" ? codigoCurso : null,
-                usuario_id: userId, 
-                tecnologias: selectedTecnologias.map(tecnologia => tecnologia.id), 
-                categorias: selectedCategorias.map(categoria => categoria.id),
-                autores 
-            };
-            
-            console.log("Datos enviados:", body);
-
+            const formData = new FormData();
+            formData.append("titulo", titulo);
+            formData.append("descripcion", descripcion);
+            formData.append("archivoComprimido", archivoComprimido); // Asegúrate de enviar el archivo
+            formData.append("descripcion_licencia", necesitaLicencia ? descripcionLicencia : "");
+            formData.append("necesita_licencia", necesitaLicencia);
+            formData.append("tipo", tipo);
+            formData.append("codigo_curso", tipo === "aula" ? codigoCurso : "");
+            formData.append("usuario_id", userId);
+            formData.append("tecnologias", JSON.stringify(selectedTecnologias.map(tecnologia => tecnologia.id)));
+            formData.append("categorias", JSON.stringify(selectedCategorias.map(categoria => categoria.id)));
+            formData.append("autores", JSON.stringify(autores));
+    
+            // Obtener el token JWT almacenado en localStorage
+            const token = localStorage.getItem('token');
+    
+            // Verificar si el token está presente
+            if (!token) {
+                throw new Error('No token provided');
+            }
+    
+            // Enviar la solicitud con el token en el encabezado Authorization
             const response = await fetch("http://localhost:5000/api/proyectos/subir", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    'Authorization': `Bearer ${token}`, // Agregar el token aquí
                 },
-                body: JSON.stringify(body)
+                body: formData
             });
-
+    
             if (response.ok) {
                 alert("Proyecto registrado correctamente");
                 navigate("/profesor/dashboard");
             } else {
                 const errorData = await response.json();
                 console.error("Error al registrar el proyecto", errorData);
-                setErrorMessage("Error al registrar el proyecto");
+                setErrorMessage("Error al registrar el proyecto: " + errorData.error);
             }
         } catch (err) {
             console.error("Error en la solicitud:", err);
             setErrorMessage("Error en la solicitud: " + err.message);
         }
     };
+    
+    
 
     return (
         <div className="profesor-container">

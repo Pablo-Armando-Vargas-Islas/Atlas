@@ -2,10 +2,10 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = async (to, subject, text) => {
     const transporter = nodemailer.createTransport({
-        service: 'hotmail', // Usa 'outlook' o 'hotmail' si tu universidad usa Microsoft
+        service: 'outlook', // Proveedor: 'outlook' o 'hotmail' 
         auth: {
-            user: process.env.EMAIL_USER, // Tu correo institucional
-            pass: process.env.EMAIL_PASS, // Tu contraseña o app password
+            user: process.env.EMAIL_USER, 
+            pass: process.env.EMAIL_PASS, 
         },
     });
 

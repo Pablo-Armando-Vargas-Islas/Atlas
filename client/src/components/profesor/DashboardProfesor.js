@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Button, Row, Col, Form, InputGroup, Nav } from "react-bootstrap";
 import { FaList, FaThLarge } from "react-icons/fa";
 import { jwtDecode as jwt_decode } from "jwt-decode";
-import ProyectoModal from '../ProyectoModal'; // Importar el componente del modal
+import ProyectoModal from '../ProyectoModal'; 
 import '../styles/DashboardProfesor.css';
 
 const DashboardProfesor = () => {
@@ -13,23 +13,23 @@ const DashboardProfesor = () => {
     const [searchAtlasTerm, setSearchAtlasTerm] = useState("");
     const [activeTab, setActiveTab] = useState("misProyectos");
     const [userId, setUserId] = useState(null);
-    const [showModal, setShowModal] = useState(false); // Estado para mostrar el modal
-    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null); // Proyecto seleccionado
+    const [showModal, setShowModal] = useState(false); 
+    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null); 
 
-    // Obtener ID del usuario desde el token almacenado
+    //  Obtener el id del usuario del token
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
             const decodedToken = jwt_decode(token);
             if (decodedToken && decodedToken.id) {
-                setUserId(decodedToken.id); // Solo asigna el userId si el token está bien decodificado
+                setUserId(decodedToken.id); 
             } else {
                 console.error("Token inválido o sin id");
             }
         }
     }, []);
 
-    // Fetch para obtener los proyectos del profesor
+    // Fetch para obtener los proyectos del usuario
     useEffect(() => {
         let retryCount = 0;
         const maxRetries = 5;
@@ -59,7 +59,7 @@ const DashboardProfesor = () => {
                         if (retryCount < maxRetries) {
                             retryCount++;
                             console.log(`Reintentando obtener los proyectos... Intento ${retryCount}`);
-                            setTimeout(fetchProyectosWithRetry, 2000); // Esperar 2 segundos antes de reintentar
+                            setTimeout(fetchProyectosWithRetry, 2000); // Reintentar después de 2 segundos
                         } else {
                             console.error("Se alcanzó el número máximo de reintentos");
                         }
@@ -73,7 +73,7 @@ const DashboardProfesor = () => {
         }
     }, [userId, activeTab]);
 
-    // Fetch para obtener todos los proyectos de Atlas
+    // Fetch para obtener los proyectos de Atlas
     useEffect(() => {
         const fetchAtlasProyectos = async () => {
             try {
@@ -91,18 +91,18 @@ const DashboardProfesor = () => {
                 }
 
                 const data = await response.json();
-                setAtlasProyectos(data); // Guardar los proyectos en el estado
+                setAtlasProyectos(data); 
             } catch (err) {
                 console.error("Error al obtener los proyectos de Atlas:", err);
             }
         };
 
         if (activeTab === "buscarAtlas") {
-            fetchAtlasProyectos(); // Solo hacer la petición cuando esté en la pestaña Atlas
+            fetchAtlasProyectos(); 
         }
     }, [activeTab]);
 
-    // Función para abrir el modal con el proyecto seleccionado
+    // Función para mostrar el modal con los detalles del proyecto
     const verDetalles = (proyecto) => {
         setProyectoSeleccionado(proyecto);
         setShowModal(true);
@@ -113,7 +113,7 @@ const DashboardProfesor = () => {
         setProyectoSeleccionado(null);
     };
 
-    // Función para manejar la solicitud de acceso
+    // Función para enviar una solicitud al profesor
     const enviarSolicitud = async (proyectoId, motivo) => {
         try {
             const token = localStorage.getItem('token');
@@ -157,14 +157,13 @@ const DashboardProfesor = () => {
                 {/* Navegación por pestañas (estilo carpetas) */}
                 <Nav variant="tabs" activeKey={activeTab} onSelect={(selectedTab) => setActiveTab(selectedTab)}>
                     <Nav.Item>
-                        <Nav.Link eventKey="misProyectos">Mis Proyectos</Nav.Link>
+                        <Nav.Link eventKey="buscarAtlas">Atlas</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
-                        <Nav.Link eventKey="buscarAtlas">Atlas</Nav.Link>
+                        <Nav.Link eventKey="misProyectos">Mis Proyectos</Nav.Link>
                     </Nav.Item>
                 </Nav>
 
-                {/* Contenido según la pestaña activa */}
                 <div className="tab-content mt-4">
                     {activeTab === "misProyectos" && (
                         <>
@@ -205,7 +204,7 @@ const DashboardProfesor = () => {
                                     </div>
                                 </div>
 
-                                {/* Vista de lista o cuadrícula */}
+                                {/* Seleccionar vista de lista o cuadrícula */}
                                 <div className="projects-content">
                                     {viewMode === "list" ? (
                                         <ListView proyectos={filteredProyectos} onVerDetalles={verDetalles} />

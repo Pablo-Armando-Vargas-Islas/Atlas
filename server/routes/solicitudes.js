@@ -41,6 +41,7 @@ router.post('/crear', verifyToken, async (req, res) => {
 });
 
 // Ruta para aceptar una solicitud 
+// Ruta para aceptar una solicitud 
 router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => {
     const { solicitudId } = req.params;
     const adminId = req.user.id;
@@ -57,11 +58,25 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
             return res.status(404).json({ error: "Solicitud no encontrada" });
         }
 
-        // Obtener el proyecto solicitado y el correo del solicitante
+        // Obtener el correo del solicitante
+        const solicitante = await pool.query(
+            `SELECT u.correo_institucional
+             FROM usuarios u
+             JOIN solicitudes s ON u.id = s.solicitante_id
+             WHERE s.id = $1`,
+            [solicitudId]  // Usar solicitudId para obtener el solicitante
+        );
+
+        if (solicitante.rows.length === 0) {
+            return res.status(404).json({ error: "Solicitante no encontrado" });
+        }
+
+        const correoSolicitante = solicitante.rows[0].correo_institucional;
+
+        // Obtener el proyecto solicitado
         const proyecto = await pool.query(
-            `SELECT p.ruta_archivo_comprimido, u.correo_institucional
+            `SELECT p.ruta_archivo_comprimido
              FROM proyectos p
-             JOIN usuarios u ON p.usuario_id = u.id
              WHERE p.id = $1`,
             [solicitudAceptada.rows[0].proyecto_id]
         );
@@ -70,7 +85,6 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
             return res.status(404).json({ error: "Proyecto no encontrado" });
         }
 
-        const correoSolicitante = proyecto.rows[0].correo_institucional;
         const enlaceGitHub = proyecto.rows[0].ruta_archivo_comprimido;
 
         // Enviar correo al solicitante
@@ -86,6 +100,7 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
         res.status(500).send("Error del servidor");
     }
 });
+
 
 // Ruta para rechazar una solicitud
 router.post('/solicitud/rechazar/:solicitudId', verifyToken, async (req, res) => {
@@ -133,6 +148,7 @@ router.post('/solicitud/rechazar/:solicitudId', verifyToken, async (req, res) =>
         res.status(500).send("Error del servidor");
     }
 });
+
 
 // Ruta para obtener las solicitudes del usuario autenticado (solicitante)
 router.get('/misSolicitudes', verifyToken, async (req, res) => {

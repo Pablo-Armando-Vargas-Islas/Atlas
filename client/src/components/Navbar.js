@@ -19,10 +19,7 @@ const Navbar = () => {
                 {/* Contenido del navbar */}
                 <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
                     <ul className="navbar-nav navbar-links">
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/profesor/dashboard">Buscador</Link>
-                        </li>
-
+                        
                         {rol === 2 && (
                             <>
                                 <li className="nav-item">
@@ -51,6 +48,10 @@ const Navbar = () => {
                                 <Link className="nav-link" to="/alumno/proyectos">Mis Proyectos</Link>
                             </li>
                         )}
+
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/profesor/dashboard">Buscador</Link>
+                        </li>
                     </ul>
                     
                     {/* Botón de Cerrar Sesión */}

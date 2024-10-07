@@ -68,11 +68,13 @@ export const AuthProvider = ({ children }) => {
 
     // Función para restablecer el temporizador de inactividad
     const resetInactivityTimer = () => {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            logout();
-            alert("Tu sesión ha expirado por inactividad.");
-        }, INACTIVITY_LIMIT);
+        if (token) { // Verificar si hay un token presente
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                logout();
+                alert("Tu sesión ha expirado por inactividad.");
+            }, INACTIVITY_LIMIT);
+        }
     };
 
     // useEffect para iniciar la vigilancia de inactividad
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }) => {
             window.removeEventListener("mousemove", resetInactivityTimer);
             window.removeEventListener("keypress", resetInactivityTimer);
         };
-    }, []);
+    }, [token]);
 
     return (
         <AuthContext.Provider value={{ token, rol, userId, login, logout }}>

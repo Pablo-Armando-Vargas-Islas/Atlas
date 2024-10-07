@@ -69,6 +69,7 @@ router.post("/login", async (req, res) => {
                 id: user.rows[0].id,
                 rol_id: user.rows[0].rol_id,
                 nombre: user.rows[0].nombre,
+                correo_institucional: user.rows[0].correo_institucional,
             },
             process.env.JWT_SECRET,
             { expiresIn: "1h" } // El token expirará en 1 hora

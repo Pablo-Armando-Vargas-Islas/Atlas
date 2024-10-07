@@ -6,7 +6,7 @@ const proyectosRoutes = require("./routes/proyectos");
 const cursosRoutes = require('./routes/cursos');
 const solicitudesRouter = require('./routes/solicitudes');
 require('dotenv').config();
-require('./cronJobs');
+require('./utils/cronJobs');
 
 
 // Middleware
