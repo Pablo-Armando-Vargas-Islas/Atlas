@@ -1,6 +1,8 @@
 const express = require('express');
 const sendEmail = require('../utils/sendEmail');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
 const pool = require('../db');
 const { verifyToken } = require('../middleware/authMiddleware');
 
@@ -40,7 +42,6 @@ router.post('/crear', verifyToken, async (req, res) => {
     }
 });
 
-// Ruta para aceptar una solicitud 
 // Ruta para aceptar una solicitud 
 router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => {
     const { solicitudId } = req.params;
@@ -91,7 +92,15 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
         await sendEmail(
             correoSolicitante,
             "Acceso aprobado a proyecto",
-            `Tu solicitud ha sido aprobada. Aquí tienes el enlace al código: ${enlaceGitHub}`
+            `¡Muy bien, tu solicitud ha sido aprovada! 
+
+            Para acceder al código del archivo que solicitaste, por favor ve a la sección de "Mis Solicitudes", busca la solicitud correspondinet y da clic en "Descargar"
+
+            IMPORTANTE:
+            Recuerda que tienes unicamente 3 días para descargar el archivo, de lo contrario tendrás que hacer una nueva solicitud
+            
+            
+            Saludos coordiales, Repositorio Atlas. `
         );
 
         res.json({ message: "Solicitud aceptada y correo enviado." });
@@ -138,8 +147,14 @@ router.post('/solicitud/rechazar/:solicitudId', verifyToken, async (req, res) =>
         // Enviar correo con el motivo del rechazo
         await sendEmail(
             correoSolicitante,
-            "Acceso rechazado a proyecto",
-            `Tu solicitud ha sido rechazada. Motivo: ${comentarios}`
+            "Acceso al proyecto denegado",
+            `Lo sentimos, tu solicitud fué rechazada.
+            
+            Estimado usuario, lamentamos informarte que por el momento no podemos brindarte el acceso al código que solicitaste. 
+            
+            Motivo: ${comentarios}
+
+            Saludos coordiales, Repositorio Atlas. `
         );
 
         res.json({ message: "Solicitud rechazada y correo enviado." });
@@ -169,6 +184,46 @@ router.get('/misSolicitudes', verifyToken, async (req, res) => {
     }
 });
 
+
+// Ruta para descargar un archivo
+router.get('/descargar/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    try {
+        // Obtén la solicitud del usuario autenticado y verifica que esté aceptada
+        const solicitud = await pool.query(
+            `SELECT p.ruta_archivo_comprimido 
+             FROM solicitudes s 
+             JOIN proyectos p ON s.proyecto_id = p.id
+             WHERE s.id = $1 AND s.solicitante_id = $2 AND s.status_solicitud = 'aceptada'`,
+            [id, userId]
+        );
+
+        if (solicitud.rowCount === 0) {
+            return res.status(404).json({ error: 'Solicitud no encontrada o acceso no autorizado' });
+        }
+
+        const rutaArchivo = solicitud.rows[0].ruta_archivo_comprimido;
+        const nombreArchivo = path.basename(rutaArchivo); // Obtén el nombre del archivo original
+
+        // Verifica si la ruta del archivo existe en el sistema de archivos
+        if (!fs.existsSync(rutaArchivo)) {
+            return res.status(404).json({ error: 'Archivo no encontrado' });
+        }
+
+        // Descargar el archivo con su nombre original
+        res.download(path.resolve(rutaArchivo), nombreArchivo, (err) => {
+            if (err) {
+                console.error('Error al descargar el archivo:', err);
+                res.status(500).send('Error al descargar el archivo');
+            }
+        });
+    } catch (error) {
+        console.error('Error al procesar la solicitud:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
 
 
 

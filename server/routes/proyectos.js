@@ -13,29 +13,27 @@ const createDirectoryIfNotExists = (directory) => {
     }
 };
 
-// Configurar Multer para almacenar archivos en carpetas por fecha
+// Configurar Multer para almacenar archivos
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const currentDate = new Date();
-        const year = currentDate.getFullYear().toString();  // Convertir año a cadena
-        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');  // Convertir mes a cadena con ceros
-        const day = currentDate.getDate().toString().padStart(2, '0');  // Convertir día a cadena con ceros
+        const year = currentDate.getFullYear().toString();
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const userId = req.user.id;
 
-        // Ruta absoluta en Windows con estructura año/mes/día
-        const dir = path.join('C:\\Users\\pavip\\Documents\\Server', year, month, day); // Añadir día a la estructura
+        // Ruta basada en año/mes/usuario
+        const dir = path.join('C:\\Users\\pavip\\Documents\\Server', year, month, userId.toString());
 
-        // Crear la carpeta si no existe
+        // Crear el directorio si no existe
         createDirectoryIfNotExists(dir);
 
         cb(null, dir);
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
     }
 });
-
-
 
 
 const upload = multer({ storage: storage });

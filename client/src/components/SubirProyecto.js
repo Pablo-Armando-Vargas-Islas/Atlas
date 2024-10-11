@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Modal, Button } from "react-bootstrap";
-import "../styles/SubirProyectoProfesor.css";
+import "./styles/SubirProyectoProfesor.css";
 
 const SubirProyectoProfesor = () => {
     const [userId, setUserId] = useState(null);

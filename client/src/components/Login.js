@@ -5,10 +5,22 @@ import { AuthContext } from "../context/AuthContext";
 const Login = () => {
     const [correoInstitucional, setCorreoInstitucional] = useState("");
     const [contraseña, setContraseña] = useState("");
-    const [alert, setAlert] = useState({ type: "", message: "" }); // Estado para la alerta
-    const { login, rol } = useContext(AuthContext);
+    const [alert, setAlert] = useState({ type: "", message: "" });
+    const { login, token, rol } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (token && rol) {
+            // Redirigir según el rol del usuario
+            if (rol === 1) {
+                navigate("/admin/dashboard");
+            } else if (rol === 2) {
+                navigate("/profesor/dashboard");
+            } else if (rol === 3) {
+                navigate("/alumno/dashboard");
+            }
+        }
+    }, [token, rol, navigate]);
 
     const onSubmitForm = async (e) => {
         e.preventDefault();

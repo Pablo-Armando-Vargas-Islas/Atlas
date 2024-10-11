@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Row, Col, Card } from 'react-bootstrap'; // Importamos los componentes necesarios
 import { FaList, FaThLarge } from 'react-icons/fa'; // Iconos para cambiar de vista
+import BotonDescarga from './utils/BotonDescarga'; // Asegúrate de que la ruta sea correcta
 
 const MisSolicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -80,7 +81,9 @@ const ListView = ({ solicitudes }) => {
                     <p><strong>Motivo:</strong> {solicitud.motivo || 'Sin motivo'}</p>
                     <p><strong>Estatus:</strong> {solicitud.status_solicitud || 'Pendiente'}</p>
                     {solicitud.status_solicitud === 'aceptada' && solicitud.ruta_archivo_comprimido ? (
-                        <p><a href={solicitud.ruta_archivo_comprimido}>Acceder al proyecto</a></p>
+                        <>
+                            <BotonDescarga id={solicitud.id} />
+                        </>
                     ) : (
                         <p>{solicitud.status_solicitud === 'rechazada' ? 'Solicitud rechazada' : 'En espera de aprobación'}</p>
                     )}
@@ -102,7 +105,9 @@ const GridView = ({ solicitudes }) => {
                             <Card.Text><strong>Motivo:</strong> {solicitud.motivo || 'Sin motivo'}</Card.Text>
                             <Card.Text><strong>Status:</strong> {solicitud.status_solicitud || 'Pendiente'}</Card.Text>
                             {solicitud.status_solicitud === 'aceptada' && solicitud.ruta_archivo_comprimido ? (
-                                <Card.Text><a href={solicitud.ruta_archivo_comprimido}>Acceder al proyecto</a></Card.Text>
+                                <>
+                                    <BotonDescarga id={solicitud.id} />
+                                </>
                             ) : (
                                 <Card.Text>{solicitud.status_solicitud === 'rechazada' ? 'Solicitud rechazada' : 'En espera de aprobación'}</Card.Text>
                             )}

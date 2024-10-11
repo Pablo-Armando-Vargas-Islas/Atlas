@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
 
@@ -8,11 +9,25 @@ export const AuthProvider = ({ children }) => {
     const [rol, setRol] = useState(null);
     const [userId, setUserId] = useState(null);
     const navigate = useNavigate();
+    const inactivityTimer = useRef(null); // Referencia para el temporizador de inactividad
 
+    // Cargar el token y la información del usuario al montar el componente
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (storedToken) {
-            setToken(storedToken);
+            try {
+                const { exp, rol_id, id } = jwtDecode(storedToken);
+                const currentTime = Math.floor(Date.now() / 1000);
+                if (currentTime > exp) {
+                    logout(); // Si el token ha expirado, realiza el logout
+                } else {
+                    setToken(storedToken);
+                    setRol(rol_id);
+                    setUserId(id);
+                }
+            } catch (e) {
+                logout(); // Si el token no es válido, realiza el logout
+            }
         }
     }, []);
 
@@ -52,25 +67,25 @@ export const AuthProvider = ({ children }) => {
         }
     };
     
-
     // Función para manejar el logout
     const logout = () => {
         setToken(null);
         setRol(null);
         setUserId(null);
         localStorage.removeItem("token");
-        navigate("/");
+        navigate("/login");
     };
 
     // Tiempo de inactividad en milisegundos (por ejemplo, 30 minutos)
-    const INACTIVITY_LIMIT = 30 * 60 * 1000; 
-    let inactivityTimer;
+    const INACTIVITY_LIMIT = 5 * 60 * 1000; 
 
     // Función para restablecer el temporizador de inactividad
     const resetInactivityTimer = () => {
         if (token) { // Verificar si hay un token presente
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(() => {
+            if (inactivityTimer.current) {
+                clearTimeout(inactivityTimer.current);
+            }
+            inactivityTimer.current = setTimeout(() => {
                 logout();
                 alert("Tu sesión ha expirado por inactividad.");
             }, INACTIVITY_LIMIT);
@@ -88,7 +103,9 @@ export const AuthProvider = ({ children }) => {
 
         // Limpiar los eventos al desmontar el componente
         return () => {
-            clearTimeout(inactivityTimer);
+            if (inactivityTimer.current) {
+                clearTimeout(inactivityTimer.current);
+            }
             window.removeEventListener("mousemove", resetInactivityTimer);
             window.removeEventListener("keypress", resetInactivityTimer);
         };

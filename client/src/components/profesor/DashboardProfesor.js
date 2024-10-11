@@ -165,57 +165,7 @@ const DashboardProfesor = () => {
                 </Nav>
 
                 <div className="tab-content mt-4">
-                    {activeTab === "misProyectos" && (
-                        <>
-                            {/* Barra de búsqueda para "Mis Proyectos" */}
-                            <div className="search-bar-container mb-4">
-                                <InputGroup className="search-bar">
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Buscar en mis proyectos"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="search-input"
-                                    />
-                                    <Button variant="primary" className="search-button">
-                                        Buscar
-                                    </Button>
-                                </InputGroup>
-                            </div>
-
-                            {/* Contenedor de proyectos con selector de vista */}
-                            <div className="projects-container">
-                                <div className="projects-header d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="mb-0"></h5>
-                                    <div className="view-toggle">
-                                        <Button
-                                            variant={viewMode === "list" ? "primary" : "outline-primary"}
-                                            onClick={() => setViewMode("list")}
-                                            className="me-2"
-                                        >
-                                            <FaList />
-                                        </Button>
-                                        <Button
-                                            variant={viewMode === "grid" ? "primary" : "outline-primary"}
-                                            onClick={() => setViewMode("grid")}
-                                        >
-                                            <FaThLarge />
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                {/* Seleccionar vista de lista o cuadrícula */}
-                                <div className="projects-content">
-                                    {viewMode === "list" ? (
-                                        <ListView proyectos={filteredProyectos} onVerDetalles={verDetalles} />
-                                    ) : (
-                                        <GridView proyectos={filteredProyectos} onVerDetalles={verDetalles} />
-                                    )}
-                                </div>
-                            </div>
-                        </>
-                    )}
-
+                    
                     {activeTab === "buscarAtlas" && (
                         <>
                             {/* Barra de búsqueda para "Atlas" */}
@@ -274,6 +224,57 @@ const DashboardProfesor = () => {
                                     enviarSolicitud={enviarSolicitud}
                                 />
                             )}
+                        </>
+                    )}
+
+{activeTab === "misProyectos" && (
+                        <>
+                            {/* Barra de búsqueda para "Mis Proyectos" */}
+                            <div className="search-bar-container mb-4">
+                                <InputGroup className="search-bar">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Buscar en mis proyectos"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="search-input"
+                                    />
+                                    <Button variant="primary" className="search-button">
+                                        Buscar
+                                    </Button>
+                                </InputGroup>
+                            </div>
+
+                            {/* Contenedor de proyectos con selector de vista */}
+                            <div className="projects-container">
+                                <div className="projects-header d-flex justify-content-between align-items-center mb-3">
+                                    <h5 className="mb-0"></h5>
+                                    <div className="view-toggle">
+                                        <Button
+                                            variant={viewMode === "list" ? "primary" : "outline-primary"}
+                                            onClick={() => setViewMode("list")}
+                                            className="me-2"
+                                        >
+                                            <FaList />
+                                        </Button>
+                                        <Button
+                                            variant={viewMode === "grid" ? "primary" : "outline-primary"}
+                                            onClick={() => setViewMode("grid")}
+                                        >
+                                            <FaThLarge />
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                {/* Seleccionar vista de lista o cuadrícula */}
+                                <div className="projects-content">
+                                    {viewMode === "list" ? (
+                                        <ListView proyectos={filteredProyectos} onVerDetalles={verDetalles} />
+                                    ) : (
+                                        <GridView proyectos={filteredProyectos} onVerDetalles={verDetalles} />
+                                    )}
+                                </div>
+                            </div>
                         </>
                     )}
                 </div>

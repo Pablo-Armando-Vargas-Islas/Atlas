@@ -67,7 +67,7 @@ const Register = () => {
             if (response.status === 200) {
                 setAlert({ type: "success", message: "Registro exitoso" });
                 setTimeout(() => {
-                    navigate("/"); // Redirigir al login después de un registro exitoso
+                    navigate("/login"); // Redirigir al login después de un registro exitoso
                 }, 2000);
             } else {
                 const data = await response.json();
@@ -134,7 +134,7 @@ const Register = () => {
             </form>
             <button
                 className="btn btn-secondary mt-3"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/login")}
             >
                 Volver al Login
             </button>
