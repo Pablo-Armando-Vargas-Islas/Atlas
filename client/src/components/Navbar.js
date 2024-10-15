@@ -1,63 +1,66 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // Importamos el AuthContext
-import './styles/Navbar.css'; // Asegúrate de importar el archivo CSS
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import './styles/Navbar.css';
 
 const Navbar = () => {
-    const { rol, logout } = useContext(AuthContext); // Extraemos logout del AuthContext
+    const { rol, logout, token } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const isLoginPage = location.pathname === '/login';
+    const isSignUpPage = location.pathname === '/register';
 
     return (
-        <nav className="navbar navbar-expand-lg custom-navbar">
-            <div className="container-fluid justify-content-center">
-                <a className="navbar-brand navbar-logo" href="#">ATLAS</a>
-
-                {/* Botón del navbar para pantallas pequeñas */}
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-
-                {/* Contenido del navbar */}
-                <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                    <ul className="navbar-nav navbar-links">
-                        
-                        {rol === 2 && (
-                            <>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/profesor/cursos">Mis Cursos</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/MisSolicitudes">Mis Solicitudes</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/profesor/crearCurso">Crear Curso</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/SubirProyecto">Subir Proyecto</Link>
-                                </li>
-                            </>
-                        )}
-
-                        {rol === 1 && (
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/admin/dashboard">Admin Dashboard</Link>
-                            </li>
-                        )}
-
-                        {rol === 3 && (
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/alumno/proyectos">Mis Proyectos</Link>
-                            </li>
-                        )}
-
-                        <li className="nav-item">
+        <nav className="custom-navbar">
+            <div className="navbar-container">
+                <div className="navbar-logo" onClick={() => navigate('/')}>ATLAS</div>
+                <div className="navbar-links">
+                    {rol === 2 && (
+                        <>
+                            <Link className="nav-link" to="/profesor/cursos">Mis Cursos</Link>
+                            <Link className="nav-link" to="/MisSolicitudes">Mis Solicitudes</Link>
+                            <Link className="nav-link" to="/profesor/crearCurso">Crear Curso</Link>
+                            <Link className="nav-link" to="/SubirProyecto">Subir Proyecto</Link>
                             <Link className="nav-link" to="/profesor/dashboard">Buscador</Link>
-                        </li>
-                    </ul>
-                    
-                    {/* Botón de Cerrar Sesión */}
-                    <button className="btn btn-danger ms-3" onClick={logout}>
-                        Cerrar Sesión
-                    </button>
+                        </>
+                    )}
+
+                    {rol === 1 && (
+                        <>
+                            <Link className="nav-link" to="/admin/dashboard">Admin Dashboard</Link>
+                            <Link className="nav-link" to="/profesor/dashboard">Buscador</Link>
+                        </>
+                    )}
+
+                    {rol === 3 && (
+                        <>
+                            <Link className="nav-link" to="/alumno/proyectos">Mis Proyectos</Link>
+                            <Link className="nav-link" to="/profesor/dashboard">Buscador</Link>
+                        </>
+                    )}
+                </div>
+                <div className="auth-buttons">
+                    {!token ? (
+                        <>
+                            <button
+                                className={`btn ${isLoginPage ? 'btn-primary' : 'btn-outline-primary'} btn-login`}
+                                onClick={() => navigate('/login')}
+                            >
+                                Log in
+                            </button>
+                            <button
+                                className={`btn ${isSignUpPage ? 'btn-primary' : 'btn-outline-primary'} btn-signup`}
+                                onClick={() => navigate('/register')}
+                            >
+                                Sign up
+                            </button>
+                        </>
+                    ) : (
+                        <button className="btn btn-logout" onClick={logout}>
+                            Cerrar Sesión
+                        </button>
+                    )}
                 </div>
             </div>
         </nav>

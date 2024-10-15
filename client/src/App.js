@@ -30,9 +30,8 @@ function AppContent() {
 
     return (
         <>
-            {/* Mostrar el Navbar solo si el usuario está autenticado */}
-            {token && <Navbar />}
-
+            <Navbar />
+            
             <Routes>
                 {/* Ruta predeterminada que redirige al login si no está autenticado */}
                 <Route

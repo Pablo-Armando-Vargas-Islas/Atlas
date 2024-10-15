@@ -1,46 +1,110 @@
-/* Fondo blanco del Navbar */
+/* Estilo general del navbar */
 .custom-navbar {
-    background-color: white !important; 
-    color: #0D6EFD !important;
-    border-bottom: 2px solid #0D6EFD;
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: visible;
 }
 
-/* Logo del Navbar */
+/* Contenedor del navbar */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Logo del navbar */
 .navbar-logo {
     font-size: 1.5rem;
-    color: #0D6EFD !important;
     font-weight: bold;
-    margin-right: auto;
+    color: #000000;
+    cursor: pointer;
+    text-decoration: none;
+    flex-shrink: 0;
 }
 
-/* Links del Navbar */
+/* Enlaces del navbar */
 .navbar-links {
     display: flex;
-    width: 100%; /* Asegura que los links ocupen el ancho completo */
+    align-items: center;
+    gap: 20px;
+    flex-grow: 1;
+    justify-content: flex-start;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-.navbar-links .nav-link {
-    color: #0D6EFD !important;
-    margin: 0 20px; /* Espaciado entre los links */
+.nav-link {
+    font-size: 1rem;
+    color: #2b2b2b;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    flex-shrink: 0;
 }
 
-.navbar-links .nav-link:hover {
-    color: #0876d7 !important;
+.nav-link:hover {
+    color: #0876d7;
 }
 
-/* Botón del Navbar (Pantallas pequeñas) */
-.navbar-toggler {
-    background-color: #0D6EFD !important;
+/* Botones de autenticación */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* Botón de login/sign-up (activo) */
+.btn-primary {
+    background-color: #0D6EFD;
+    color: #ffffff;
+    padding: 5px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Botón de login/sign-up (inactivo) */
+.btn-outline-primary {
+    background-color: transparent;
+    color: #0D6EFD;
+    padding: 5px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0D6EFD;
+    color: #ffffff;
+}
+
+/* Botón de cerrar sesión */
+.btn-logout {
+    background-color: #dc3545;
+    color: #ffffff;
     border: none;
+    padding: 5px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-}
-
-.navbar-toggler:focus, .navbar-toggler:hover {
-    background-color: #0876d7 !important;
+.btn-logout:hover {
+    background-color: #c82333;
 }

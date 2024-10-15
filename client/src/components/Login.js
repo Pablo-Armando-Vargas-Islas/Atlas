@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import './styles/Login.css';
 
 const Login = () => {
     const [correoInstitucional, setCorreoInstitucional] = useState("");
@@ -31,7 +32,6 @@ const Login = () => {
             const response = await login(body);
 
             if (response.ok) {
-                // Guardar el token en localStorage
                 localStorage.setItem("token", response.token);
                 console.log("Token guardado en localStorage:", response.token);
             } else {
@@ -45,41 +45,53 @@ const Login = () => {
     };
 
     return (
-        <div className="container">
-            <h1 className="text-center mt-5">Login</h1>
-            {alert.message && (
-                <div className={`alert alert-${alert.type}`} role="alert">
-                    {alert.message}
-                </div>
-            )}
-            <form onSubmit={onSubmitForm}>
-                <div className="form-group">
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        className="form-control"
-                        value={correoInstitucional}
-                        onChange={(e) => setCorreoInstitucional(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Contraseña</label>
-                    <input
-                        type="password"
-                        className="form-control"
-                        value={contraseña}
-                        onChange={(e) => setContraseña(e.target.value)}
-                        required
-                    />
-                </div>
-                <button className="btn btn-primary mt-3">Login</button>
-            </form>
-            <button 
-                className="btn btn-link mt-3" 
-                onClick={() => navigate("/register")}>
-                No tienes una cuenta? Regístrate aquí
-            </button>
+        <div className="backgroud-container-login">
+        <div className="container login-container d-flex align-items-center justify-content-center min-vh-100">
+            <div className="login-box col-md-6 shadow p-5 rounded-4 bg-white">
+                <h1 className="text-center mb-4">Bienvenido</h1>
+                {alert.message && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                <form onSubmit={onSubmitForm}>
+                    <div className="form-group login-form-group mb-3">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            className="form-control login-form-control rounded-pill"
+                            id="email"
+                            placeholder="Correo electrónico"
+                            value={correoInstitucional}
+                            onChange={(e) => setCorreoInstitucional(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group login-form-group mb-3 position-relative">
+                        <label htmlFor="password">Contraseña</label>
+                        <input
+                            type="password"
+                            className="form-control login-form-control rounded-pill"
+                            id="password"
+                            placeholder="Contraseña"
+                            value={contraseña}
+                            onChange={(e) => setContraseña(e.target.value)}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="btn btn-link forgot-password-link"
+                            onClick={() => navigate("/forgot-password")}
+                        >
+                            ¿Has olvidado la contraseña?
+                        </button>
+                    </div>
+                    <button type="submit" className="btn btn-primary login-btn-primary w-100 mt-3 rounded-pill">
+                        Iniciar Sesión
+                    </button>
+                </form>
+            </div>
+        </div>
         </div>
     );
 };

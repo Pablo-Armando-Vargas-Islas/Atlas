@@ -1,0 +1,56 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    background-color: #e8f0ff; 
+}
+
+.register-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -30px; 
+}
+
+.register-box {
+    max-width: 500px;
+    border-radius: 25px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 50px;
+}
+
+.register-form-group {
+    margin-bottom: 15px;
+}
+
+.register-form-control {
+    padding: 15px;
+    font-size: 1rem;
+    border-radius: 50px;
+    border: 1px solid #dcdcdc; 
+}
+
+/* Estilo del botón Registrar*/
+.register-btn-primary {
+    border-radius: 8px;
+    background-color: #0069d9; 
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.register-btn-primary:hover {
+    background-color: #004c99;
+}
+
+.btn-link {
+    text-decoration: underline;
+    color: #0069d9;
+}
+
+.btn-link:hover {
+    color: #003d99;
+}

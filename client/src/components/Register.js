@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import './styles/Register.css'; 
 
 const Register = () => {
     const [nombre, setNombre] = useState("");
     const [correoInstitucional, setCorreoInstitucional] = useState("");
     const [contraseña, setContraseña] = useState("");
-    const [rol, setRol] = useState("alumno"); // valor por defecto es "alumno"
-    const [alert, setAlert] = useState({ type: "", message: "" }); // Estado para la alerta
+    const [rol, setRol] = useState(""); 
+    const [alert, setAlert] = useState({ type: "", message: "" }); 
     const navigate = useNavigate();
 
     const validateEmail = (email) => {
@@ -29,14 +30,12 @@ const Register = () => {
                 return 2; // Profesor
             case "alumno":
                 return 3; // Alumno
-            default:
-                return 3; // Por defecto, asigna como alumno
         }
     };
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
-        setAlert({ type: "", message: "" }); // Resetear alertas previas
+        setAlert({ type: "", message: "" }); 
 
         // Validaciones
         if (!validateNombre(nombre)) {
@@ -55,7 +54,7 @@ const Register = () => {
         }
 
         try {
-            const rol_id = getRolId(rol); // Convertimos el rol a su correspondiente rol_id
+            const rol_id = getRolId(rol); 
             const body = { nombre, correo_institucional: correoInstitucional, contraseña, rol_id };
             
             const response = await fetch("http://localhost:5000/api/auth/register", {
@@ -67,7 +66,7 @@ const Register = () => {
             if (response.status === 200) {
                 setAlert({ type: "success", message: "Registro exitoso" });
                 setTimeout(() => {
-                    navigate("/login"); // Redirigir al login después de un registro exitoso
+                    navigate("/login"); 
                 }, 2000);
             } else {
                 const data = await response.json();
@@ -80,64 +79,72 @@ const Register = () => {
     };
 
     return (
-        <div className="container">
-            <h1 className="text-center mt-5">Registrar Usuario</h1>
-            {alert.message && (
-                <div className={`alert alert-${alert.type}`} role="alert">
-                    {alert.message}
-                </div>
-            )}
-            <form onSubmit={onSubmitForm}>
-                <div className="form-group">
-                    <label>Nombre completo</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        className="form-control"
-                        value={correoInstitucional}
-                        onChange={(e) => setCorreoInstitucional(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="form-group"> 
-                    <label>Contraseña</label>
-                    <input
-                        type="password"
-                        className="form-control"
-                        value={contraseña}
-                        onChange={(e) => setContraseña(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label>¿Eres alumno o docente?</label>
-                    <select
-                        className="form-control"
-                        value={rol}
-                        onChange={(e) => setRol(e.target.value)}
-                        required
-                    >
-                        <option value="alumno">Alumno</option>
-                        <option value="docente">Docente</option>
-                    </select>
-                </div>
-                <button className="btn btn-primary mt-3">Registrar</button>
-            </form>
-            <button
-                className="btn btn-secondary mt-3"
-                onClick={() => navigate("/login")}
-            >
-                Volver al Login
-            </button>
+        <div className="backgroud-container-register">
+        <div className="container register-container d-flex align-items-center justify-content-center min-vh-100">
+            <div className="register-box col-md-6 shadow p-5 rounded-4 bg-white">
+                <h1 className="text-center mb-4">Registro</h1>
+                {alert.message && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                <form onSubmit={onSubmitForm}>
+                    <div className="form-group register-form-group mb-3">
+                        <label htmlFor="nombre">Nombre completo</label>
+                        <input
+                            type="text"
+                            className="form-control register-form-control rounded-pill"
+                            id="nombre"
+                            placeholder="Nombre completo"
+                            value={nombre}
+                            onChange={(e) => setNombre(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group register-form-group mb-3">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            className="form-control register-form-control rounded-pill"
+                            id="email"
+                            placeholder="Correo electrónico"
+                            value={correoInstitucional}
+                            onChange={(e) => setCorreoInstitucional(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group register-form-group mb-3">
+                        <label htmlFor="password">Contraseña</label>
+                        <input
+                            type="password"
+                            className="form-control register-form-control rounded-pill"
+                            id="password"
+                            placeholder="Contraseña"
+                            value={contraseña}
+                            onChange={(e) => setContraseña(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group register-form-group mb-3">
+                        <label htmlFor="rol">¿Eres alumno o docente?</label>
+                        <select
+                            className="form-control register-select-control rounded-pill"
+                            id="rol"
+                            value={rol}
+                            onChange={(e) => setRol(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Selecciona una opción</option>
+                            <option value="alumno">Alumno</option>
+                            <option value="docente">Docente</option>
+                        </select>
+                    </div>
+                    <button type="submit" className="btn btn-primary register-btn-primary w-100 mt-4 rounded-pill">
+                        Registrar
+                    </button>
+                </form>
+            </div>
+        </div>
         </div>
     );
 };
