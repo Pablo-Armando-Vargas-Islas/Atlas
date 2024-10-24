@@ -4,31 +4,20 @@ import { AuthContext } from "../context/AuthContext";
 import './styles/Login.css';
 
 const Login = () => {
-    const [correoInstitucional, setCorreoInstitucional] = useState("");
+    const [usuario, setUsuario] = useState("");
+    //const [correoInstitucional, setCorreoInstitucional] = useState("");
     const [contraseña, setContraseña] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
-    const { login, token, rol } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (token && rol) {
-            // Redirigir según el rol del usuario
-            if (rol === 1) {
-                navigate("/admin/dashboard");
-            } else if (rol === 2) {
-                navigate("/profesor/dashboard");
-            } else if (rol === 3) {
-                navigate("/alumno/dashboard");
-            }
-        }
-    }, [token, rol, navigate]);
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
         setAlert({ type: "", message: "" }); // Resetear alertas previas
 
         try {
-            const body = { correo_institucional: correoInstitucional, contraseña };
+            const body = { usuario, contraseña };
             const response = await login(body);
 
             if (response.ok) {
@@ -48,7 +37,7 @@ const Login = () => {
         <div className="backgroud-container-login">
         <div className="container login-container d-flex align-items-center justify-content-center min-vh-100">
             <div className="login-box col-md-6 shadow p-5 rounded-4 bg-white">
-                <h1 className="text-center mb-4">Bienvenido</h1>
+                <h1 className="text-center mb-4">Atlas</h1>
                 {alert.message && (
                     <div className={`alert alert-${alert.type}`} role="alert">
                         {alert.message}
@@ -56,7 +45,7 @@ const Login = () => {
                 )}
                 <form onSubmit={onSubmitForm}>
                     <div className="form-group login-form-group mb-3">
-                        <label htmlFor="email">Email</label>
+                        {/* <label htmlFor="email">Correo electrónico</label> 
                         <input
                             type="email"
                             className="form-control login-form-control rounded-pill"
@@ -65,10 +54,19 @@ const Login = () => {
                             value={correoInstitucional}
                             onChange={(e) => setCorreoInstitucional(e.target.value)}
                             required
+                        />*/}
+                        <input
+                            type="text"
+                            className="form-control login-form-control rounded-pill"
+                            id="usuario"
+                            placeholder="Usuario"
+                            value={usuario}
+                            onChange={(e) => setUsuario(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="form-group login-form-group mb-3 position-relative">
-                        <label htmlFor="password">Contraseña</label>
+                        {/* <label htmlFor="password">Contraseña</label> */}
                         <input
                             type="password"
                             className="form-control login-form-control rounded-pill"
@@ -78,17 +76,19 @@ const Login = () => {
                             onChange={(e) => setContraseña(e.target.value)}
                             required
                         />
-                        <button
-                            type="button"
-                            className="btn btn-link forgot-password-link"
-                            onClick={() => navigate("/forgot-password")}
-                        >
-                            ¿Has olvidado la contraseña?
-                        </button>
                     </div>
                     <button type="submit" className="btn btn-primary login-btn-primary w-100 mt-3 rounded-pill">
                         Iniciar Sesión
                     </button>
+                    <div className="forgot-password-link-container">
+    <button
+        type="button"
+        className="btn btn-link forgot-password-link"
+        onClick={() => navigate("/forgot-password")}
+    >
+        ¿Has olvidado la contraseña?
+    </button>
+</div>
                 </form>
             </div>
         </div>

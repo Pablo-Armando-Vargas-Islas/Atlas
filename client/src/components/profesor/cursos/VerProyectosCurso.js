@@ -1,14 +1,16 @@
+// VerProyectosCurso.js
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Table, Button } from 'react-bootstrap';
-import ProyectoModal from '../../ProyectoModal'; // Importar el componente del modal reutilizable
+import ProyectoModal from '../../ProyectoModal';
+import '../../styles/VerProyectosCurso.css'; // Archivo CSS para estilos específicos
 
 const VerProyectosCurso = () => {
     const { cursoId } = useParams();
     const [proyectos, setProyectos] = useState([]);
     const [curso, setCurso] = useState({});
-    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null); // Proyecto seleccionado para el modal
-    const [showModal, setShowModal] = useState(false); // Controlar la visibilidad del modal
+    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const fetchProyectos = async () => {
@@ -70,28 +72,29 @@ const VerProyectosCurso = () => {
     };
 
     return (
-        <div className="profesor-container">
-            <div className="main-content">
-                <h1 className="text-center mt-5">Proyectos en {curso.nombre_curso}</h1>
+        <div className="ver-proyectos-curso-container">
+            <div className="ver-proyectos-main-content">
+                <h1 className="text-center my-4">Proyectos en {curso.nombre_curso}</h1>
                 {proyectos.length === 0 ? (
                     <p className="text-center">No hay proyectos entregados en este curso.</p>
                 ) : (
-                    <Table striped bordered hover className="mt-5">
-                        <thead>
+                    <Table responsive bordered hover className="proyectos-curso-table mt-4">
+                        <thead className="table-header">
                             <tr>
-                                <th>Título del Proyecto</th>
-                                <th>Descripción</th>
-                                <th>Acciones</th>
+                                <th className="text-center">Título del Proyecto</th>
+                                <th className="text-center">Descripción</th>
+                                <th className="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {proyectos.map((proyecto) => (
                                 <tr key={proyecto.id}>
-                                    <td>{proyecto.titulo}</td>
-                                    <td>{proyecto.descripcion}</td>
-                                    <td>
+                                    <td className="text-center">{proyecto.titulo}</td>
+                                    <td className="text-center">{proyecto.descripcion}</td>
+                                    <td className="text-center">
                                         <Button
                                             variant="outline-primary"
+                                            className="detalle-proyecto-btn"
                                             onClick={() => verDetalles(proyecto)}
                                         >
                                             Ver Detalles
@@ -110,7 +113,7 @@ const VerProyectosCurso = () => {
                     show={showModal}
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
-                    enviarSolicitud={enviarSolicitud}
+                    enviarSolicitud={enviarSolicitud} // Pasando enviarSolicitud como prop
                 />
             )}
         </div>

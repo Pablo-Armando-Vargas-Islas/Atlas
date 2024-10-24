@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col, Card } from 'react-bootstrap'; // Importamos los componentes necesarios
-import { FaList, FaThLarge } from 'react-icons/fa'; // Iconos para cambiar de vista
-import BotonDescarga from './utils/BotonDescarga'; // Asegúrate de que la ruta sea correcta
+import { Table, Button, Modal } from 'react-bootstrap';
+import './styles/MisSolicitudes.css';
+import BotonDescarga from './utils/BotonDescarga';
 
 const MisSolicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
-    const [viewMode, setViewMode] = useState('list'); // Estado para manejar el modo de vista
     const [error, setError] = useState(null);
+    const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const fetchSolicitudes = async () => {
@@ -32,90 +33,103 @@ const MisSolicitudes = () => {
         fetchSolicitudes();
     }, []);
 
+    const handleVerDetalles = (solicitud) => {
+        setSolicitudSeleccionada(solicitud);
+        setShowModal(true);
+    };
+
+    const handleCerrarModal = () => {
+        setShowModal(false);
+        setSolicitudSeleccionada(null);
+    };
+
     return (
         <div className="mis-solicitudes-container">
             <div className="solicitudes-content">
-                <h1>Mis Solicitudes</h1>
-                {/* Botones para cambiar el modo de vista */}
-                <div className="view-toggle mb-4">
-                    <Button
-                        variant={viewMode === "list" ? "primary" : "outline-primary"}
-                        onClick={() => setViewMode('list')}
-                        className="me-2"
-                    >
-                        <FaList /> Vista de Lista
-                    </Button>
-                    <Button
-                        variant={viewMode === "grid" ? "primary" : "outline-primary"}
-                        onClick={() => setViewMode('grid')}
-                    >
-                        <FaThLarge /> Vista de Cuadrícula
-                    </Button>
-                </div>
-
+                <h1 className="text-center mb-4">Mis Solicitudes</h1>
                 {error ? (
-                    <p>Error: {error}</p>
+                    <p className="text-danger text-center">Error: {error}</p>
                 ) : solicitudes.length === 0 ? (
-                    <p>No tienes solicitudes pendientes.</p>
+                    <p className="text-center">No tienes solicitudes pendientes.</p>
                 ) : (
-                    <>
-                        {viewMode === 'list' ? (
-                            <ListView solicitudes={solicitudes} />
-                        ) : (
-                            <GridView solicitudes={solicitudes} />
-                        )}
-                    </>
+                    <Table responsive bordered hover className="mis-solicitudes-table mt-4">
+                        <thead className="table-header">
+                            <tr>
+                                <th className="text-center">Proyecto</th>
+                                <th className="text-center">Fecha de Solicitud</th>
+                                <th className="text-center">Estatus</th>
+                                <th className="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {solicitudes.map((solicitud) => (
+                                <tr key={solicitud.id}>
+                                    <td className="text-center">{solicitud.titulo}</td>
+                                    <td className="text-center">{new Date(solicitud.fecha_solicitud).toLocaleDateString()}</td>
+                                    <td className="text-center">
+                                        {solicitud.status_solicitud.charAt(0).toUpperCase() + solicitud.status_solicitud.slice(1)}
+                                    </td>
+                                    <td className="text-center">
+                                        <Button
+                                            variant="outline-primary"
+                                            onClick={() => handleVerDetalles(solicitud)}
+                                        >
+                                            Ver Detalles
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
                 )}
+
+                {/* Modal para Detalles de la Solicitud */}
+                <Modal show={showModal} onHide={handleCerrarModal} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Detalles de la Solicitud</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'aceptada' && (
+                            <>
+                                <p>Tu solicitud ha sido aceptada.</p>
+                                <p>IMPORTANTE: Recuerda que tienes solo 10 días para descargar el archivo de lo contrario perderás el acceso y deberás hacer otra solicitud.</p>
+                            </>
+                        )}
+                        {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'rechazada' && (
+                            <>
+                                <p>Tu solicitud ha sido rechazada.</p>
+                                <p>Motivo del rechazo: {solicitudSeleccionada.comentarios}</p>
+                            </>
+                        )}
+                        {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'pendiente' && (
+                            <>
+                                <p>Tu solicitud aún está siendo revisada.</p>
+                                <p>Por favor espera, se te notificará por correo electrónico cuando ya tengamos una respuesta para ti.</p>
+                            </>
+                        )}
+                        {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'cerrado' && (
+                            <>
+                                <p>Esta solicitud ya alcanzó el máximo de días disponible.</p>
+                            </>
+                        )}
+                    </Modal.Body>
+                    {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'aceptada' && (
+                        <Modal.Footer>
+                            {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'aceptada' && (() => {
+                                const fechaLimiteDescarga = new Date(solicitudSeleccionada.fecha_limite_descarga);
+                                const hoy = new Date();
+
+                                if (fechaLimiteDescarga >= hoy) {
+                                    return <BotonDescarga id={solicitudSeleccionada.id} />;
+                                } else {
+                                    return <p>El periodo de descarga ha expirado.</p>;
+                                }
+                            })()}
+                        </Modal.Footer>
+                    )}
+                </Modal>
             </div>
         </div>
-    );
-};
-
-// Componente para vista en lista
-const ListView = ({ solicitudes }) => {
-    return (
-        <div className="list-view">
-            {solicitudes.map((solicitud) => (
-                <div key={solicitud.id} className="list-item mb-3 p-3">
-                    <p><strong>Proyecto solicitado:</strong> {solicitud.titulo || 'Sin título'}</p>
-                    <p><strong>Motivo:</strong> {solicitud.motivo || 'Sin motivo'}</p>
-                    <p><strong>Estatus:</strong> {solicitud.status_solicitud || 'Pendiente'}</p>
-                    {solicitud.status_solicitud === 'aceptada' && solicitud.ruta_archivo_comprimido ? (
-                        <>
-                            <BotonDescarga id={solicitud.id} />
-                        </>
-                    ) : (
-                        <p>{solicitud.status_solicitud === 'rechazada' ? 'Solicitud rechazada' : 'En espera de aprobación'}</p>
-                    )}
-                </div>
-            ))}
-        </div>
-    );
-};
-
-// Componente para vista en cuadrícula
-const GridView = ({ solicitudes }) => {
-    return (
-        <Row className="grid-view">
-            {solicitudes.map((solicitud) => (
-                <Col key={solicitud.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>{solicitud.titulo || 'Sin título'}</Card.Title>
-                            <Card.Text><strong>Motivo:</strong> {solicitud.motivo || 'Sin motivo'}</Card.Text>
-                            <Card.Text><strong>Status:</strong> {solicitud.status_solicitud || 'Pendiente'}</Card.Text>
-                            {solicitud.status_solicitud === 'aceptada' && solicitud.ruta_archivo_comprimido ? (
-                                <>
-                                    <BotonDescarga id={solicitud.id} />
-                                </>
-                            ) : (
-                                <Card.Text>{solicitud.status_solicitud === 'rechazada' ? 'Solicitud rechazada' : 'En espera de aprobación'}</Card.Text>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </Col>
-            ))}
-        </Row>
     );
 };
 

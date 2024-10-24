@@ -1,10 +1,33 @@
 .mis-solicitudes-container {
     display: flex;
-    height: 100vh; /* Asegúrate de que ocupe toda la altura */
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .solicitudes-content {
-    flex: 1; /* Esto asegura que el contenido ocupe el resto del espacio */
-    padding: 20px; /* Añade algo de padding para separar el contenido del borde */
-    overflow-y: auto; /* Permite desplazamiento si el contenido es largo */
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.mis-solicitudes-table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table-header {
+    background-color: #1980e6;
+    color: #ffffff;
+}
+
+.mis-solicitudes-table th,
+.mis-solicitudes-table td {
+    vertical-align: middle;
+    padding: 15px;
 }

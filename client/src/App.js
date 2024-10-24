@@ -4,11 +4,16 @@ import ProtectedRoute from '../src/routes/ProtectedRoute';
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import DashboardProfesor from "./components/profesor/DashboardProfesor";
+import Buscador from "./components/Buscador";
+import BusquedaGlobal from "./components/buscador/BusquedaGlobal"
 import SubirProyecto from "./components/SubirProyecto";
 import DashboardAdmin from "./components/admin/DashboardAdmin";
-//import DashboardAlumno from "./components/alumno/DashboardAlumno";
-import MisProyectos from "./components/alumno/MisProyectos";
+import NavegarPorTitulo from "./components/buscador/NavegarPorTitulo";
+import NavegarPorAutor from "./components/buscador/NavegarPorAutor";
+import NavegarPorCategoria from "./components/buscador/NavegarPorCategoria";
+import NavegarPorFecha from "./components/buscador/NavegarPorFecha";
+import NavegarPorCurso from "./components/buscador/NavegarPorCurso";
+import MisProyectos from "./components/buscador/MisProyectos";
 import CrearCursoProfesor from './components/profesor/cursos/CrearCursoProfesor';
 import GestionCursosProfesor from './components/profesor/cursos/GestionCursosProfesor';
 import VerProyectosCurso from './components/profesor/cursos/VerProyectosCurso';
@@ -37,7 +42,7 @@ function AppContent() {
                 <Route
                     path="/"
                     element={
-                        token ? <Navigate to="/profesor/dashboard" /> : <Navigate to="/login" />
+                        token ? <Navigate to="/Buscador" /> : <Navigate to="/login" />
                     }
                 />
 
@@ -47,10 +52,10 @@ function AppContent() {
 
                 {/* Rutas protegidas */}
                 <Route
-                    path="/profesor/dashboard"
+                    path="/Buscador"
                     element={
                         <ProtectedRoute>
-                            <DashboardProfesor />
+                            <Buscador />
                         </ProtectedRoute>
                     }
                 />
@@ -103,13 +108,62 @@ function AppContent() {
                     }
                 />
                 <Route
-                    path="/MisProyectos"
+                    path="/buscador/busqueda-global"
+                    element={
+                        <ProtectedRoute>
+                            <BusquedaGlobal />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/buscador/mis-proyectos"
                     element={
                         <ProtectedRoute>
                             <MisProyectos />
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/buscador/navegar-por-titulo"
+                    element={
+                        <ProtectedRoute>
+                            <NavegarPorTitulo />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/buscador/navegar-por-autor"
+                    element={
+                        <ProtectedRoute>
+                            <NavegarPorAutor />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/buscador/navegar-por-categoria"
+                    element={
+                        <ProtectedRoute>
+                            <NavegarPorCategoria />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/buscador/navegar-por-fecha"
+                    element={
+                        <ProtectedRoute>
+                            <NavegarPorFecha />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/buscador/navegar-por-cursos"
+                    element={
+                        <ProtectedRoute>
+                            <NavegarPorCurso />
+                        </ProtectedRoute>
+                    }
+                />
+                
                 {/* Repite la lógica para cada ruta protegida */}
             </Routes>
         </>

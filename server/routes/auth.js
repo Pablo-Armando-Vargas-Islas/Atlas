@@ -8,7 +8,7 @@ require('dotenv').config();
 // Registro de Usuario
 router.post("/register", async (req, res) => {
     try {
-        const { nombre, correo_institucional, contraseña, rol_id } = req.body;
+        const { nombre, correo_institucional, contraseña, rol_id, codigo_estudiante, cedula } = req.body;
 
         // Verificar si el correo institucional ya existe
         const user = await pool.query(
@@ -20,15 +20,36 @@ router.post("/register", async (req, res) => {
             return res.status(401).json("El correo institucional ya está registrado");
         }
 
+        // Verificar si el código de estudiante o la cédula ya existe
+        if (rol_id === 3 && codigo_estudiante) {
+            const existingStudentCode = await pool.query(
+                "SELECT * FROM usuarios WHERE codigo_estudiante = $1",
+                [codigo_estudiante]
+            );
+            if (existingStudentCode.rows.length > 0) {
+                return res.status(401).json("El código de estudiante ya está registrado");
+            }
+        }
+
+        if (rol_id === 2 && cedula) {
+            const existingCedula = await pool.query(
+                "SELECT * FROM usuarios WHERE cedula = $1",
+                [cedula]
+            );
+            if (existingCedula.rows.length > 0) {
+                return res.status(401).json("La cédula ya está registrada");
+            }
+        }
+
         // Hashear la contraseña
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contraseña, salt);
 
         // Insertar el nuevo usuario en la base de datos
         const newUser = await pool.query(
-            `INSERT INTO usuarios (nombre, correo_institucional, contraseña, rol_id) 
-            VALUES ($1, $2, $3, $4) RETURNING *`,
-            [nombre, correo_institucional, hashedPassword, rol_id]
+            `INSERT INTO usuarios (nombre, correo_institucional, contraseña, rol_id, codigo_estudiante, cedula) 
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [nombre, correo_institucional, hashedPassword, rol_id, codigo_estudiante || null, cedula || null]
         );
 
         res.json(newUser.rows[0]);
@@ -38,19 +59,20 @@ router.post("/register", async (req, res) => {
     }
 });
 
+
 // Login de Usuario
 router.post("/login", async (req, res) => {
     try {
-        const { correo_institucional, contraseña } = req.body;
+        const { usuario, contraseña } = req.body;
 
-        // Verificación de usuarios
+        // Verificación de usuarios (puede ser por correo institucional, código de estudiante o cédula)
         const user = await pool.query(
-            "SELECT * FROM usuarios WHERE correo_institucional = $1",
-            [correo_institucional]
+            "SELECT * FROM usuarios WHERE codigo_estudiante = $1 OR cedula = $1",
+            [usuario]
         );
 
         if (user.rows.length === 0) {
-            return res.status(401).json({ error: "El correo o la contraseña no coinciden o son incorrectos" });
+            return res.status(401).json({ error: "El usuario o la contraseña no coinciden o son incorrectos" });
         }
 
         // Validación de contraseñas

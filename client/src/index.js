@@ -1,15 +1,14 @@
-import 'bootstrap/dist/css/bootstrap.min.css';  // Estilos de Bootstrap
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';  // JavaScript de Bootstrap y Popper.js
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import { createRoot } from 'react-dom/client'; // Importa createRoot desde react-dom/client
 import App from './App';
+import { BuscadorProvider } from './context/BuscadorContext'; // Importar el contexto del buscador
+import './index.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container); // Crear el root
+
 root.render(
-  <React.StrictMode>
+  <BuscadorProvider>
     <App />
-  </React.StrictMode>
+  </BuscadorProvider>
 );
-
-

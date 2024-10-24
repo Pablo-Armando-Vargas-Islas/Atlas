@@ -1,18 +1,70 @@
-.profesor-container {
-    margin-top: 50px;
+.crear-curso-profesor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-.main-content {
-    background-color: #f8f9fa;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.crear-curso-main-content {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    width: 100%;
 }
 
-.mt-5 {
-    margin-top: 3rem !important;
+h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: #343a40;
 }
 
-.ml-3 {
-    margin-left: 1rem !important;
+.crear-curso-input {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.crear-curso-submit-button {
+    background-color: #0056B3;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.crear-curso-submit-button:hover {
+    background-color: #00458e;
+    color: #ffffff;
+}
+
+.crear-curso-codigo {
+    font-family: 'Inter', sans-serif;
+    color: #1980e6;
+}
+
+.crear-curso-copiar-button {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.crear-curso-copiar-button:hover {
+    background-color: #0056b3;
+}
+
+.crear-curso-cerrar-button {
+    background-color: #6c757d;
+    border: none;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.crear-curso-cerrar-button:hover {
+    background-color: #5a6268;
+    color: #ffffff;
 }

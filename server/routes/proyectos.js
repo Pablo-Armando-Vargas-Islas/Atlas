@@ -36,10 +36,12 @@ const storage = multer.diskStorage({
 });
 
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage }).fields([
+    { name: 'archivoComprimido', maxCount: 1 },
+    { name: 'formatoAprobacion', maxCount: 1 } // Nuevo campo para el formato de aprobación
+]);
 
-
-// Ruta para obtener proyectos por usuario_id
+// Ruta para obtener proyectos por usuario_id, con posibilidad de ordenar
 router.get("/", verifyToken, async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
@@ -47,17 +49,30 @@ router.get("/", verifyToken, async (req, res) => {
         }
 
         const usuario_id = req.user.id;
+        const { orden } = req.query; // Obtenemos el criterio de orden de los parámetros de consulta
+
+        // Determinar columna de orden
+        let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+        if (orden === 'popularidad') {
+            orderBy = 'p.popularidad DESC';
+        } else if (orden === 'relevancia') {
+            orderBy = 'p.relevancia DESC';
+        }
 
         const proyectos = await pool.query(
             `SELECT p.*, 
                     array_agg(DISTINCT a.nombre_autor) as autores, 
-                    array_agg(DISTINCT t.nombre) as tecnologias 
-            FROM proyectos p 
-            LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
-            LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
-            LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id 
-            WHERE p.usuario_id = $1 
-            GROUP BY p.id`,
+                    array_agg(DISTINCT t.nombre) as tecnologias,
+                    array_agg(DISTINCT c.nombre) as categorias
+             FROM proyectos p 
+             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
+             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
+             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+             LEFT JOIN categorias c ON pc.categoria_id = c.id
+             WHERE p.usuario_id = $1 
+             GROUP BY p.id
+             ORDER BY ${orderBy}`,
             [usuario_id]
         );
 
@@ -68,27 +83,83 @@ router.get("/", verifyToken, async (req, res) => {
     }
 });
 
-// Ruta para obtener todos los proyectos
+// Ruta para la búsqueda global de proyectos
 router.get("/atlas", verifyToken, async (req, res) => {
     try {
+        const query = req.query.query || '';  // Parámetro de búsqueda
+        const orden = req.query.orden || 'reciente';  // Parámetro de orden
+
+        console.log("Parámetros recibidos:", { query, orden });
+
+        // Si la consulta está vacía, no aplicar condiciones específicas
+        let searchConditions = 'TRUE';
+        if (query.trim()) {
+            const keywords = query.split(' ').filter(Boolean);
+            searchConditions = keywords.map(keyword => `(
+                p.titulo ILIKE '%${keyword}%'
+                OR a.nombre_autor ILIKE '%${keyword}%'
+                OR t.nombre ILIKE '%${keyword}%'
+                OR c.nombre ILIKE '%${keyword}%'
+                OR p.descripcion ILIKE '%${keyword}%'
+            )`).join(' AND ');
+        }
+
+        console.log("Condición de búsqueda:", searchConditions);
+
+        // Determinar columna de orden
+        let orderBy;
+        switch (orden) {
+            case 'antiguo':
+                orderBy = 'p.fecha_hora ASC';
+                break;
+            case 'popularidad':
+                orderBy = 'p.popularidad DESC';
+                break;
+            case 'relevancia':
+                orderBy = 'p.relevancia DESC';
+                break;
+            case 'reciente':
+            default:
+                orderBy = 'p.fecha_hora DESC';
+                break;
+        }
+
+        console.log("Orden:", orderBy);
+
+        // Consulta SQL que devuelve todos los proyectos, autores, tecnologías y categorías
         const proyectos = await pool.query(
-            `SELECT p.*, 
-                    array_agg(DISTINCT a.nombre_autor) as autores, 
-                    array_agg(DISTINCT t.nombre) as tecnologias 
-             FROM proyectos p 
-             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
-             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
-             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id 
-             GROUP BY p.id`
+            `WITH proyecto_filtrado AS (
+                SELECT DISTINCT p.id
+                FROM proyectos p
+                LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
+                LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
+                LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id 
+                LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+                LEFT JOIN categorias c ON pc.categoria_id = c.id
+                WHERE ${searchConditions}
+            )
+            SELECT p.*, 
+                   array_agg(DISTINCT a.nombre_autor) as autores, 
+                   array_agg(DISTINCT t.nombre) as tecnologias,
+                   array_agg(DISTINCT c.nombre) as categorias
+            FROM proyectos p
+            LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+            LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+            LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+            LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+            LEFT JOIN categorias c ON pc.categoria_id = c.id
+            WHERE p.id IN (SELECT id FROM proyecto_filtrado)
+            GROUP BY p.id
+            ORDER BY ${orderBy}`
         );
 
+        console.log("Proyectos encontrados:", proyectos.rows.length);
         res.json(proyectos.rows);
     } catch (err) {
         console.error("Error en el servidor:", err.message);
         res.status(500).send("Error del servidor");
     }
 });
-
 
 
 // Ruta para obtener tecnologías
@@ -114,7 +185,7 @@ router.get("/categorias", async (req, res) => {
 });
 
 // Ruta para subir un archivo comprimido (para proyectos)
-router.post("/subir", verifyToken, upload.single('archivoComprimido'), async (req, res) => {
+router.post("/subir", verifyToken, upload, async (req, res) => {
     try {
         const {
             titulo,
@@ -129,7 +200,8 @@ router.post("/subir", verifyToken, upload.single('archivoComprimido'), async (re
             autores
         } = req.body;
 
-        const rutaArchivoComprimido = req.file ? req.file.path : null;
+        const archivoComprimido = req.files['archivoComprimido'] ? req.files['archivoComprimido'][0].path : null;
+        const formatoAprobacion = req.files['formatoAprobacion'] ? req.files['formatoAprobacion'][0].path : null;
 
         // Verificar que tecnologías, categorías y autores sean arrays válidos
         const tecnologiasArray = JSON.parse(tecnologias);  // Convertir a arreglo
@@ -156,14 +228,14 @@ router.post("/subir", verifyToken, upload.single('archivoComprimido'), async (re
             newProject = await pool.query(
                 `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-                [titulo, descripcion, rutaArchivoComprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
+                [titulo, descripcion, archivoComprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
             );
         } else if (tipo === "grado") {
-            // Registrar el proyecto de grado
+            // Registrar el proyecto de grado con formato de aprobación
             newProject = await pool.query(
-                `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id)
-                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-                [titulo, descripcion, rutaArchivoComprimido, descripcion_licencia, necesita_licencia, tipo, usuario_id]
+                `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, formato_aprobacion, descripcion_licencia, necesita_licencia, tipo, usuario_id)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+                [titulo, descripcion, archivoComprimido, formatoAprobacion, descripcion_licencia, necesita_licencia, tipo, usuario_id]
             );
         } else {
             return res.status(400).json({ error: "Tipo de proyecto no válido" });
@@ -171,7 +243,7 @@ router.post("/subir", verifyToken, upload.single('archivoComprimido'), async (re
 
         const proyectoId = newProject.rows[0].id;
 
-        // Asociar tecnologías y categorías en la base de datos (igual que antes)
+        // Asociar tecnologías, categorías y autores
         if (tecnologias && tecnologiasArray.length > 0) {
             for (const tecnologiaId of tecnologiasArray) {
                 await pool.query(
@@ -207,5 +279,309 @@ router.post("/subir", verifyToken, upload.single('archivoComprimido'), async (re
         res.status(500).send("Error del servidor");
     }
 });
+
+// Ruta para la búsqueda de proyectos por título
+router.get("/titulo", verifyToken, async (req, res) => {
+    try {
+      const query = req.query.query || '';
+      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+  
+      // Dividir la consulta en palabras clave
+      const keywords = query.split(' ').filter(Boolean);
+  
+      // Crear una expresión para buscar cada palabra clave usando ILIKE en el título
+      const searchConditions = keywords.length > 0 
+        ? `WHERE ${keywords.map(keyword => `p.titulo ILIKE '%${keyword}%'`).join(' AND ')}`
+        : '';
+  
+      // Determinar columna de orden
+      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+      if (orden === 'popularidad') {
+        orderBy = 'p.popularidad DESC';
+      } else if (orden === 'relevancia') {
+        orderBy = 'p.relevancia DESC';
+      } else if (orden === 'antiguo') {
+        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
+      }
+  
+      // Consulta SQL que devuelve los proyectos que coinciden con el título
+      const proyectos = await pool.query(
+        `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+                array_agg(DISTINCT a.nombre_autor) AS autores, 
+                array_agg(DISTINCT t.nombre) AS tecnologias,
+                array_agg(DISTINCT c.nombre) AS categorias
+         FROM proyectos p
+         LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+         LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+         LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+         LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+         LEFT JOIN categorias c ON pc.categoria_id = c.id
+         ${searchConditions}
+         GROUP BY p.id
+         ORDER BY ${orderBy}`
+      );
+  
+      res.json(proyectos.rows);
+    } catch (err) {
+      console.error("Error en el servidor:", err.message);
+      res.status(500).send("Error del servidor");
+    }
+  });
+  
+
+// Ruta para obtener todos los proyectos sin filtros
+router.get("/todos", verifyToken, async (req, res) => {
+    try {
+        const proyectos = await pool.query(
+            `SELECT p.*, 
+                    array_agg(DISTINCT a.nombre_autor) as autores, 
+                    array_agg(DISTINCT t.nombre) as tecnologias,
+                    array_agg(DISTINCT c.nombre) as categorias
+             FROM proyectos p
+             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+             LEFT JOIN categorias c ON pc.categoria_id = c.id
+             GROUP BY p.id
+             ORDER BY p.fecha_hora DESC`
+        );
+
+        res.json(proyectos.rows);
+    } catch (err) {
+        console.error("Error en el servidor:", err.message);
+        res.status(500).send("Error del servidor");
+    }
+});
+
+// Ruta para la búsqueda de proyectos por autor
+router.get("/autor", verifyToken, async (req, res) => {
+    try {
+      const query = req.query.query || '';
+      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+  
+      // Dividir la consulta en palabras clave
+      const keywords = query.split(' ').filter(Boolean);
+  
+      // Crear una subconsulta para buscar proyectos que tengan al menos un autor que coincida
+      const searchConditions = keywords.length > 0
+        ? keywords.map(keyword => `a.nombre_autor ILIKE '%${keyword}%'`).join(' OR ')
+        : 'TRUE';
+  
+      // Determinar columna de orden
+      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+      if (orden === 'popularidad') {
+        orderBy = 'p.popularidad DESC';
+      } else if (orden === 'relevancia') {
+        orderBy = 'p.relevancia DESC';
+      } else if (orden === 'antiguo') {
+        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
+      }
+  
+      // Consulta SQL que devuelve los proyectos que coinciden con el autor y todos los datos asociados
+      const proyectos = await pool.query(
+        `WITH proyecto_filtrado AS (
+            SELECT DISTINCT p.id
+            FROM proyectos p
+            LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+            WHERE ${searchConditions}
+        )
+        SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+               array_agg(DISTINCT a.nombre_autor) AS autores, 
+               array_agg(DISTINCT t.nombre) AS tecnologias,
+               array_agg(DISTINCT c.nombre) AS categorias
+        FROM proyectos p
+        LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+        LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+        LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+        LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+        LEFT JOIN categorias c ON pc.categoria_id = c.id
+        WHERE p.id IN (SELECT id FROM proyecto_filtrado)
+        GROUP BY p.id
+        ORDER BY ${orderBy}`
+      );
+  
+      res.json(proyectos.rows);
+    } catch (err) {
+      console.error("Error en el servidor:", err.message);
+      res.status(500).send("Error del servidor");
+    }
+  });
+
+  // Ruta para la búsqueda de proyectos por categoría
+router.get("/categoria", verifyToken, async (req, res) => {
+    try {
+      const query = req.query.query || '';
+      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+  
+      // Dividir la consulta en palabras clave
+      const keywords = query.split(' ').filter(Boolean);
+  
+      // Crear una subconsulta para buscar proyectos que tengan al menos una categoría que coincida
+      const searchConditions = keywords.length > 0
+        ? keywords.map(keyword => `c.nombre ILIKE '%${keyword}%'`).join(' OR ')
+        : 'TRUE';
+  
+      // Determinar columna de orden
+      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+      if (orden === 'popularidad') {
+        orderBy = 'p.popularidad DESC';
+      } else if (orden === 'relevancia') {
+        orderBy = 'p.relevancia DESC';
+      } else if (orden === 'antiguo') {
+        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
+      }
+  
+      // Consulta SQL que devuelve los proyectos que coinciden con la categoría y todos los datos asociados
+      const proyectos = await pool.query(
+        `WITH proyecto_filtrado AS (
+            SELECT DISTINCT p.id
+            FROM proyectos p
+            LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+            LEFT JOIN categorias c ON pc.categoria_id = c.id
+            WHERE ${searchConditions}
+        )
+        SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+               array_agg(DISTINCT a.nombre_autor) AS autores, 
+               array_agg(DISTINCT t.nombre) AS tecnologias,
+               array_agg(DISTINCT c.nombre) AS categorias
+        FROM proyectos p
+        LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+        LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+        LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+        LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+        LEFT JOIN categorias c ON pc.categoria_id = c.id
+        WHERE p.id IN (SELECT id FROM proyecto_filtrado)
+        GROUP BY p.id
+        ORDER BY ${orderBy}`
+      );
+  
+      res.json(proyectos.rows);
+    } catch (err) {
+      console.error("Error en el servidor:", err.message);
+      res.status(500).send("Error del servidor");
+    }
+  });
+  
+  // Ruta para la búsqueda de proyectos por fecha
+router.get("/fecha", verifyToken, async (req, res) => {
+    try {
+      const year = req.query.year || ''; // Obtener el año seleccionado
+      const month = req.query.month || ''; // Obtener el mes seleccionado
+      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+  
+      // Crear condición de búsqueda de fecha
+      let searchConditions = 'TRUE';
+      if (year && month) {
+        searchConditions = `EXTRACT(YEAR FROM p.fecha_hora) = ${year} AND EXTRACT(MONTH FROM p.fecha_hora) = ${month}`;
+      } else if (year) {
+        searchConditions = `EXTRACT(YEAR FROM p.fecha_hora) = ${year}`;
+      }
+  
+      // Determinar columna de orden
+      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+      if (orden === 'popularidad') {
+        orderBy = 'p.popularidad DESC';
+      } else if (orden === 'relevancia') {
+        orderBy = 'p.relevancia DESC';
+      } else if (orden === 'antiguo') {
+        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
+      }
+  
+      // Consulta SQL que devuelve los proyectos que coinciden con la fecha y todos los datos asociados
+      const proyectos = await pool.query(
+        `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+                array_agg(DISTINCT a.nombre_autor) AS autores, 
+                array_agg(DISTINCT t.nombre) AS tecnologias,
+                array_agg(DISTINCT c.nombre) AS categorias
+         FROM proyectos p
+         LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+         LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+         LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+         LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+         LEFT JOIN categorias c ON pc.categoria_id = c.id
+         WHERE ${searchConditions}
+         GROUP BY p.id
+         ORDER BY ${orderBy}`
+      );
+  
+      res.json(proyectos.rows);
+    } catch (err) {
+      console.error("Error en el servidor:", err.message);
+      res.status(500).send("Error del servidor");
+    }
+  });
+
+  // Ruta para obtener los años disponibles en los que hay proyectos registrados
+router.get("/fecha/anos", verifyToken, async (req, res) => {
+  try {
+    const años = await pool.query(
+      `SELECT DISTINCT EXTRACT(YEAR FROM fecha_hora) AS año
+       FROM proyectos
+       ORDER BY año ASC`
+    );
+
+    res.json(años.rows.map(row => row.año));
+  } catch (err) {
+    console.error("Error en el servidor al obtener los años:", err.message);
+    res.status(500).send("Error del servidor");
+  }
+});
+
+// Ruta para obtener los nombres y códigos de los cursos disponibles
+router.get("/cursos/nombres", verifyToken, async (req, res) => {
+    try {
+        const cursos = await pool.query(
+            `SELECT DISTINCT nombre_curso, codigo_curso
+             FROM cursos
+             ORDER BY nombre_curso ASC`
+        );
+
+        res.json(cursos.rows);
+    } catch (err) {
+        console.error("Error en el servidor al obtener los cursos:", err.message);
+        res.status(500).send("Error del servidor");
+    }
+});
+
+
+  // Ruta para la búsqueda de proyectos por curso
+router.get("/curso", verifyToken, async (req, res) => {
+    try {
+        const curso = req.query.curso?.trim(); // Eliminar espacios adicionales del valor de curso
+        if (!curso) {
+            console.log("No se recibió el parámetro de curso.");
+            return res.status(400).send("Falta el parámetro de curso.");
+        }
+
+        const proyectos = await pool.query(
+            `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+                    array_agg(DISTINCT a.nombre_autor) AS autores, 
+                    array_agg(DISTINCT t.nombre) AS tecnologias,
+                    array_agg(DISTINCT c.nombre) AS categorias
+             FROM proyectos p
+             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+             LEFT JOIN categorias c ON pc.categoria_id = c.id
+             WHERE p.codigo_curso = $1
+             GROUP BY p.id
+             ORDER BY p.fecha_hora DESC`,
+            [curso]
+        );
+
+        if (proyectos.rows.length === 0) {
+            console.log("No se encontraron proyectos con el código de curso proporcionado.");
+        }
+
+        res.json(proyectos.rows);
+    } catch (err) {
+        console.error("Error en el servidor al obtener proyectos por curso:", err.message);
+        res.status(500).send("Error del servidor");
+    }
+});
+
+
 
 module.exports = router;

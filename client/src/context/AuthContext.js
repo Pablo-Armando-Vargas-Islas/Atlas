@@ -49,11 +49,11 @@ export const AuthProvider = ({ children }) => {
 
                 // Redirecciones según el rol del usuario
                 if (data.usuario.rol_id === 1) {
-                    navigate("/admin/dashboard");
+                    navigate("/admin/DashboardAdmin");
                 } else if (data.usuario.rol_id === 2) {
-                    navigate("/profesor/dashboard");
+                    navigate("/Buscador");
                 } else if (data.usuario.rol_id === 3) {
-                    navigate("/alumno/dashboard");
+                    navigate("/Buscador");
                 }
     
                 return { ok: true, token: data.token };

@@ -1,0 +1,102 @@
+.mis-proyectos-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    height: auto;
+    min-height: 550px;
+    overflow-y: auto;
+    max-width: 1000px;
+    margin: 2% auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+}
+
+.mis-proyectos-title {
+    font-size: 2rem;
+    color: #007bff;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    width: 90%; 
+    max-width: 800px;
+    display: flex;
+    justify-content: center;
+}
+
+.search-input {
+    flex: 1;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.search-button-misProyectos {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.list-view {
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+}
+
+.list-item {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.list-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.list-item-title {
+    font-size: 1.5rem;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.list-item-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.list-item-detail {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.icon-detail {
+    color: #007bff;
+}
+
+.list-item-description {
+    color: #555;
+    font-size: 1rem;
+}
+
+.button-ver-detalles {
+    margin-top: 10px;
+}
+
+.sort-container {
+    display: flex;
+    justify-content: center;
+    margin-top: -15px;
+    width: 100%;
+    max-width: 200px;
+}

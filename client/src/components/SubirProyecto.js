@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Modal, Button } from "react-bootstrap";
-import "./styles/SubirProyectoProfesor.css";
+import "./styles/SubirProyecto.css";
 
 const SubirProyectoProfesor = () => {
     const [userId, setUserId] = useState(null);
@@ -25,6 +25,13 @@ const SubirProyectoProfesor = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [missingFields, setMissingFields] = useState([]);
     const [cursoEstado, setCursoEstado] = useState("");
+    const [formatoAprobacion, setFormatoAprobacion] = useState(null);
+    const [showCursoModal, setShowCursoModal] = useState(false);
+    const [cursoModalMessage, setCursoModalMessage] = useState("");
+    const [cursoValidado, setCursoValidado] = useState(false);
+
+
+
     const navigate = useNavigate();
 
     // Recuperar el token del localStorage y decodificarlo
@@ -69,6 +76,7 @@ const SubirProyectoProfesor = () => {
 
     const validateFields = () => {
         const missing = [];
+        if (tipo === "grado" && !formatoAprobacion) missing.push("formatoAprobacion");
         if (!titulo) missing.push("titulo");
         if (!descripcion) missing.push("descripcion");
         if (!archivoComprimido) missing.push("archivoComprimido");
@@ -131,20 +139,22 @@ const SubirProyectoProfesor = () => {
     
                 if (data.estado === "cerrado") {
                     setCursoValido(false); // El curso no es válido para subir proyectos
-                    alert(`El curso de ${data.nombre_curso} ya no está recibiendo más trabajos.`);
+                    setCursoModalMessage(`El curso "${data.nombre_curso}" ya no está recibiendo más trabajos.`);
                 } else {
                     setCursoValido(true); // El curso está abierto y permite entregas
-                    alert(`Te has unido al curso de ${data.nombre_curso}`);
+                    setCursoModalMessage(`Muy bien! Se subirá el proyecto en el curso "${data.nombre_curso}"`);
+                    setCursoValidado(true);
                 }
             } else {
                 setCursoValido(false);
                 setErrorMessage("El código del curso no existe.");
-                alert("El código del curso no existe.");
+                setCursoModalMessage("El código del curso no existe.");
             }
         } catch (error) {
             console.error("Error al validar el código del curso:", error);
             setErrorMessage("Error en la validación del curso.");
         }
+        setShowCursoModal(true);
     };
 
     const onSubmitForm = (e) => {
@@ -159,6 +169,7 @@ const SubirProyectoProfesor = () => {
     const handleConfirm = async () => {
         try {
             const formData = new FormData();
+            formData.append("formatoAprobacion", formatoAprobacion);
             formData.append("titulo", titulo);
             formData.append("descripcion", descripcion);
             formData.append("archivoComprimido", archivoComprimido); // Asegúrate de enviar el archivo
@@ -190,7 +201,7 @@ const SubirProyectoProfesor = () => {
     
             if (response.ok) {
                 alert("Proyecto registrado correctamente");
-                navigate("/profesor/dashboard");
+                navigate("/Buscador");
             } else {
                 const errorData = await response.json();
                 console.error("Error al registrar el proyecto", errorData);
@@ -205,8 +216,8 @@ const SubirProyectoProfesor = () => {
     
 
     return (
-        <div className="profesor-container">
-            <div className="main-content">
+        <div className="proyecto-container">
+            <div className="proyecto-main-content">
                 <h1 className="text-center mt-5">Registrar Proyecto</h1>
                 <form className="mt-5" onSubmit={onSubmitForm}>
                     {errorMessage && (
@@ -231,27 +242,194 @@ const SubirProyectoProfesor = () => {
                     {/* Campo para validar el código del curso si es aula */}
                     {tipo === "aula" && (
                         <div className="form-group">
-                            <label>Código del Curso</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={codigoCurso}
-                                onChange={(e) => setCodigoCurso(e.target.value)}
-                                required
-                            />
-                            <Button
-                                variant="primary"
-                                onClick={validarCodigoCurso}
-                                className="mt-2"
-                            >
-                                Validar Código
-                            </Button>
+                            <label>Curso</label>
+                            {cursoValidado ? (
+                                <>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={cursoNombre}
+                                        disabled
+                                    />
+                                    <Button
+                                        variant="warning"
+                                        onClick={() => {
+                                            setCursoValidado(false);
+                                            setCodigoCurso("");
+                                            setCursoValido(false);
+                                        }}
+                                        className="mt-2"
+                                    >
+                                        Cambiar Curso
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={codigoCurso}
+                                        onChange={(e) => setCodigoCurso(e.target.value)}
+                                        required
+                                    />
+                                    <Button
+                                        variant="primary"
+                                        onClick={validarCodigoCurso}
+                                        className="mt-2"
+                                    >
+                                        Validar Código
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     )}
 
                     {/* Los demás campos se habilitan solo si el curso es válido o si es un proyecto de grado */}
-                    {(cursoValido || tipo === "grado") && cursoEstado !== "cerrado" && (
+                    {(cursoValido) && cursoEstado !== "cerrado" && (
                         <>
+                            <div className="form-group">
+                                <label>Título</label>
+                                <input
+                                    type="text"
+                                    className={`form-control ${missingFields.includes("titulo") ? "border-danger" : ""}`}
+                                    value={titulo}
+                                    onChange={(e) => setTitulo(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Descripción</label>
+                                <textarea
+                                    className={`form-control ${missingFields.includes("descripcion") ? "border-danger" : ""}`}
+                                    value={descripcion}
+                                    onChange={(e) => setDescripcion(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                            <label>Autores</label>
+                                {autores.map((autor, index) => (
+                                    <div key={index} className="d-flex mb-2">
+                                        <input
+                                            type="text"
+                                            className={`form-control ${missingFields.includes("autores") ? "border-danger" : ""}`}
+                                            value={autor}
+                                            onChange={(e) => handleAutorChange(index, e.target.value)}
+                                            required
+                                        />
+                                        <button type="button" className="btn btn-primary ml-2" onClick={addAutorField}>+</button>
+                                        {index > 0 && (
+                                            <button type="button" className="btn btn-danger ml-2" onClick={() => removeAutorField(index)}>-</button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="form-group">
+                                <label>¿Necesita alguna licencia?</label>
+                                <div className="form-check">
+                                    <input
+                                        type="radio"
+                                        className="form-check-input"
+                                        id="licenciaSi"
+                                        name="licencia"
+                                        value="si"
+                                        checked={necesitaLicencia}
+                                        onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
+                                    />
+                                    <label className="form-check-label" htmlFor="licenciaSi">
+                                        Sí
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <input
+                                        type="radio"
+                                        className="form-check-input"
+                                        id="licenciaNo"
+                                        name="licencia"
+                                        value="no"
+                                        checked={!necesitaLicencia}
+                                        onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
+                                    />
+                                    <label className="form-check-label" htmlFor="licenciaNo">
+                                        No
+                                    </label>
+                                </div>
+
+                                {necesitaLicencia && (
+                                    <div className="form-group mt-3">
+                                        <label>Descripción de la Licencia</label>
+                                        <textarea
+                                            className="form-control"
+                                            value={descripcionLicencia}
+                                            onChange={(e) => setDescripcionLicencia(e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="form-group">
+                                <label>Link de GitHub</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={linkGithub}
+                                    onChange={(e) => setLinkGithub(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Archivo Comprimido</label>
+                                <input
+                                    type="file"
+                                    className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
+                                    onChange={(e) => setArchivoComprimido(e.target.files[0])}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Tecnologías</label>
+                                <div className={`${missingFields.includes("tecnologias") ? "border border-danger p-2" : ""}`}>
+                                    {tecnologias.map((tecnologia) => (
+                                        <button
+                                            type="button"
+                                            key={tecnologia.id}
+                                            className={`btn m-1 ${selectedTecnologias.includes(tecnologia) ? "btn-primary" : "btn-outline-primary"}`}
+                                            onClick={() => toggleTecnologia(tecnologia)}
+                                        >
+                                            {tecnologia.nombre}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Categorías</label>
+                                <div className={`${missingFields.includes("categorias") ? "border border-danger p-2" : ""}`}>
+                                    {categorias.map((categoria) => (
+                                        <button
+                                            type="button"
+                                            key={categoria.id}
+                                            className={`btn m-1 ${selectedCategorias.includes(categoria) ? "btn-success" : "btn-outline-success"}`}
+                                            onClick={() => toggleCategoria(categoria)}
+                                        >
+                                            {categoria.nombre}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <Button type="submit" className="btn btn-success mt-3">Registrar</Button>
+                        </>
+                    )}
+
+                    {tipo === "grado" && (
+                        <>
+                            <div className="form-group">
+                                <label>Formato de Aprobación (Imagen)</label>
+                                <input
+                                    type="file"
+                                    className={`form-control ${missingFields.includes("formatoAprobacion") ? "border-danger" : ""}`}
+                                    onChange={(e) => setFormatoAprobacion(e.target.files[0])}
+                                    required
+                                />
+                            </div>
                             <div className="form-group">
                                 <label>Título</label>
                                 <input
@@ -409,6 +587,21 @@ const SubirProyectoProfesor = () => {
                         <Button variant="primary" onClick={handleConfirm}>Confirmar y Registrar</Button>
                     </Modal.Footer>
                 </Modal>
+
+                {/* Modal para mostrar el mensaje del curso */}
+                <Modal show={showCursoModal} onHide={() => setShowCursoModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Resultado</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>{cursoModalMessage}</p>
+                    </Modal.Body>
+
+                    {/* <Modal.Footer>
+                        <Button variant="primary" onClick={() => setShowCursoModal(false)}>Cerrar</Button>
+                    </Modal.Footer> */}
+                </Modal>
+
             </div>
         </div>
     );

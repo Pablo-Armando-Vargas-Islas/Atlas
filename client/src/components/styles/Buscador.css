@@ -1,0 +1,76 @@
+.buscador-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    height: auto; /* Ajustar la altura según el contenido */
+    min-height: 550px;
+    overflow-y: auto; /* Permitir scroll si el contenido es extenso */
+    max-width: 1000px;
+    margin: 2% auto; /* Reducir el margen superior para que esté más arriba */
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    justify-content: center; /* Centrar el contenido verticalmente */
+}
+
+.buscador-title {
+    font-size: 2rem;
+    color: #007bff;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    width: 90%; 
+    max-width: 800px;
+    display: flex;
+    justify-content: center;
+}
+
+.search-input {
+    flex: 1;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.search-button-buscador {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    width: 100%;
+}
+
+.button-card {
+    width: 240px; /* Aumentar el tamaño de las tarjetas */
+    height: 140px; /* Aumentar el tamaño de las tarjetas */
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    color: #000;
+}
+
+.button-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    background-color: #0052A6; /* Cambiar a azul */
+    color: #fff; /* Cambiar el texto a blanco */
+}
+
+.button-card .card-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem; /* Aumentar el tamaño del texto */
+    height: 100%;
+}

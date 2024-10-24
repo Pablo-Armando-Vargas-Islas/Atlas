@@ -121,6 +121,69 @@ CREATE TABLE proyectos_categorias (
 ALTER TABLE cursos
 ADD COLUMN estado text DEFAULT 'abierto' CHECK (estado IN ('abierto', 'cerrado'));
 
+ALTER TABLE usuarios
+ADD COLUMN codigo_estudiante text UNIQUE,
+ADD COLUMN cedula text UNIQUE;
+
+ALTER TABLE solicitudes
+    ADD COLUMN fecha_limite_descarga timestamptz;
+
+ALTER TABLE solicitudes
+    ALTER COLUMN status_solicitud 
+    SET DATA TYPE text
+    USING status_solicitud::text,
+    ADD CHECK (status_solicitud IN ('pendiente', 'aceptada', 'rechazada', 'cerrado'));
+
+ALTER TABLE solicitudes
+    ALTER COLUMN status_solicitud 
+    SET DATA TYPE text
+    USING status_solicitud::text,
+    ADD CHECK (status_solicitud IN ('pendiente', 'aceptada', 'rechazada', 'cerrado', 'expirado'));
+
+ALTER TABLE solicitudes
+ 	ADD COLUMN descargas_count integer DEFAULT 0;
+
+ALTER TABLE solicitudes
+    DROP CONSTRAINT solicitudes_status_solicitud_check;
+
+ALTER TABLE solicitudes
+    ADD CONSTRAINT solicitudes_status_solicitud_check
+    CHECK (status_solicitud IN ('pendiente', 'aceptada', 'rechazada', 'cerrado', 'expirado'));
+
+ALTER TABLE proyectos
+ADD COLUMN popularidad INT DEFAULT 0, -- Almacena cuántas veces se ha solicitado acceso al proyecto
+ADD COLUMN relevancia INT DEFAULT 0; -- Almacena cuántas veces se ha descargado el proyecto
+
+CREATE OR REPLACE FUNCTION incrementar_popularidad() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE proyectos
+    SET popularidad = popularidad + 1
+    WHERE id = NEW.proyecto_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_incrementar_popularidad
+AFTER INSERT ON solicitudes
+FOR EACH ROW
+WHEN (NEW.status_solicitud = 'aceptada')
+EXECUTE FUNCTION incrementar_popularidad();
+
+CREATE OR REPLACE FUNCTION incrementar_relevancia() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE proyectos
+    SET relevancia = relevancia + 1
+    WHERE id = NEW.proyecto_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_incrementar_relevancia
+AFTER INSERT OR UPDATE OF descargas_count ON solicitudes
+FOR EACH ROW
+WHEN (NEW.descargas_count > 0)
+EXECUTE FUNCTION incrementar_relevancia();
+
 
 
 -- Índices para proyectos
@@ -138,4 +201,10 @@ CREATE INDEX idx_proyectos_categorias_categoria_id ON proyectos_categorias (cate
 -- Índices para solicitudes
 CREATE INDEX idx_solicitudes_proyecto_id ON solicitudes (proyecto_id);
 CREATE INDEX idx_solicitudes_solicitante_id ON solicitudes (solicitante_id);
+
+-- Índices para cursos
+CREATE INDEX idx_proyectos_codigo_curso ON proyectos (codigo_curso);
+
+
+CREATE EXTENSION IF NOT EXISTS unaccent;
 

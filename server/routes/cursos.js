@@ -64,6 +64,24 @@ router.post('/cerrarCurso/:cursoId', verifyToken, async (req, res) => {
     }
 });
 
+// Ruta para abrir un curso
+router.post('/abrirCurso/:cursoId', verifyToken, async (req, res) => {
+    const { cursoId } = req.params;
+    const { nuevaFechaLimite } = req.body;
+
+    try {
+        const curso = await pool.query(
+            `UPDATE cursos SET estado = 'abierto', fecha_fin = $1 WHERE id = $2 RETURNING *`,
+            [nuevaFechaLimite, cursoId]
+        );
+        res.json({ curso: curso.rows[0] });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Error al abrir el curso' });
+    }
+});
+
+
 // Ruta para obtener los proyectos de un curso
 router.get('/curso/:cursoId/proyectos', verifyToken, async (req, res) => {
     const { cursoId } = req.params;

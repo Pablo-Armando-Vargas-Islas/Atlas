@@ -1,0 +1,68 @@
+/* src/styles/TarjetaProyecto.css */
+.tarjeta-proyecto {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  width: 90%;
+  max-width: 900px; /* Igual que la barra de búsqueda */
+  margin: 0 auto; /* Centrar las tarjetas */
+}
+
+.tarjeta-proyecto:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+  
+  .tarjeta-info {
+    margin-top: 10px;
+  }
+  
+  .tarjeta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+  
+  .me-2 {
+    margin-right: 0.5rem;
+  }
+
+  .badge-sm {
+    font-size: 0.8rem;
+  }
+
+  .highlight {
+    background-color: rgba(129, 129, 129, 0.249);
+    font-weight: bold;
+  }
+  
+/* Colores personalizados para las etiquetas de tipo de proyecto */
+.badge-tipo-grado {
+  background-color: #28a745 !important; /* Verde para Grado */
+  color: white !important;
+}
+
+.badge-tipo-aula {
+  background-color: #007bff !important; /* Azul para Aula */
+  color: white !important;
+}
+
+.badge-tipo-desconocido {
+  background-color: #6c757d !important; /* Gris para desconocido */
+  color: white !important;
+}
+
+/* Colores personalizados para las etiquetas de tecnologías */
+.badge-tecnologia {
+  background-color: #17a2b8 !important; /* Color personalizado para tecnologías */
+  color: white !important;
+}
+
+/* Colores personalizados para las etiquetas de categorías */
+.badge-categoria {
+  background-color: #ffbf00 !important; /* Amarillo para categorías */
+  color: black !important;
+}
+
+

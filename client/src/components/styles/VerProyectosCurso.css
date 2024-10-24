@@ -1,0 +1,43 @@
+.ver-proyectos-curso-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.ver-proyectos-main-content {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    width: 100%;
+}
+
+.table-header {
+    background-color: #1980e6;
+    color: #ffffff;
+}
+
+.proyectos-curso-table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.proyectos-curso-table th,
+.proyectos-curso-table td {
+    vertical-align: middle;
+    padding: 15px;
+}
+
+.detalle-proyecto-btn {
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.detalle-proyecto-btn:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+}

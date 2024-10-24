@@ -1,0 +1,42 @@
+.navegar-por-curso-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    height: auto;
+    min-height: 550px;
+    overflow-y: auto;
+    max-width: 1000px;
+    margin: 2% auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navegar-curso-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  
+  .curso-select {
+    width: 300px;
+    font-size: 1.1rem;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .sort-select {
+    width: 200px;
+    margin-left: 1rem;
+  }
+  
+  .pagination {
+    margin-top: 2rem;
+    font-size: 1rem;
+  }
+  
+  .pagination button {
+    margin: 0 1rem;
+  }
+  

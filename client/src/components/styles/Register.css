@@ -1,6 +1,5 @@
 html, body {
     height: 100%;
-    overflow: hidden;
     margin: 0;
     background-color: #e8f0ff; 
 }
@@ -35,7 +34,7 @@ html, body {
 /* Estilo del botón Registrar*/
 .register-btn-primary {
     border-radius: 8px;
-    background-color: #0069d9; 
+    background-color: #0ba8e2; 
     color: #ffffff;
     border: none;
     padding: 10px;
@@ -43,7 +42,7 @@ html, body {
 }
 
 .register-btn-primary:hover {
-    background-color: #004c99;
+    background-color: #088ac2;
 }
 
 .btn-link {
