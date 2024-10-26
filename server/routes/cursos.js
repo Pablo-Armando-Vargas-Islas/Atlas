@@ -35,8 +35,11 @@ router.get('/cursos', verifyToken, async (req, res) => {
              WHERE fecha_fin < NOW() AND estado = 'abierto'`
         );
 
+        // Obtener los cursos del profesor ordenados por estado y fecha
         const cursos = await pool.query(
-            `SELECT * FROM cursos WHERE profesor_id = $1`,
+            `SELECT * FROM cursos 
+             WHERE profesor_id = $1
+             ORDER BY estado = 'abierto' DESC, fecha_fin ASC NULLS FIRST`,
             [profesorId]
         );
 
@@ -48,13 +51,14 @@ router.get('/cursos', verifyToken, async (req, res) => {
 });
 
 
+
 // Ruta para cerrar un curso
 router.post('/cerrarCurso/:cursoId', verifyToken, async (req, res) => {
     const { cursoId } = req.params;
 
     try {
         const curso = await pool.query(
-            `UPDATE cursos SET estado = 'cerrado' WHERE id = $1 RETURNING *`,
+            `UPDATE cursos SET estado = 'cerrado', fecha_fin = NOW() WHERE id = $1 RETURNING *`,
             [cursoId]
         );
         res.json({ curso: curso.rows[0] });

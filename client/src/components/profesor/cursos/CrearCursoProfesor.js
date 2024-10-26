@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Modal } from 'react-bootstrap';
-import '../../styles/CrearCursoProfesor.css';
+import '../../../styles/CrearCursoProfesor.css';
 
 const CrearCursoProfesor = () => {
     const [nombreCurso, setNombreCurso] = useState('');
@@ -26,7 +26,7 @@ const CrearCursoProfesor = () => {
 
     // Función para copiar el código al portapapeles
     const copiarMensaje = () => {
-        const mensaje = `Hola este es el código del curso "${nombreCurso}":\n${codigoCurso}`;
+        const mensaje = `Hola este es el código del curso *${nombreCurso}*:\n${codigoCurso}`;
         navigator.clipboard.writeText(mensaje);
         setCopied(true);
     };

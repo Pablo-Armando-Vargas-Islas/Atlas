@@ -1,9 +1,10 @@
 // VerProyectosCurso.js
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Table, Button } from 'react-bootstrap';
-import ProyectoModal from '../../ProyectoModal';
-import '../../styles/VerProyectosCurso.css'; // Archivo CSS para estilos específicos
+import ProyectoModal from '../../../utils/ProyectoModal';
+import '../../../styles/GestionCursosProfesor.css'; // Utilizar el CSS de GestionCursosProfesor
 
 const VerProyectosCurso = () => {
     const { cursoId } = useParams();
@@ -47,6 +48,12 @@ const VerProyectosCurso = () => {
     // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
         try {
+            const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
+            if (solicitudPendiente) {
+                alert('Ya existe una solicitud pendiente para este proyecto.');
+                return;
+            }
+
             const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
                 method: 'POST',
@@ -62,7 +69,7 @@ const VerProyectosCurso = () => {
 
             if (response.ok) {
                 alert('Solicitud enviada con éxito');
-                setShowModal(false);
+                cerrarModal();
             } else {
                 alert('Error al enviar la solicitud');
             }
@@ -71,15 +78,40 @@ const VerProyectosCurso = () => {
         }
     };
 
+    // Función para verificar si ya existe una solicitud pendiente antes de enviar una nueva solicitud
+    const verificarSolicitudPendiente = async (proyectoId) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data.pendiente;
+            } else {
+                console.error('Error al verificar la solicitud pendiente');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al verificar la solicitud pendiente:', error);
+            return false;
+        }
+    };
+
     return (
         <div className="ver-proyectos-curso-container">
-            <div className="ver-proyectos-main-content">
+            <div className="gestion-cursos-main-content"> {/* Usar la clase existente para contenido principal */}
                 <h1 className="text-center my-4">Proyectos en {curso.nombre_curso}</h1>
                 {proyectos.length === 0 ? (
                     <p className="text-center">No hay proyectos entregados en este curso.</p>
                 ) : (
-                    <Table responsive bordered hover className="proyectos-curso-table mt-4">
-                        <thead className="table-header">
+                    <Table responsive bordered hover className="gestion-cursos-table mt-4"> {/* Cambiar la clase de la tabla */}
+                        <thead>
                             <tr>
                                 <th className="text-center">Título del Proyecto</th>
                                 <th className="text-center">Descripción</th>
@@ -94,7 +126,7 @@ const VerProyectosCurso = () => {
                                     <td className="text-center">
                                         <Button
                                             variant="outline-primary"
-                                            className="detalle-proyecto-btn"
+                                            className="detalle-proyecto-btn" 
                                             onClick={() => verDetalles(proyecto)}
                                         >
                                             Ver Detalles

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
-import ProyectoModal from '../ProyectoModal';
-import TarjetaProyecto from '../TarjetaProyecto';
-import '../styles/NavegarPorCategoria.css';
+import ProyectoModal from '../../utils/ProyectoModal';
+import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import '../../styles/NavegarPorCategoria.css';
 
 const NavegarPorCategoria = () => {
   const [proyectos, setProyectos] = useState([]);
@@ -76,6 +76,64 @@ const NavegarPorCategoria = () => {
     } catch (error) {
       console.error("Error al obtener proyectos:", error);
     }
+  };
+
+  // Función para enviar la solicitud de acceso
+  const enviarSolicitud = async (proyectoId, motivo) => {
+    try {
+        const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
+        if (solicitudPendiente) {
+            alert('Ya existe una solicitud pendiente para este proyecto.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                proyecto_id: proyectoId,
+                motivo: motivo,
+            }),
+        });
+
+        if (response.ok) {
+            alert('Solicitud enviada con éxito');
+            cerrarModal();
+        } else {
+            alert('Error al enviar la solicitud');
+        }
+    } catch (error) {
+        console.error('Error al enviar la solicitud:', error);
+    }
+  };
+
+  // Función para verificar si ya existe una solicitud pendiente antes de enviar una nueva solicitud
+  const verificarSolicitudPendiente = async (proyectoId) => {
+      try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+              method: 'GET',
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+              },
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              return data.pendiente;
+          } else {
+              console.error('Error al verificar la solicitud pendiente');
+              return false;
+          }
+      } catch (error) {
+          console.error('Error al verificar la solicitud pendiente:', error);
+          return false;
+      }
   };
 
   const handleOrderChange = (e) => {
@@ -155,6 +213,7 @@ const NavegarPorCategoria = () => {
               proyecto={proyecto}
               query={searchTerm} // Resaltar coincidencias en la tarjeta
               verDetalles={verDetalles}
+              enviarSolicitud={enviarSolicitud}
             />
           ))
         )}
@@ -185,6 +244,8 @@ const NavegarPorCategoria = () => {
           show={showModal}
           handleClose={cerrarModal}
           proyecto={proyectoSeleccionado}
+          enviarSolicitud={enviarSolicitud}
+          omitDetails={false}
         />
       )}
     </div>

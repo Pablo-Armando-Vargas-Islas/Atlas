@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, Button, InputGroup, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import './styles/Buscador.css';
+import '../styles/Buscador.css';
 
 const BuscadorBox = () => {
     const navigate = useNavigate();

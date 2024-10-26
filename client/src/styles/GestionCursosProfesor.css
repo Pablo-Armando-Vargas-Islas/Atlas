@@ -1,0 +1,81 @@
+.gestion-cursos-profesor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.ver-proyectos-curso-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.gestion-cursos-main-content {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    width: 100%;
+}
+
+.gestion-cursos-table {
+    border-radius: 10px;
+    overflow: hidden; 
+    width: 100%;
+    margin-bottom: 30px; /* Espacio al final de la tabla */
+}
+
+.gestion-cursos-table th,
+.gestion-cursos-table td {
+    vertical-align: middle;
+    padding: 15px;
+    border: 1px solid #ddd; /* Agregar bordes ligeros entre celdas */
+    text-align: center; /* Centramos todo el contenido de la tabla */
+}
+
+ 
+.gestion-cursos-table th {
+    font-weight: bold;
+    font-size: 1em;
+    color: #ffffff;
+    background-color: #0854A2; /* Color de fondo más suave para encabezado */
+    text-align: center; /* Centrar horizontalmente el contenido */
+    vertical-align: middle; /* Centrar verticalmente el contenido */
+    padding: 12px;
+}
+
+.ver-proyectos-btn,
+.cerrar-curso-btn {
+    border-radius: 15px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.ver-proyectos-btn:hover,
+.cerrar-curso-btn:hover {
+    opacity: 0.9;
+}
+
+.detalle-proyecto-btn {
+    border-radius: 10px;
+    color: #0854A2;
+    background-color: #ffffff;
+    border-color: #0854A2;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.detalle-proyecto-btn:hover {
+    color: #ec881d;
+    background-color: #ffffff;
+    border-color: #ec881d;
+}
+
+.detalle-proyecto-btn:active {
+    color: #ffffff!important;
+    background-color: #ec881d!important;
+    border-color: #ec881d!important;
+}

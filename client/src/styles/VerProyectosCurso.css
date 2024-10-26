@@ -18,7 +18,7 @@
 .table-header {
     background-color: #1980e6;
     color: #ffffff;
-}
+} 
 
 .proyectos-curso-table {
     border-radius: 10px;
@@ -38,6 +38,6 @@
 }
 
 .detalle-proyecto-btn:hover {
-    background-color: #0056b3;
+    background-color: #167ce9;
     color: #ffffff;
 }

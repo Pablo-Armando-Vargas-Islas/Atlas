@@ -1,0 +1,57 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #e8f0ff; /* Fondo predominante azul */
+    font-family: Arial, sans-serif; /* Fuente moderna y limpia */
+}
+
+/* Caja de registro */
+.register-box {
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+    text-align: center;
+    margin-top: -70px;
+}
+
+/* Título principal */
+.register-title {
+    color: #0854A2!important; /* Color predominante */
+    font-weight: bold;
+}
+
+/* Botón de registro */
+.register-btn-primary {
+    background-color: #91cb1b; /* Verde de la universidad */
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.register-btn-primary:hover {
+    background-color: #ec881d;
+    color: #ffffff;
+    transform: scale(1.01);
+}
+
+.register-btn-primary:active {
+    background-color: #ec881d!important;
+    color: #ffffff!important;
+}
+
+/* Input del formulario */
+.register-form-control {
+    border: 0.5px solid #0855a25c;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+.register-form-control:focus {
+    border-color: #1D84F3;
+    box-shadow: 0 0 5px rgba(29, 132, 243, 0.5);
+    outline: none;
+}

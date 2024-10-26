@@ -1,0 +1,101 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif; /* Fuente más moderna y limpia */
+}
+
+/* Contenedor principal de login */
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    margin-top: -50px; /* Ajuste de altura */
+}
+
+/* Caja de login */
+.login-box {
+    max-width: 500px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aumentar un poco la sombra para darle más profundidad */
+    padding: 40px;
+    position: relative;
+    text-align: center;
+}
+
+/* Título principal */
+h1 {
+    color: #0854A2!important; /* Color predominante */
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+/* Botón de iniciar sesión */
+.login-btn-primary {
+    background-color: #91cb1b; /* Verde de la universidad */
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.login-btn-primary:hover {
+    background-color: #ec881d!important;
+    color: #ffffff!important;
+    transform: scale(1.01);
+}
+
+.login-btn-primary:active {
+    background-color: #ec881d!important;
+    color: #ffffff!important;
+}
+
+/* Input del formulario */
+.login-form-control {
+    border: 0.5px solid #0855a25c; /* Borde azul predominante */
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.login-form-control:focus {
+    border-color: #1D84F3; /* Azul brillante para indicar el enfoque */
+    box-shadow: 0 0 5px rgba(29, 132, 243, 0.5);
+}
+
+/* Estilo específico para el link de "Olvidé la contraseña" */
+.forgot-password-link-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px; /* Ajustar la separación si es necesario */
+}
+
+.forgot-password-link {
+    font-size: 0.8rem;
+    margin-top: -10px!important;
+    color: #0854A2; /* Naranja para resaltar */
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password-link:hover {
+    color: #0854A2; /* Azul predominante al pasar el cursor */
+}
+
+/* Botón de log in y sign up con más separación */
+.auth-buttons {
+    display: flex;
+    gap: 20px; /* Añadir un espacio adecuado entre los botones */
+    align-items: center;
+    justify-content: center; /* Centra los botones */
+}
+
+/* Imagen de bienvenida con borde redondeado */
+.login-image {
+    width: 100px; /* Ajusta el tamaño según necesites */
+    height: 100px; /* Asegúrate de que sea un cuadrado para un círculo perfecto */
+    object-fit: cover; /* Asegura que la imagen se ajuste sin distorsionarse */
+    border-radius: 50%; /* Borde redondo */
+    border: 3px solid #1D84F3; /* Añadir un borde azul brillante */
+    margin-bottom: 20px; /* Separación con el título */
+}

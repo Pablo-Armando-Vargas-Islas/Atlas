@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth");
 const proyectosRoutes = require("./routes/proyectos");
 const cursosRoutes = require('./routes/cursos');
 const solicitudesRouter = require('./routes/solicitudes');
+const metricasRouter = require("./routes/metricas");
 require('dotenv').config();
 require('./utils/cronJobs');
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/proyectos", proyectosRoutes);
 app.use('/api/cursos', cursosRoutes);
 app.use('/api/solicitudes', solicitudesRouter);
+app.use('/api/metricas', metricasRouter);
 
 // Endpoint de Login
 app.post("/api/auth/login", async (req, res) => {

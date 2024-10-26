@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, Table, OverlayTrigger, Tooltip, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaClipboard, FaEye, FaLock, FaUnlock } from 'react-icons/fa';
-import '../../styles/GestionCursosProfesor.css';
+import '../../../styles/GestionCursosProfesor.css';
 
 const GestionCursosProfesor = () => {
     const [cursos, setCursos] = useState([]);
+    const [tooltipText, setTooltipText] = useState({});
     const [cursoIdModificar, setCursoIdModificar] = useState(null);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [accion, setAccion] = useState('');
@@ -13,7 +14,7 @@ const GestionCursosProfesor = () => {
     const [fechaInvalida, setFechaInvalida] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
+    useEffect(() => { 
         // Fetch para obtener los cursos activos del profesor
         const fetchCursos = async () => {
             try {
@@ -25,6 +26,15 @@ const GestionCursosProfesor = () => {
                 });
                 const data = await response.json();
                 setCursos(data);
+
+                // Inicializar el texto del tooltip con "Copiar Código" para cada curso
+                const initialTooltipText = {};
+                data.forEach((curso) => {
+                    initialTooltipText[curso.id] = 'Copiar Código';
+                });
+                setTooltipText(initialTooltipText);
+
+
             } catch (error) {
                 console.error('Error al obtener los cursos:', error);
             }
@@ -33,12 +43,24 @@ const GestionCursosProfesor = () => {
         fetchCursos();
     }, []);
 
-    // Función para copiar el código del curso al portapapeles
-    const copiarCodigo = (curso) => {
-        const mensaje = `Hola este es el código del curso de ${curso.nombre_curso}:
-${curso.codigo_curso}`;
+     // Función para copiar el código del curso al portapapeles
+     const copiarCodigo = (curso) => {
+        const mensaje = `Hola este es el código del curso de *${curso.nombre_curso}*:\n${curso.codigo_curso}`;
         navigator.clipboard.writeText(mensaje);
-        alert('Código copiado al portapapeles: ' + curso.codigo_curso);
+
+        // Actualizar el texto del Tooltip a "Copiado"
+        setTooltipText((prevState) => ({
+            ...prevState,
+            [curso.id]: 'Copiado!'
+        }));
+
+        // Volver a cambiar el texto del Tooltip a "Copiar Código" después de 2 segundos
+        setTimeout(() => {
+            setTooltipText((prevState) => ({
+                ...prevState,
+                [curso.id]: 'Copiar Código'
+            }));
+        }, 1500);
     };
 
     // Función para manejar la apertura del modal de confirmación de acción
@@ -78,7 +100,11 @@ ${curso.codigo_curso}`;
                     // Actualizar el estado del curso según la acción realizada
                     setCursos(cursos.map(curso =>
                         curso.id === cursoIdModificar
-                            ? { ...curso, estado: accion === 'cerrar' ? 'cerrado' : 'abierto', fecha_fin: accion === 'abrir' ? nuevaFechaLimite : curso.fecha_fin }
+                            ? { 
+                                ...curso, 
+                                estado: accion === 'cerrar' ? 'cerrado' : 'abierto', 
+                                fecha_fin: accion === 'cerrar' ? new Date().toISOString().split('T')[0] : nuevaFechaLimite 
+                              }
                             : curso
                     ));
                 } else {
@@ -107,7 +133,7 @@ ${curso.codigo_curso}`;
                 {cursos.length === 0 ? (
                     <p className="text-center">No tienes cursos activos en este momento.</p>
                 ) : (
-                    <Table responsive bordered hover className="gestion-cursos-table mt-4">
+                    <Table responsive bordered hover className="gestion-cursos-table no-hover mt-4">
                         <thead className="table-header">
                             <tr>
                                 <th className="text-center">Nombre del Curso</th>
@@ -158,7 +184,7 @@ ${curso.codigo_curso}`;
                                                 <FaEye />
                                             </Button>
                                         </OverlayTrigger>{' '}
-                                        <OverlayTrigger placement="top" overlay={<Tooltip>Copiar Código</Tooltip>}>
+                                        <OverlayTrigger placement="top" overlay={<Tooltip>{tooltipText[curso.id]}</Tooltip>}>
                                             <Button variant="link" className="p-0 copiar-codigo-btn ml-2 text-muted" onClick={() => copiarCodigo(curso)}>
                                                 <FaClipboard />
                                             </Button>
@@ -212,4 +238,4 @@ ${curso.codigo_curso}`;
     );
 };
 
-export default GestionCursosProfesor;
+export default GestionCursosProfesor; 

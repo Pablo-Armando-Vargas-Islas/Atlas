@@ -1,7 +1,7 @@
 /* General Navbar Style */
 .custom-navbar {
     width: 100%;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     border-bottom: 1px solid #e0e0e0;
     position: sticky;
     top: 0;
@@ -91,7 +91,7 @@
 
 /* Botón de Cerrar Sesión */
 .btn-logout {
-    background-color: #d9534f; /* Rojo para resaltar */
+    background-color: #ec321d; /* Rojo para resaltar */
     color: white;
     border: none;
     padding: 6px 12px;
@@ -102,18 +102,19 @@
 }
 
 .btn-logout:hover {
-    background-color: #c9302c; /* Color más oscuro al pasar el mouse */
+    background-color: #cf2c1a; /* Color más oscuro al pasar el mouse */
+    color: white;
     transform: scale(1.05); /* Efecto de agrandamiento ligero */
 }
 
 .btn-logout:active {
-    background-color: #ac2925; /* Aún más oscuro al hacer clic */
+    background-color: #cf2c1a; /* Aún más oscuro al hacer clic */
     transform: scale(0.95); /* Efecto de reducción al hacer clic */
 }
 
 /* Logo Image Style */
 .navbar-logo-image {
-    width: 150px; /* Ajusta el tamaño según lo necesites */
-    height: auto;
+    width: 148px; /* Ajusta el tamaño según lo necesites */
+    height: 48px;
     cursor: pointer;
 }

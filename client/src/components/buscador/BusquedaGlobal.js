@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { InputGroup, Form, Button } from "react-bootstrap";
 import { useBuscador } from '../../context/BuscadorContext';
-import TarjetaProyecto from '../TarjetaProyecto';
-import ProyectoModal from '../ProyectoModal';
-import '../styles/BusquedaGlobal.css';
+import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import ProyectoModal from '../../utils/ProyectoModal';
+import '../../styles/BusquedaGlobal.css';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -47,8 +47,15 @@ const BusquedaGlobal = () => {
         setProyectoSeleccionado(null);
     };
 
+    // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
         try {
+            const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
+            if (solicitudPendiente) {
+                alert('Ya existe una solicitud pendiente para este proyecto.');
+                return;
+            }
+
             const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
                 method: 'POST',
@@ -64,7 +71,7 @@ const BusquedaGlobal = () => {
 
             if (response.ok) {
                 alert('Solicitud enviada con éxito');
-                setShowModal(false);
+                cerrarModal();
             } else {
                 alert('Error al enviar la solicitud');
             }
@@ -72,6 +79,32 @@ const BusquedaGlobal = () => {
             console.error('Error al enviar la solicitud:', error);
         }
     };
+
+    // Función para verificar si ya existe una solicitud pendiente antes de enviar una nueva solicitud
+    const verificarSolicitudPendiente = async (proyectoId) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data.pendiente;
+            } else {
+                console.error('Error al verificar la solicitud pendiente');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al verificar la solicitud pendiente:', error);
+            return false;
+        }
+    };
+
 
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const paginatedProyectos = resultados.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -115,6 +148,7 @@ const BusquedaGlobal = () => {
                             proyecto={proyecto}
                             query={consultaLocal}
                             verDetalles={handleVerDetalles}
+                            enviarSolicitud={enviarSolicitud}
                         />
                     ))
                 )}
@@ -146,7 +180,7 @@ const BusquedaGlobal = () => {
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
                     enviarSolicitud={enviarSolicitud}
-                    showSolicitudField={true}
+                    omitDetails={true} // Omitir la vista de detalles y mostrar directamente el formulario de solicitud
                 />
             )}
         </div>

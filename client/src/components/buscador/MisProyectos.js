@@ -1,11 +1,9 @@
-// MisProyectos.js
-
 import React, { useState, useEffect } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { jwtDecode as jwt_decode } from "jwt-decode";
-import ProyectoModal from '../ModalBuscador'; // Importar ProyectoModal
-import TarjetaProyecto from '../TarjetaProyecto'; 
-import '../styles/MisProyectos.css';
+import ProyectoModal from '../../utils/ProyectoModal'; // Actualizar la importación para que apunte a ProyectoModal.js
+import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import '../../styles/MisProyectos.css';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -84,6 +82,39 @@ const MisProyectos = () => {
         setProyectoSeleccionado(null);
     };
 
+    // Función para enviar la solicitud de acceso
+    const enviarSolicitud = async (proyectoId, motivo) => {
+        try {
+            const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
+            if (solicitudPendiente) {
+                alert('Ya existe una solicitud pendiente para este proyecto.');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    proyecto_id: proyectoId,
+                    motivo: motivo,
+                }),
+            });
+
+            if (response.ok) {
+                alert('Solicitud enviada con éxito');
+                cerrarModal();
+            } else {
+                alert('Error al enviar la solicitud');
+            }
+        } catch (error) {
+            console.error('Error al enviar la solicitud:', error);
+        }
+    };
+
     // Función para verificar si ya existe una solicitud pendiente antes de enviar una nueva solicitud
     const verificarSolicitudPendiente = async (proyectoId) => {
         try {
@@ -109,51 +140,13 @@ const MisProyectos = () => {
         }
     };
 
-    // Función para enviar la solicitud de acceso
-    const enviarSolicitud = async (proyectoId, motivo) => {
-        const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
-        if (solicitudPendiente) {
-            alert('Ya existe una solicitud pendiente para este proyecto.');
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    proyecto_id: proyectoId,
-                    motivo: motivo,
-                }),
-            });
-
-            if (response.ok) {
-                alert('Solicitud enviada con éxito');
-                setShowModal(false);
-            } else {
-                alert('Error al enviar la solicitud');
-            }
-        } catch (error) {
-            console.error('Error al enviar la solicitud:', error);
-        }
-    };
-
     // Filtrar y ordenar proyectos por búsqueda en "Mis Proyectos"
     const filteredProyectos = proyectos
         .filter((proyecto) => {
-            // Si el término de búsqueda está vacío, no aplicar ningún filtro
             if (searchTerm.trim() === "") {
                 return true;
             }
-
-            // Dividir la búsqueda en términos
             const searchTerms = searchTerm.toLowerCase().split(" ").filter(term => term.trim() !== "");
-
-            // Verificar si al menos uno de los términos de búsqueda está presente en alguno de los campos del proyecto
             return searchTerms.some((term) => {
                 return (
                     proyecto.titulo.toLowerCase().includes(term) ||
@@ -174,12 +167,10 @@ const MisProyectos = () => {
             return 0;
         });
 
-    // Calcular la paginación
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const paginatedProyectos = filteredProyectos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
     const totalPages = Math.ceil(filteredProyectos.length / ITEMS_PER_PAGE);
 
-    // Cambiar página
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
             setCurrentPage(page);
@@ -190,7 +181,6 @@ const MisProyectos = () => {
         <div className="mis-proyectos-box d-flex flex-column align-items-center">
             <h1 className="mis-proyectos-title mb-4">Mis Proyectos</h1>
 
-            {/* Barra de búsqueda para "Mis Proyectos" */}
             <InputGroup className="search-bar mb-4">
                 <Form.Control
                     type="text"
@@ -204,7 +194,6 @@ const MisProyectos = () => {
                 </Button>
             </InputGroup>
 
-            {/* Selector de criterio de orden */}
             <div className="sort-container mb-4">
                 <Form.Select
                     value={sortCriterion}
@@ -216,7 +205,6 @@ const MisProyectos = () => {
                 </Form.Select>
             </div>
 
-            {/* Contenedor de proyectos usando TarjetaProyecto */}
             <div className="projects-container">
                 {filteredProyectos.length === 0 ? (
                     <p>No se ha podido encontrar ningún proyecto.</p>
@@ -225,14 +213,14 @@ const MisProyectos = () => {
                         <TarjetaProyecto
                             key={proyecto.id}
                             proyecto={proyecto}
-                            query={searchTerm} // Pasar el término de búsqueda para resaltar las coincidencias
-                            onVerDetalles={() => verDetalles(proyecto)} // Mostrar detalles en el modal para solicitar acceso
+                            query={searchTerm}
+                            onVerDetalles={() => verDetalles(proyecto)}
+                            enviarSolicitud={enviarSolicitud} // Pasar la función enviarSolicitud a TarjetaProyecto
                         />
                     ))
                 )}
             </div>
 
-            {/* Paginación */}
             {filteredProyectos.length > 0 && (
                 <div className="pagination mt-4 d-flex justify-content-center">
                     <Button
@@ -253,13 +241,12 @@ const MisProyectos = () => {
                 </div>
             )}
 
-            {/* Modal reutilizable para mostrar directamente el formulario de solicitud */}
             {proyectoSeleccionado && (
                 <ProyectoModal
                     show={showModal}
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
-                    enviarSolicitud={enviarSolicitud} // Pasamos la función enviarSolicitud como prop al modal
+                    enviarSolicitud={enviarSolicitud}
                 />
             )}
         </div>

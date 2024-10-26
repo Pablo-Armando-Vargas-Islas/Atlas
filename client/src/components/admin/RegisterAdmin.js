@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import './styles/Register.css'; 
+import './styles/RegisterAdmin.css'; 
 
-const Register = () => {
+const RegisterAdmin = () => {
     const [nombre, setNombre] = useState("");
     const [correoInstitucional, setCorreoInstitucional] = useState("");
     const [contraseña, setContraseña] = useState("");
@@ -67,7 +67,7 @@ const Register = () => {
             };
             
             
-            const response = await fetch("http://localhost:5000/api/auth/register", {
+            const response = await fetch("http://localhost:5000/api/auth/registerAdmin", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
@@ -185,4 +185,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default RegisterAdmin;

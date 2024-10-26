@@ -2,12 +2,13 @@ import React, { useContext } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import ProtectedRoute from '../src/routes/ProtectedRoute';
 import { AuthProvider, AuthContext } from "./context/AuthContext";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Buscador from "./components/Buscador";
+import Login from "./views/Login";
+import Register from "./views/Register";
+import Buscador from "./views/Buscador";
 import BusquedaGlobal from "./components/buscador/BusquedaGlobal"
-import SubirProyecto from "./components/SubirProyecto";
-import DashboardAdmin from "./components/admin/DashboardAdmin";
+import SubirProyecto from "./views/SubirProyecto";
+import DashboardAdministrador from "./components/admin/DashboardAdmin";
+import Solicitudes from "./components/admin/Solicitudes";
 import NavegarPorTitulo from "./components/buscador/NavegarPorTitulo";
 import NavegarPorAutor from "./components/buscador/NavegarPorAutor";
 import NavegarPorCategoria from "./components/buscador/NavegarPorCategoria";
@@ -17,8 +18,8 @@ import MisProyectos from "./components/buscador/MisProyectos";
 import CrearCursoProfesor from './components/profesor/cursos/CrearCursoProfesor';
 import GestionCursosProfesor from './components/profesor/cursos/GestionCursosProfesor';
 import VerProyectosCurso from './components/profesor/cursos/VerProyectosCurso';
-import MisSolicitudes from "./components/MisSolicitudes";
-import Navbar from "./components/Navbar";
+import MisSolicitudes from "./views/MisSolicitudes";
+import Navbar from "./views/Navbar";
 
 function App() {
     return (
@@ -48,7 +49,7 @@ function AppContent() {
 
                 {/* Rutas públicas */}
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/signup" element={<Register />} />
 
                 {/* Rutas protegidas */}
                 <Route
@@ -100,10 +101,18 @@ function AppContent() {
                     }
                 />
                 <Route
-                    path="/admin/DashboardAdmin"
+                    path="/admin/solicitudes"
                     element={
                         <ProtectedRoute>
-                            <DashboardAdmin />
+                            <Solicitudes />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <DashboardAdministrador />
                         </ProtectedRoute>
                     }
                 />

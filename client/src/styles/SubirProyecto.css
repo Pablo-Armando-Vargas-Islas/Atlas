@@ -1,0 +1,106 @@
+.proyecto-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+
+.proyecto-main-content {
+    width: 100%;
+    max-width: 1000px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.proyecto-form-group label {
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.proyecto-form-group input,
+.proyecto-form-group textarea{
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.proyecto-form-group .btn {
+    margin-top: 10px;
+}
+ 
+.alert {
+    margin-bottom: 20px;
+}
+
+.boton-descarga {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #1980e6;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.boton-descarga:hover {
+    background-color: #0b61b3;
+}
+
+.mt-3 {
+    margin-top: 20px;
+}
+
+.contenedor-boton-subir {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente, si es necesario */
+    height: 100%; /* Ajusta según tus necesidades */
+}
+
+.btn-subir-proyecto{
+    background-color: #91cb1b; /* Verde de la universidad */
+    color: #ffffff;
+    border: none;
+    width: 900px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-subir-proyecto:hover {
+    background-color: #91cb1b;
+    color: #ffffff;
+    transform: scale(1.01);
+}
+
+.btn-subir-proyecto:active {
+    background-color: #91cb1b!important;
+    color: #ffffff;
+}
+
+.btn-validar{
+    background-color: #91cb1b; /* Verde de la universidad */
+    color: #ffffff;
+    border-color: #91cb1b;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-validar:hover {
+    background-color: #91cb1b;
+    color: #ffffff;
+    border-color: #91cb1b;
+    transform: scale(1.01);
+}
+
+.btn-validar:active {
+    background-color: #91cb1b!important;
+    color: #ffffff;
+    border-color: #91cb1b;
+}

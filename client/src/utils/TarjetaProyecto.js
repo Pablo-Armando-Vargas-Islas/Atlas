@@ -1,10 +1,10 @@
 // src/components/TarjetaProyecto.js
 import React, { useState } from 'react';
 import { Card, Badge } from 'react-bootstrap';
-import ProyectoModal from '../components/ModalBuscador'; // Importar el modal que queremos abrir
-import './styles/TarjetaProyecto.css';
+import ProyectoModal from '../utils/ProyectoModal'; // Importar el modal que queremos abrir
+import '../styles/TarjetaProyecto.css';
 
-const TarjetaProyecto = ({ proyecto, query }) => {
+const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
   const [showModal, setShowModal] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
 
@@ -116,6 +116,8 @@ const TarjetaProyecto = ({ proyecto, query }) => {
           show={showModal}
           handleClose={cerrarModal}
           proyecto={proyectoSeleccionado}
+          enviarSolicitud={enviarSolicitud}
+          omitDetails={true}
         />
       )}
     </>

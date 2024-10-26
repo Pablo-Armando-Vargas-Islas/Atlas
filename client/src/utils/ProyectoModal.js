@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import '../styles/ProyectoModal.css';
 
-const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud }) => {
-    const [isMotivoStage, setIsMotivoStage] = useState(false); // Controla si está en la etapa de motivo
+const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetails = false }) => {
+    const [isMotivoStage, setIsMotivoStage] = useState(omitDetails); // Controla si está en la etapa de motivo
+
     const [motivo, setMotivo] = useState('');
     const [isMotivoValid, setIsMotivoValid] = useState(false); // Valida si el motivo es válido
 
@@ -20,6 +22,11 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud }) => {
         enviarSolicitud(proyecto.id, motivo);
         handleClose(); // Cerrar el modal tras enviar la solicitud
     };
+
+    useEffect(() => {
+        // Establecer la etapa del motivo directamente si omitDetails es true
+        setIsMotivoStage(omitDetails);
+    }, [omitDetails]);
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -45,6 +52,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud }) => {
                             <p><strong>Descripción:</strong> {proyecto.descripcion}</p>
                             <p><strong>Autores:</strong> {proyecto.autores.join(', ')}</p>
                             <p><strong>Tecnologías:</strong> {proyecto.tecnologias.join(', ')}</p>
+                            <p><strong>Categorías:</strong> {proyecto.categorias.join(', ')}</p>
                         </>
                     )
                 )}
@@ -54,7 +62,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud }) => {
                     <>
                         <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
                         <Button
-                            variant="primary"
+                            className='btn-solicitar-acceso'
                             onClick={handleEnviarSolicitud}
                             disabled={!isMotivoValid} // Deshabilitar el botón si el motivo no es válido
                         >
@@ -62,7 +70,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud }) => {
                         </Button>
                     </>
                 ) : (
-                    <Button variant="primary" onClick={handleSolicitarAcceso}>Solicitar Acceso</Button>
+                    <Button className='btn-solicitar-acceso' onClick={handleSolicitarAcceso}>Solicitar Acceso</Button>
                 )}
             </Modal.Footer>
         </Modal>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Modal, Button } from "react-bootstrap";
-import "./styles/SubirProyecto.css";
+import "../styles/SubirProyecto.css";
 
 const SubirProyectoProfesor = () => {
     const [userId, setUserId] = useState(null);
@@ -273,9 +273,8 @@ const SubirProyectoProfesor = () => {
                                         required
                                     />
                                     <Button
-                                        variant="primary"
                                         onClick={validarCodigoCurso}
-                                        className="mt-2"
+                                        className="btn-validar mt-2"
                                     >
                                         Validar Código
                                     </Button>
@@ -415,7 +414,9 @@ const SubirProyectoProfesor = () => {
                                     ))}
                                 </div>
                             </div>
-                            <Button type="submit" className="btn btn-success mt-3">Registrar</Button>
+                            <div class="contenedor-boton-subir">
+                                <Button type="submit" className="btn-subir-proyecto mt-3">Registrar</Button>
+                            </div>
                         </>
                     )}
 
@@ -558,7 +559,9 @@ const SubirProyectoProfesor = () => {
                                     ))}
                                 </div>
                             </div>
-                            <Button type="submit" className="btn btn-success mt-3">Registrar</Button>
+                            <div class="contenedor-boton-subir">
+                                <Button type="submit" className="btn-subir-proyecto mt-3">Registrar</Button>
+                            </div>
                         </>
                     )}
                 </form>

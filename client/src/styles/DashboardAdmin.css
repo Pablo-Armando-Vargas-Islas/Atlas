@@ -1,0 +1,41 @@
+.admin-dashboard-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.admin-dashboard-title {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.admin-metricas-generales {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.admin-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-width: 200px;
+}
+
+.admin-card-title {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    color: #007bff;
+}
+
+.admin-card-list-item {
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.admin-card-text {
+    font-size: 1em;
+    color: #333;
+}

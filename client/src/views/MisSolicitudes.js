@@ -1,7 +1,9 @@
+// MisSolicitudes.js
+
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
-import './styles/MisSolicitudes.css';
-import BotonDescarga from './utils/BotonDescarga';
+import '../styles/MisSolicitudes.css';
+import BotonDescarga from '../utils/BotonDescarga';
 
 const MisSolicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -72,6 +74,7 @@ const MisSolicitudes = () => {
                                     <td className="text-center">
                                         <Button
                                             variant="outline-primary"
+                                            className="ver-detalles-btn" // Usar la clase ya definida para el botón
                                             onClick={() => handleVerDetalles(solicitud)}
                                         >
                                             Ver Detalles
