@@ -104,3 +104,7 @@
     color: #ffffff;
     border-color: #91cb1b;
 }
+
+.border-danger {
+    border: 1px solid red !important;
+}

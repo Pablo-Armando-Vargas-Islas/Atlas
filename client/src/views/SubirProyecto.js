@@ -8,7 +8,7 @@ const SubirProyectoProfesor = () => {
     const [userId, setUserId] = useState(null);
     const [titulo, setTitulo] = useState("");
     const [descripcion, setDescripcion] = useState("");
-    const [necesitaLicencia, setNecesitaLicencia] = useState(false);
+    const [necesitaLicencia, setNecesitaLicencia] = useState(null);
     const [descripcionLicencia, setDescripcionLicencia] = useState("");
     const [linkGithub, setLinkGithub] = useState("");
     const [archivoComprimido, setArchivoComprimido] = useState(null);
@@ -29,9 +29,6 @@ const SubirProyectoProfesor = () => {
     const [showCursoModal, setShowCursoModal] = useState(false);
     const [cursoModalMessage, setCursoModalMessage] = useState("");
     const [cursoValidado, setCursoValidado] = useState(false);
-
-
-
     const navigate = useNavigate();
 
     // Recuperar el token del localStorage y decodificarlo
@@ -79,22 +76,52 @@ const SubirProyectoProfesor = () => {
         if (tipo === "grado" && !formatoAprobacion) missing.push("formatoAprobacion");
         if (!titulo) missing.push("titulo");
         if (!descripcion) missing.push("descripcion");
+        if (necesitaLicencia === null) missing.push("necesitaLicencia");
+        if (necesitaLicencia === true && !descripcionLicencia) missing.push("descripcionLicencia"); // Validar solo si necesitaLicencia es true
+        if (!linkGithub) missing.push("linkGithub");
         if (!archivoComprimido) missing.push("archivoComprimido");
         if (!tipo) missing.push("tipo");
         if (autores.some(autor => !autor)) missing.push("autores");
         if (selectedTecnologias.length === 0) missing.push("tecnologias");
         if (selectedCategorias.length === 0) missing.push("categorias");
-
+    
         setMissingFields(missing);
-
+    
         if (missing.length > 0) {
-            setErrorMessage("Por favor, completa todos los campos.");
+            const camposFaltantes = missing.map((field) => {
+                switch (field) {
+                    case "titulo":
+                        return "Título";
+                    case "descripcion":
+                        return "Descripción";
+                    case "necesitaLicencia":
+                        return "¿Necesita alguna licencia?";
+                    case "descripcionLicencia":
+                        return "Descripción de la Licencia";
+                    case "linkGithub":
+                        return "Link de GitHub";
+                    case "archivoComprimido":
+                        return "Archivo Comprimido";
+                    case "formatoAprobacion":
+                        return "Formato de Aprobación";
+                    case "autores":
+                        return "Autores";
+                    case "tecnologias":
+                        return "Tecnologías";
+                    case "categorias":
+                        return "Categorías";
+                    default:
+                        return field;
+                }
+            });
+    
+            setErrorMessage(`Por favor, completa todos los campos: ${camposFaltantes.join(", ")}`);
             return false;
         }
-
+    
         setErrorMessage("");
         return true;
-    };
+    };      
 
     const addAutorField = () => {
         setAutores([...autores, ""]);
@@ -127,6 +154,35 @@ const SubirProyectoProfesor = () => {
         }
     };
 
+    // Validación de formato de imagen
+    const handleFormatoAprobacionChange = (e) => {
+        const file = e.target.files[0];
+        const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    
+        if (file && !validImageTypes.includes(file.type)) {
+            setErrorMessage("Solo se permiten archivos de imagen (.png, .jpg, .jpeg) para el formato de aprobación.");
+            e.target.value = null; // Limpiar el input de archivo
+            return;
+        }
+    
+        setFormatoAprobacion(file);
+    };    
+
+    // Validación de formato zip o rar
+    const handleArchivoComprimidoChange = (e) => {
+        const file = e.target.files[0];
+        const validCompressedTypes = ['application/zip', 'application/x-rar-compressed'];
+    
+        if (file && !validCompressedTypes.includes(file.type)) {
+            setErrorMessage("Solo se permiten archivos comprimidos (.zip, .rar) para el archivo comprimido.");
+            e.target.value = null; // Limpiar el input de archivo
+            return;
+        }
+    
+        setArchivoComprimido(file);
+    };
+    
+
     // Validar el código del curso
     const validarCodigoCurso = async () => {
         try {
@@ -157,17 +213,63 @@ const SubirProyectoProfesor = () => {
         setShowCursoModal(true);
     };
 
-    const onSubmitForm = (e) => {
+    const onSubmitForm = async (e) => {
         e.preventDefault();
-        if (tipo === "aula" && !cursoValido) {
-            setErrorMessage("Debes validar el código del curso antes de continuar.");
+    
+        // Validar los campos antes de proceder
+        if (!validateFields()) {
+            return; // Si la validación falla, no procedemos
+        }
+    
+        // Obtener el token JWT almacenado en localStorage
+        const token = localStorage.getItem('token');
+    
+        if (!token) {
+            setErrorMessage("No se encontró un token de autenticación.");
             return;
         }
-        setShowModal(true); // Mostrar la ventana de confirmación si todo está validado
+    
+        // Validar si el título ya existe en la base de datos
+        try {
+            const checkResponse = await fetch(`http://localhost:5000/api/proyectos/titulo-existe?titulo=${encodeURIComponent(titulo)}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            // Verificar si la respuesta fue exitosa
+            if (!checkResponse.ok) {
+                throw new Error("Error en la respuesta al validar el título.");
+            }
+    
+            const checkData = await checkResponse.json();
+    
+            // Revisar la respuesta del backend
+            if (checkData.exists) {
+                setErrorMessage("El título del proyecto ya está registrado. Por favor, elige otro título.");
+                return; // Si el título ya existe, no procedemos
+            }
+        } catch (err) {
+            console.error("Error al validar el título del proyecto:", err);
+            setErrorMessage("Error al validar el título del proyecto: " + err.message);
+            return;
+        }
+    
+        // Si todo está validado correctamente y el título no existe, mostramos el modal de confirmación
+        setShowModal(true);
     };
+    
 
     const handleConfirm = async () => {
         try {
+            // Validar si el título ya existe
+            const checkResponse = await fetch(`http://localhost:5000/api/proyectos/titulo-existe?titulo=${encodeURIComponent(titulo)}`);
+            const checkData = await checkResponse.json();
+            if (checkData.exists) {
+                setErrorMessage("El título del proyecto ya está registrado. Por favor, elige otro título.");
+                return;
+            }
+
             const formData = new FormData();
             formData.append("formatoAprobacion", formatoAprobacion);
             formData.append("titulo", titulo);
@@ -293,7 +395,7 @@ const SubirProyectoProfesor = () => {
                                     className={`form-control ${missingFields.includes("titulo") ? "border-danger" : ""}`}
                                     value={titulo}
                                     onChange={(e) => setTitulo(e.target.value)}
-                                    required
+                                    
                                 />
                             </div>
                             <div className="form-group">
@@ -302,7 +404,7 @@ const SubirProyectoProfesor = () => {
                                     className={`form-control ${missingFields.includes("descripcion") ? "border-danger" : ""}`}
                                     value={descripcion}
                                     onChange={(e) => setDescripcion(e.target.value)}
-                                    required
+                                    
                                 />
                             </div>
                             <div className="form-group">
@@ -314,7 +416,7 @@ const SubirProyectoProfesor = () => {
                                             className={`form-control ${missingFields.includes("autores") ? "border-danger" : ""}`}
                                             value={autor}
                                             onChange={(e) => handleAutorChange(index, e.target.value)}
-                                            required
+                                            
                                         />
                                         <button type="button" className="btn btn-primary ml-2" onClick={addAutorField}>+</button>
                                         {index > 0 && (
@@ -323,16 +425,16 @@ const SubirProyectoProfesor = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="form-group">
+                            <div className={`form-group ${missingFields.includes("necesitaLicencia") ? "border-danger p-3 rounded" : ""}`}>
                                 <label>¿Necesita alguna licencia?</label>
                                 <div className="form-check">
                                     <input
                                         type="radio"
-                                        className="form-check-input"
+                                        className={`form-check-imput ${missingFields.includes("necesitaLicencia") ? "border-danger" : ""}`}
                                         id="licenciaSi"
                                         name="licencia"
                                         value="si"
-                                        checked={necesitaLicencia}
+                                        checked={necesitaLicencia === true}
                                         onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
                                     />
                                     <label className="form-check-label" htmlFor="licenciaSi">
@@ -342,11 +444,11 @@ const SubirProyectoProfesor = () => {
                                 <div className="form-check">
                                     <input
                                         type="radio"
-                                        className="form-check-input"
+                                        className={`form-check-imput ${missingFields.includes("necesitaLicencia") ? "border-danger" : ""}`}
                                         id="licenciaNo"
                                         name="licencia"
                                         value="no"
-                                        checked={!necesitaLicencia}
+                                        checked={necesitaLicencia === false}
                                         onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
                                     />
                                     <label className="form-check-label" htmlFor="licenciaNo">
@@ -358,7 +460,7 @@ const SubirProyectoProfesor = () => {
                                     <div className="form-group mt-3">
                                         <label>Descripción de la Licencia</label>
                                         <textarea
-                                            className="form-control"
+                                            className={`form-control ${missingFields.includes("descripcionLicencia") ? "border-danger" : ""}`}
                                             value={descripcionLicencia}
                                             onChange={(e) => setDescripcionLicencia(e.target.value)}
                                         />
@@ -370,7 +472,7 @@ const SubirProyectoProfesor = () => {
                                 <label>Link de GitHub</label>
                                 <input
                                     type="text"
-                                    className="form-control"
+                                    className={`form-control ${missingFields.includes("linkGithub") ? "border-danger" : ""}`}
                                     value={linkGithub}
                                     onChange={(e) => setLinkGithub(e.target.value)}
                                 />
@@ -380,8 +482,8 @@ const SubirProyectoProfesor = () => {
                                 <input
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
-                                    onChange={(e) => setArchivoComprimido(e.target.files[0])}
-                                    required
+                                    onChange={handleArchivoComprimidoChange}
+                                    accept=".zip,.rar"
                                 />
                             </div>
                             <div className="form-group">
@@ -414,7 +516,7 @@ const SubirProyectoProfesor = () => {
                                     ))}
                                 </div>
                             </div>
-                            <div class="contenedor-boton-subir">
+                            <div className="contenedor-boton-subir">
                                 <Button type="submit" className="btn-subir-proyecto mt-3">Registrar</Button>
                             </div>
                         </>
@@ -427,8 +529,8 @@ const SubirProyectoProfesor = () => {
                                 <input
                                     type="file"
                                     className={`form-control ${missingFields.includes("formatoAprobacion") ? "border-danger" : ""}`}
-                                    onChange={(e) => setFormatoAprobacion(e.target.files[0])}
-                                    required
+                                    onChange={handleFormatoAprobacionChange}
+                                    accept=".png,.jpg,.jpeg" // Para aceptar solo archivos de imagen
                                 />
                             </div>
                             <div className="form-group">
@@ -438,7 +540,7 @@ const SubirProyectoProfesor = () => {
                                     className={`form-control ${missingFields.includes("titulo") ? "border-danger" : ""}`}
                                     value={titulo}
                                     onChange={(e) => setTitulo(e.target.value)}
-                                    required
+                                    
                                 />
                             </div>
                             <div className="form-group">
@@ -447,7 +549,7 @@ const SubirProyectoProfesor = () => {
                                     className={`form-control ${missingFields.includes("descripcion") ? "border-danger" : ""}`}
                                     value={descripcion}
                                     onChange={(e) => setDescripcion(e.target.value)}
-                                    required
+                                    
                                 />
                             </div>
                             <div className="form-group">
@@ -459,7 +561,7 @@ const SubirProyectoProfesor = () => {
                                             className={`form-control ${missingFields.includes("autores") ? "border-danger" : ""}`}
                                             value={autor}
                                             onChange={(e) => handleAutorChange(index, e.target.value)}
-                                            required
+                                            
                                         />
                                         <button type="button" className="btn btn-primary ml-2" onClick={addAutorField}>+</button>
                                         {index > 0 && (
@@ -468,16 +570,16 @@ const SubirProyectoProfesor = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="form-group">
+                            <div className={`form-group ${missingFields.includes("necesitaLicencia") ? "border-danger p-3 rounded" : ""}`}>
                                 <label>¿Necesita alguna licencia?</label>
                                 <div className="form-check">
                                     <input
                                         type="radio"
-                                        className="form-check-input"
+                                        className={`form-check-imput ${missingFields.includes("necesitaLicencia") ? "border-danger" : ""}`}
                                         id="licenciaSi"
                                         name="licencia"
                                         value="si"
-                                        checked={necesitaLicencia}
+                                        checked={necesitaLicencia === true}
                                         onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
                                     />
                                     <label className="form-check-label" htmlFor="licenciaSi">
@@ -487,11 +589,11 @@ const SubirProyectoProfesor = () => {
                                 <div className="form-check">
                                     <input
                                         type="radio"
-                                        className="form-check-input"
+                                        className={`form-check-imput ${missingFields.includes("necesitaLicencia") ? "border-danger" : ""}`}
                                         id="licenciaNo"
                                         name="licencia"
                                         value="no"
-                                        checked={!necesitaLicencia}
+                                        checked={necesitaLicencia === false}
                                         onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
                                     />
                                     <label className="form-check-label" htmlFor="licenciaNo">
@@ -503,7 +605,7 @@ const SubirProyectoProfesor = () => {
                                     <div className="form-group mt-3">
                                         <label>Descripción de la Licencia</label>
                                         <textarea
-                                            className="form-control"
+                                            className={`form-control ${missingFields.includes("descripcionLicencia") ? "border-danger" : ""}`}
                                             value={descripcionLicencia}
                                             onChange={(e) => setDescripcionLicencia(e.target.value)}
                                         />
@@ -515,7 +617,7 @@ const SubirProyectoProfesor = () => {
                                 <label>Link de GitHub</label>
                                 <input
                                     type="text"
-                                    className="form-control"
+                                    className={`form-control ${missingFields.includes("linkGithub") ? "border-danger" : ""}`}
                                     value={linkGithub}
                                     onChange={(e) => setLinkGithub(e.target.value)}
                                 />
@@ -525,8 +627,8 @@ const SubirProyectoProfesor = () => {
                                 <input
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
-                                    onChange={(e) => setArchivoComprimido(e.target.files[0])}
-                                    required
+                                    onChange={handleArchivoComprimidoChange}
+                                    accept=".zip,.rar" // Para aceptar solo archivos comprimidos
                                 />
                             </div>
                             <div className="form-group">
@@ -559,7 +661,7 @@ const SubirProyectoProfesor = () => {
                                     ))}
                                 </div>
                             </div>
-                            <div class="contenedor-boton-subir">
+                            <div className="contenedor-boton-subir">
                                 <Button type="submit" className="btn-subir-proyecto mt-3">Registrar</Button>
                             </div>
                         </>

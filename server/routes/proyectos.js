@@ -280,53 +280,75 @@ router.post("/subir", verifyToken, upload, async (req, res) => {
     }
 });
 
+// Ruta para validar si el titulo del proyecto ya existe
+router.get("/titulo-existe", verifyToken, async (req, res) => {
+  try {
+      const { titulo } = req.query;
+
+      const proyectoExistente = await pool.query(
+          `SELECT id FROM proyectos WHERE titulo = $1`,
+          [titulo]
+      );
+
+      if (proyectoExistente.rows.length > 0) {
+          return res.json({ exists: true });
+      } else {
+          return res.json({ exists: false });
+      }
+  } catch (err) {
+      console.error("Error al verificar el título del proyecto:", err.message);
+      res.status(500).json({ error: "Error del servidor" });
+  }
+});
+
+
 // Ruta para la búsqueda de proyectos por título
 router.get("/titulo", verifyToken, async (req, res) => {
-    try {
-      const query = req.query.query || '';
-      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
-  
-      // Dividir la consulta en palabras clave
-      const keywords = query.split(' ').filter(Boolean);
-  
-      // Crear una expresión para buscar cada palabra clave usando ILIKE en el título
-      const searchConditions = keywords.length > 0 
-        ? `WHERE ${keywords.map(keyword => `p.titulo ILIKE '%${keyword}%'`).join(' AND ')}`
-        : '';
-  
-      // Determinar columna de orden
-      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
-      if (orden === 'popularidad') {
-        orderBy = 'p.popularidad DESC';
-      } else if (orden === 'relevancia') {
-        orderBy = 'p.relevancia DESC';
-      } else if (orden === 'antiguo') {
-        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
-      }
-  
-      // Consulta SQL que devuelve los proyectos que coinciden con el título
-      const proyectos = await pool.query(
-        `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
-                array_agg(DISTINCT a.nombre_autor) AS autores, 
-                array_agg(DISTINCT t.nombre) AS tecnologias,
-                array_agg(DISTINCT c.nombre) AS categorias
-         FROM proyectos p
-         LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
-         LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
-         LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
-         LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-         LEFT JOIN categorias c ON pc.categoria_id = c.id
-         ${searchConditions}
-         GROUP BY p.id
-         ORDER BY ${orderBy}`
-      );
-  
-      res.json(proyectos.rows);
-    } catch (err) {
-      console.error("Error en el servidor:", err.message);
-      res.status(500).send("Error del servidor");
+  try {
+    const query = req.query.query || '';
+    const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+
+    // Dividir la consulta en palabras clave
+    const keywords = query.split(' ').filter(Boolean);
+
+    // Crear una expresión para buscar cada palabra clave usando ILIKE en el título
+    const searchConditions = keywords.length > 0 
+      ? `WHERE ${keywords.map(keyword => `p.titulo ILIKE '%${keyword}%'`).join(' AND ')}`
+      : '';
+
+    // Determinar columna de orden
+    let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+    if (orden === 'popularidad') {
+      orderBy = 'p.popularidad DESC';
+    } else if (orden === 'relevancia') {
+      orderBy = 'p.relevancia DESC';
+    } else if (orden === 'antiguo') {
+      orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
     }
-  });
+
+    // Consulta SQL que devuelve los proyectos que coinciden con el título
+    const proyectos = await pool.query(
+      `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+              array_agg(DISTINCT a.nombre_autor) AS autores, 
+              array_agg(DISTINCT t.nombre) AS tecnologias,
+              array_agg(DISTINCT c.nombre) AS categorias
+        FROM proyectos p
+        LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+        LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+        LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+        LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+        LEFT JOIN categorias c ON pc.categoria_id = c.id
+        ${searchConditions}
+        GROUP BY p.id
+        ORDER BY ${orderBy}`
+    );
+
+    res.json(proyectos.rows);
+  } catch (err) {
+    console.error("Error en el servidor:", err.message);
+    res.status(500).send("Error del servidor");
+  }
+});
   
 
 // Ruta para obtener todos los proyectos sin filtros
@@ -409,178 +431,178 @@ router.get("/autor", verifyToken, async (req, res) => {
   });
 
   // Ruta para la búsqueda de proyectos por categoría
-router.get("/categoria", verifyToken, async (req, res) => {
-    try {
-      const query = req.query.query || '';
-      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
-  
-      // Dividir la consulta en palabras clave
-      const keywords = query.split(' ').filter(Boolean);
-  
-      // Crear una subconsulta para buscar proyectos que tengan al menos una categoría que coincida
-      const searchConditions = keywords.length > 0
-        ? keywords.map(keyword => `c.nombre ILIKE '%${keyword}%'`).join(' OR ')
-        : 'TRUE';
-  
-      // Determinar columna de orden
-      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
-      if (orden === 'popularidad') {
-        orderBy = 'p.popularidad DESC';
-      } else if (orden === 'relevancia') {
-        orderBy = 'p.relevancia DESC';
-      } else if (orden === 'antiguo') {
-        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
-      }
-  
-      // Consulta SQL que devuelve los proyectos que coinciden con la categoría y todos los datos asociados
-      const proyectos = await pool.query(
-        `WITH proyecto_filtrado AS (
-            SELECT DISTINCT p.id
-            FROM proyectos p
-            LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-            LEFT JOIN categorias c ON pc.categoria_id = c.id
-            WHERE ${searchConditions}
-        )
-        SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
-               array_agg(DISTINCT a.nombre_autor) AS autores, 
-               array_agg(DISTINCT t.nombre) AS tecnologias,
-               array_agg(DISTINCT c.nombre) AS categorias
-        FROM proyectos p
-        LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
-        LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
-        LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
-        LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-        LEFT JOIN categorias c ON pc.categoria_id = c.id
-        WHERE p.id IN (SELECT id FROM proyecto_filtrado)
-        GROUP BY p.id
-        ORDER BY ${orderBy}`
-      );
-  
-      res.json(proyectos.rows);
-    } catch (err) {
-      console.error("Error en el servidor:", err.message);
-      res.status(500).send("Error del servidor");
-    }
-  });
-  
-  // Ruta para la búsqueda de proyectos por fecha
-router.get("/fecha", verifyToken, async (req, res) => {
-    try {
-      const year = req.query.year || ''; // Obtener el año seleccionado
-      const month = req.query.month || ''; // Obtener el mes seleccionado
-      const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
-  
-      // Crear condición de búsqueda de fecha
-      let searchConditions = 'TRUE';
-      if (year && month) {
-        searchConditions = `EXTRACT(YEAR FROM p.fecha_hora) = ${year} AND EXTRACT(MONTH FROM p.fecha_hora) = ${month}`;
-      } else if (year) {
-        searchConditions = `EXTRACT(YEAR FROM p.fecha_hora) = ${year}`;
-      }
-  
-      // Determinar columna de orden
-      let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
-      if (orden === 'popularidad') {
-        orderBy = 'p.popularidad DESC';
-      } else if (orden === 'relevancia') {
-        orderBy = 'p.relevancia DESC';
-      } else if (orden === 'antiguo') {
-        orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
-      }
-  
-      // Consulta SQL que devuelve los proyectos que coinciden con la fecha y todos los datos asociados
-      const proyectos = await pool.query(
-        `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+  router.get("/categoria", verifyToken, async (req, res) => {
+      try {
+        const query = req.query.query || '';
+        const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+    
+        // Dividir la consulta en palabras clave
+        const keywords = query.split(' ').filter(Boolean);
+    
+        // Crear una subconsulta para buscar proyectos que tengan al menos una categoría que coincida
+        const searchConditions = keywords.length > 0
+          ? keywords.map(keyword => `c.nombre ILIKE '%${keyword}%'`).join(' OR ')
+          : 'TRUE';
+    
+        // Determinar columna de orden
+        let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+        if (orden === 'popularidad') {
+          orderBy = 'p.popularidad DESC';
+        } else if (orden === 'relevancia') {
+          orderBy = 'p.relevancia DESC';
+        } else if (orden === 'antiguo') {
+          orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
+        }
+    
+        // Consulta SQL que devuelve los proyectos que coinciden con la categoría y todos los datos asociados
+        const proyectos = await pool.query(
+          `WITH proyecto_filtrado AS (
+              SELECT DISTINCT p.id
+              FROM proyectos p
+              LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+              LEFT JOIN categorias c ON pc.categoria_id = c.id
+              WHERE ${searchConditions}
+          )
+          SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
                 array_agg(DISTINCT a.nombre_autor) AS autores, 
                 array_agg(DISTINCT t.nombre) AS tecnologias,
                 array_agg(DISTINCT c.nombre) AS categorias
-         FROM proyectos p
-         LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
-         LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
-         LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
-         LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-         LEFT JOIN categorias c ON pc.categoria_id = c.id
-         WHERE ${searchConditions}
-         GROUP BY p.id
-         ORDER BY ${orderBy}`
-      );
+          FROM proyectos p
+          LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+          LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+          LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+          LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+          LEFT JOIN categorias c ON pc.categoria_id = c.id
+          WHERE p.id IN (SELECT id FROM proyecto_filtrado)
+          GROUP BY p.id
+          ORDER BY ${orderBy}`
+        );
+    
+        res.json(proyectos.rows);
+      } catch (err) {
+        console.error("Error en el servidor:", err.message);
+        res.status(500).send("Error del servidor");
+      }
+    });
   
-      res.json(proyectos.rows);
+  // Ruta para la búsqueda de proyectos por fecha
+  router.get("/fecha", verifyToken, async (req, res) => {
+      try {
+        const year = req.query.year || ''; // Obtener el año seleccionado
+        const month = req.query.month || ''; // Obtener el mes seleccionado
+        const orden = req.query.orden || 'fecha'; // Obtener criterio de orden
+    
+        // Crear condición de búsqueda de fecha
+        let searchConditions = 'TRUE';
+        if (year && month) {
+          searchConditions = `EXTRACT(YEAR FROM p.fecha_hora) = ${year} AND EXTRACT(MONTH FROM p.fecha_hora) = ${month}`;
+        } else if (year) {
+          searchConditions = `EXTRACT(YEAR FROM p.fecha_hora) = ${year}`;
+        }
+    
+        // Determinar columna de orden
+        let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
+        if (orden === 'popularidad') {
+          orderBy = 'p.popularidad DESC';
+        } else if (orden === 'relevancia') {
+          orderBy = 'p.relevancia DESC';
+        } else if (orden === 'antiguo') {
+          orderBy = 'p.fecha_hora ASC'; // Ordenar por fecha más antigua
+        }
+    
+        // Consulta SQL que devuelve los proyectos que coinciden con la fecha y todos los datos asociados
+        const proyectos = await pool.query(
+          `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+                  array_agg(DISTINCT a.nombre_autor) AS autores, 
+                  array_agg(DISTINCT t.nombre) AS tecnologias,
+                  array_agg(DISTINCT c.nombre) AS categorias
+          FROM proyectos p
+          LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+          LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+          LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+          LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+          LEFT JOIN categorias c ON pc.categoria_id = c.id
+          WHERE ${searchConditions}
+          GROUP BY p.id
+          ORDER BY ${orderBy}`
+        );
+    
+        res.json(proyectos.rows);
+      } catch (err) {
+        console.error("Error en el servidor:", err.message);
+        res.status(500).send("Error del servidor");
+      }
+    });
+
+  // Ruta para obtener los años disponibles en los que hay proyectos registrados
+  router.get("/fecha/anos", verifyToken, async (req, res) => {
+    try {
+      const años = await pool.query(
+        `SELECT DISTINCT EXTRACT(YEAR FROM fecha_hora) AS año
+        FROM proyectos
+        ORDER BY año ASC`
+      );
+
+      res.json(años.rows.map(row => row.año));
     } catch (err) {
-      console.error("Error en el servidor:", err.message);
+      console.error("Error en el servidor al obtener los años:", err.message);
       res.status(500).send("Error del servidor");
     }
   });
 
-  // Ruta para obtener los años disponibles en los que hay proyectos registrados
-router.get("/fecha/anos", verifyToken, async (req, res) => {
-  try {
-    const años = await pool.query(
-      `SELECT DISTINCT EXTRACT(YEAR FROM fecha_hora) AS año
-       FROM proyectos
-       ORDER BY año ASC`
-    );
+  // Ruta para obtener los nombres y códigos de los cursos disponibles
+  router.get("/cursos/nombres", verifyToken, async (req, res) => {
+      try {
+          const cursos = await pool.query(
+              `SELECT DISTINCT nombre_curso, codigo_curso
+              FROM cursos
+              ORDER BY nombre_curso ASC`
+          );
 
-    res.json(años.rows.map(row => row.año));
-  } catch (err) {
-    console.error("Error en el servidor al obtener los años:", err.message);
-    res.status(500).send("Error del servidor");
-  }
-});
-
-// Ruta para obtener los nombres y códigos de los cursos disponibles
-router.get("/cursos/nombres", verifyToken, async (req, res) => {
-    try {
-        const cursos = await pool.query(
-            `SELECT DISTINCT nombre_curso, codigo_curso
-             FROM cursos
-             ORDER BY nombre_curso ASC`
-        );
-
-        res.json(cursos.rows);
-    } catch (err) {
-        console.error("Error en el servidor al obtener los cursos:", err.message);
-        res.status(500).send("Error del servidor");
-    }
-});
+          res.json(cursos.rows);
+      } catch (err) {
+          console.error("Error en el servidor al obtener los cursos:", err.message);
+          res.status(500).send("Error del servidor");
+      }
+  });
 
 
   // Ruta para la búsqueda de proyectos por curso
-router.get("/curso", verifyToken, async (req, res) => {
-    try {
-        const curso = req.query.curso?.trim(); // Eliminar espacios adicionales del valor de curso
-        if (!curso) {
-            console.log("No se recibió el parámetro de curso.");
-            return res.status(400).send("Falta el parámetro de curso.");
-        }
+  router.get("/curso", verifyToken, async (req, res) => {
+      try {
+          const curso = req.query.curso?.trim(); // Eliminar espacios adicionales del valor de curso
+          if (!curso) {
+              console.log("No se recibió el parámetro de curso.");
+              return res.status(400).send("Falta el parámetro de curso.");
+          }
 
-        const proyectos = await pool.query(
-            `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
-                    array_agg(DISTINCT a.nombre_autor) AS autores, 
-                    array_agg(DISTINCT t.nombre) AS tecnologias,
-                    array_agg(DISTINCT c.nombre) AS categorias
-             FROM proyectos p
-             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
-             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
-             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
-             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-             LEFT JOIN categorias c ON pc.categoria_id = c.id
-             WHERE p.codigo_curso = $1
-             GROUP BY p.id
-             ORDER BY p.fecha_hora DESC`,
-            [curso]
-        );
+          const proyectos = await pool.query(
+              `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+                      array_agg(DISTINCT a.nombre_autor) AS autores, 
+                      array_agg(DISTINCT t.nombre) AS tecnologias,
+                      array_agg(DISTINCT c.nombre) AS categorias
+              FROM proyectos p
+              LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+              LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+              LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+              LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+              LEFT JOIN categorias c ON pc.categoria_id = c.id
+              WHERE p.codigo_curso = $1
+              GROUP BY p.id
+              ORDER BY p.fecha_hora DESC`,
+              [curso]
+          );
 
-        if (proyectos.rows.length === 0) {
-            console.log("No se encontraron proyectos con el código de curso proporcionado.");
-        }
+          if (proyectos.rows.length === 0) {
+              console.log("No se encontraron proyectos con el código de curso proporcionado.");
+          }
 
-        res.json(proyectos.rows);
-    } catch (err) {
-        console.error("Error en el servidor al obtener proyectos por curso:", err.message);
-        res.status(500).send("Error del servidor");
-    }
-});
+          res.json(proyectos.rows);
+      } catch (err) {
+          console.error("Error en el servidor al obtener proyectos por curso:", err.message);
+          res.status(500).send("Error del servidor");
+      }
+  });
 
 
 
