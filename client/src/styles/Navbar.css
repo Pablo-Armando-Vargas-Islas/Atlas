@@ -1,4 +1,3 @@
-/* General Navbar Style */
 .custom-navbar {
     width: 100%;
     background-color: #FFFFFF;
@@ -14,7 +13,6 @@
     overflow: visible;
 }
 
-/* Navbar Container */
 .navbar-container {
     display: flex;
     align-items: center;
@@ -22,21 +20,19 @@
     justify-content: space-between;
 }
 
-/* Menu Icon (Hamburger) */
 .menu-icon {
     display: none;
     font-size: 1.8rem;
     cursor: pointer;
     position: absolute;
-    right: 20px; /* Para alinearlo con el borde derecho */
+    right: 20px; 
 }
 
-/* Navbar Links */
 .navbar-links {
     display: flex;
     align-items: center;
-    justify-content: center; /* Centra los links */
-    flex-grow: 1; /* Permite que ocupe el espacio disponible */
+    justify-content: center; 
+    flex-grow: 1;
     gap: 20px;
 }
 
@@ -50,23 +46,20 @@
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 999;
-    text-align: center; /* Centra los links en el menú desplegable */
+    text-align: center;
 }
 
-/* Logout Button */
 .logout-button {
     margin-left: auto;
 }
 
-/* Auth Buttons */
 .auth-buttons {
     display: flex;
-    gap: 15px; /* Añadir un espacio entre los botones */
+    gap: 15px; 
     align-items: center;
     justify-content: flex-end;
 }
 
-/* Styles for Mobile */
 @media screen and (max-width: 768px) {
     .menu-icon {
         display: block;
@@ -75,7 +68,7 @@
     .navbar-links {
         display: none;
         flex-direction: column;
-        align-items: center; /* Alinear al centro para el menú desplegable */
+        align-items: center;
         gap: 15px;
         transition: all 0.3s ease;
     }
@@ -85,13 +78,12 @@
     }
 
     .logout-button {
-        display: none; /* Oculta el botón de cerrar sesión cuando se muestra el menú hamburguesa */
+        display: none;
     }
 }
 
-/* Botón de Cerrar Sesión */
 .btn-logout {
-    background-color: #ec321d; /* Rojo para resaltar */
+    background-color: #f41d05; 
     color: white;
     border: none;
     padding: 6px 12px;
@@ -102,19 +94,18 @@
 }
 
 .btn-logout:hover {
-    background-color: #cf2c1a; /* Color más oscuro al pasar el mouse */
+    background-color: #cf2c1a; 
     color: white;
-    transform: scale(1.05); /* Efecto de agrandamiento ligero */
+    transform: scale(1.05); 
 }
 
 .btn-logout:active {
-    background-color: #cf2c1a; /* Aún más oscuro al hacer clic */
-    transform: scale(0.95); /* Efecto de reducción al hacer clic */
+    background-color: #cf2c1a; 
+    transform: scale(0.95); 
 }
 
-/* Logo Image Style */
 .navbar-logo-image {
-    width: 148px; /* Ajusta el tamaño según lo necesites */
+    width: 148px; 
     height: 48px;
     cursor: pointer;
 }

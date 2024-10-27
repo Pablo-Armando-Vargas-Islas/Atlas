@@ -179,7 +179,7 @@ const NavegarPorCurso = () => {
       }
   };
 
-  // Nueva función para manejar el cambio de curso seleccionado
+  // Función para manejar el cambio de curso seleccionado
   const handleCursoChange = (e) => {
     const codigoCursoSeleccionado = e.target.value.trim();
     setSelectedCurso(codigoCursoSeleccionado);
@@ -230,7 +230,7 @@ const NavegarPorCurso = () => {
       <h1 className="navegar-curso-title mb-4">Buscar Proyectos por Curso</h1>
       <Form.Select
         value={selectedCurso}
-        onChange={handleCursoChange} // Utilizamos la nueva función para manejar el cambio
+        onChange={handleCursoChange} 
         className="curso-select mb-4"
       >
         <option value="">Seleccione un Curso</option>

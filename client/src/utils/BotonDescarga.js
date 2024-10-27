@@ -20,7 +20,7 @@ const BotonDescarga = ({ id }) => {
             // Crear un enlace temporal para descargar el archivo con el nombre correcto
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const contentDisposition = response.headers['content-disposition'];
-            let fileName = 'archivo.zip'; // Valor predeterminado
+            let fileName = 'Proyecto_Repositorio_Atlas.zip'; // Valor predeterminado
 
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="(.+)"/);

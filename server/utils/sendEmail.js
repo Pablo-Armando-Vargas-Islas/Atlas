@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, htmlContent = null) => {
     const transporter = nodemailer.createTransport({
         service: 'outlook', // Proveedor: 'outlook' o 'hotmail' 
         auth: {
@@ -14,6 +14,7 @@ const sendEmail = async (to, subject, text) => {
         to,
         subject,
         text,
+        html: htmlContent,
     };
 
     try {

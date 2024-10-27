@@ -1,7 +1,6 @@
-// src/components/TarjetaProyecto.js
 import React, { useState } from 'react';
 import { Card, Badge } from 'react-bootstrap';
-import ProyectoModal from '../utils/ProyectoModal'; // Importar el modal que queremos abrir
+import ProyectoModal from '../utils/ProyectoModal';
 import '../styles/TarjetaProyecto.css';
 
 const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
@@ -11,11 +10,11 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
   const {
     titulo,
     descripcion,
-    tipo, // Grado o Aula
-    tecnologias = [], // Valor predeterminado
-    categorias = [], // Valor predeterminado
+    tipo,
+    tecnologias = [],
+    categorias = [],
     fecha_hora,
-    autores = [], // Valor predeterminado
+    autores = [],
   } = proyecto;
 
   // Dividir la consulta en palabras clave

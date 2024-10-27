@@ -2,7 +2,6 @@ import React, { createContext, useState, useContext } from 'react';
 
 const BuscadorContext = createContext();
 
-// Proveedor de contexto del buscador
 export const BuscadorProvider = ({ children }) => {
   const [query, setQuery] = useState('');
   const [filtros, setFiltros] = useState({});

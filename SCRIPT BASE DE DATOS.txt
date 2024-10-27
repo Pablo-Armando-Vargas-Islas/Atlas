@@ -184,6 +184,9 @@ FOR EACH ROW
 WHEN (NEW.descargas_count > 0)
 EXECUTE FUNCTION incrementar_relevancia();
 
+ALTER TABLE usuarios ADD COLUMN ultima_actividad TIMESTAMP;
+
+
 
 
 -- Índices para proyectos

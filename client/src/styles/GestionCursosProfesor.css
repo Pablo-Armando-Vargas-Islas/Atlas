@@ -27,25 +27,24 @@
     border-radius: 10px;
     overflow: hidden; 
     width: 100%;
-    margin-bottom: 30px; /* Espacio al final de la tabla */
+    margin-bottom: 30px; 
 }
 
 .gestion-cursos-table th,
 .gestion-cursos-table td {
     vertical-align: middle;
     padding: 15px;
-    border: 1px solid #ddd; /* Agregar bordes ligeros entre celdas */
-    text-align: center; /* Centramos todo el contenido de la tabla */
+    border: 1px solid #ddd; 
+    text-align: center; 
 }
 
  
 .gestion-cursos-table th {
-    font-weight: bold;
     font-size: 1em;
     color: #ffffff;
-    background-color: #0854A2; /* Color de fondo más suave para encabezado */
-    text-align: center; /* Centrar horizontalmente el contenido */
-    vertical-align: middle; /* Centrar verticalmente el contenido */
+    background-color: #0854A2; 
+    text-align: center; 
+    vertical-align: middle;
     padding: 12px;
 }
 
@@ -75,6 +74,26 @@
 }
 
 .detalle-proyecto-btn:active {
+    color: #ffffff!important;
+    background-color: #ec881d!important;
+    border-color: #ec881d!important;
+}
+
+.ver-solicitud-btn{
+    border-radius: 10px;
+    color: #0854A2;
+    background-color: #ffffff;
+    border: 0.5px solid #0855a25c;
+}
+
+.ver-solicitud-btn:hover {
+    color: #ec881d;
+    background-color: #ffffff;
+    border-color: #ec881d;
+    opacity: 0.9;
+}
+
+.ver-solicitud-btn:active {
     color: #ffffff!important;
     background-color: #ec881d!important;
     border-color: #ec881d!important;

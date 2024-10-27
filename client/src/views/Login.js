@@ -1,16 +1,15 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from "../context/AuthContext";
 import '../styles/Login.css';
 
 const Login = () => {
     const [usuario, setUsuario] = useState("");
-    //const [correoInstitucional, setCorreoInstitucional] = useState("");
     const [contraseña, setContraseña] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
-
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
@@ -20,15 +19,40 @@ const Login = () => {
             const body = { usuario, contraseña };
             const response = await login(body);
 
-            if (response.ok) {
-                localStorage.setItem("token", response.token);
-                console.log("Token guardado en localStorage:", response.token);
-            } else {
-                setAlert({ type: "danger", message: response.error });
-            }
+            if (response && response.ok) {
+                const token = response.token;
+                localStorage.setItem("token", token);
 
+                // Decodificar el token
+                const decoded = jwtDecode(token);
+                console.log("Información decodificada:", decoded);
+
+                // Verificar si el usuario debe cambiar la contraseña
+                if (decoded.debe_cambiar_contrasena) {
+                    console.log("Redirigiendo a /actualiza-contraseña");
+                    navigate("/actualiza-contraseña");
+                } else {
+                    console.log("Rol del usuario:", decoded.rol_id);
+                    // Redirigir según el rol del usuario
+                    switch (decoded.rol_id) {
+                        case 1:
+                            navigate("/admin/dashboard");
+                            break;
+                        case 2:
+                            navigate("/Buscador");
+                            break;
+                        case 3:
+                            navigate("/Buscador");
+                            break;
+                        default:
+                            setAlert({ type: "danger", message: "Rol de usuario no reconocido" });
+                    }
+                }
+            } else {
+                setAlert({ type: "danger", message: response.error || "Error en la respuesta del servidor" });
+            }
         } catch (err) {
-            console.error(err.message);
+            console.error("Error en el submit:", err.message);
             setAlert({ type: "danger", message: "Error de conexión" });
         }
     };
@@ -45,16 +69,6 @@ const Login = () => {
                     )}
                     <form onSubmit={onSubmitForm}>
                         <div className="form-group login-form-group mb-3">
-                            {/* <label htmlFor="email">Correo electrónico</label> 
-                            <input
-                                type="email"
-                                className="form-control login-form-control rounded-pill"
-                                id="email"
-                                placeholder="Correo electrónico"
-                                value={correoInstitucional}
-                                onChange={(e) => setCorreoInstitucional(e.target.value)}
-                                required
-                            />*/}
                             <input
                                 type="text"
                                 className="form-control login-form-control rounded-pill"
@@ -66,7 +80,6 @@ const Login = () => {
                             />
                         </div>
                         <div className="form-group login-form-group mb-3 position-relative">
-                            {/* <label htmlFor="password">Contraseña</label> */}
                             <input
                                 type="password"
                                 className="form-control login-form-control rounded-pill"
@@ -84,7 +97,7 @@ const Login = () => {
                             <button
                                 type="button"
                                 className="btn btn-link forgot-password-link"
-                                onClick={() => navigate("/forgot-password")}
+                                onClick={() => navigate("/recuperar-contraseña")}
                             >
                                 ¿Has olvidado la contraseña?
                             </button>

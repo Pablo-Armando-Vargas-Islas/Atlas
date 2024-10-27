@@ -20,33 +20,32 @@
     border-radius: 10px;
     overflow: hidden;
     width: 100%;
-    margin-bottom: 30px; /* Espacio al final de la tabla */
+    margin-bottom: 30px; 
 }
 
 .mis-solicitudes-table th,
 .mis-solicitudes-table td {
     vertical-align: middle;
     padding: 7px;
-    border: 1px solid #ddd; /* Bordes ligeros entre celdas */
-    text-align: center; /* Centrar todo el contenido de la tabla */
+    border: 1px solid #ddd; 
+    text-align: center; 
 }
 
 .mis-solicitudes-table th {
-    font-weight: bold;
     font-size: 1em;
     color: #ffffff;
-    background-color: #0854A2; /* Color de fondo para encabezado */
+    background-color: #0854A2; 
     text-align: center;
-    vertical-align: middle; /* Centrar verticalmente */
-    height: 50px; /* Asegurar una altura constante */
-    line-height: 50px; /* Igualar altura y línea para centrar el contenido */
+    vertical-align: middle; 
+    height: 50px; 
+    line-height: 50px; 
 }
 
 .ver-detalles-btn {
     border-radius: 10px;
     color: #0854A2;
     background-color: #ffffff;
-    border-color: #0854A2;
+    border: 0.5px solid #0855a25c;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 

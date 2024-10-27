@@ -31,18 +31,19 @@ html, body {
     border: 1px solid #dcdcdc; 
 }
 
-/* Estilo del botón Registrar*/
 .register-btn-primary {
-    border-radius: 8px;
-    background-color: #0ba8e2; 
+    background-color: #91cb1b; 
     color: #ffffff;
     border: none;
-    padding: 10px;
-    font-weight: bold;
-}
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, transform 0.2s;
+} 
 
 .register-btn-primary:hover {
-    background-color: #088ac2;
+    background-color: #ec881d;
+    color: #ffffff;
+    transform: scale(1.01);
 }
 
 .btn-link {

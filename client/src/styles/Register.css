@@ -1,28 +1,26 @@
 html, body {
     height: 100%;
     margin: 0;
-    background-color: #e8f0ff; /* Fondo predominante azul */
-    font-family: Arial, sans-serif; /* Fuente moderna y limpia */
+    background-color: #e8f0ff; 
+    font-family: Arial, sans-serif; 
 }
 
-/* Caja de registro */
 .register-box {
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.95); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     text-align: center;
     margin-top: -70px;
 }
 
-/* Título principal */
 .register-title {
-    color: #0854A2!important; /* Color predominante */
+    color: #0854A2!important;
     font-weight: bold;
 }
 
-/* Botón de registro */
+
 .register-btn-primary {
-    background-color: #91cb1b; /* Verde de la universidad */
+    background-color: #91cb1b; 
     color: #ffffff;
     border: none;
     border-radius: 25px;
@@ -41,7 +39,6 @@ html, body {
     color: #ffffff!important;
 }
 
-/* Input del formulario */
 .register-form-control {
     border: 0.5px solid #0855a25c;
     padding: 10px;

@@ -1,37 +1,39 @@
 html, body {
     height: 100%;
     margin: 0;
-    font-family: Arial, sans-serif; /* Fuente más moderna y limpia */
+    font-family: Arial, sans-serif;
 }
 
-/* Contenedor principal de login */
 .login-container {
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center; 
-    margin-top: -50px; /* Ajuste de altura */
+    margin-top: -50px;
 }
 
-/* Caja de login */
 .login-box {
     max-width: 500px;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.95); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aumentar un poco la sombra para darle más profundidad */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     padding: 40px;
     position: relative;
     text-align: center;
 }
 
-/* Título principal */
 h1 {
-    color: #0854A2!important; /* Color predominante */
+    color: #0854A2!important; 
     font-weight: bold;
     margin-bottom: 30px;
 }
 
-/* Botón de iniciar sesión */
+h2 {
+    color: #0854A2!important;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
 .login-btn-primary {
     background-color: #91cb1b; /* Verde de la universidad */
     color: #ffffff;
@@ -50,7 +52,6 @@ h1 {
     color: #ffffff!important;
 }
 
-/* Input del formulario */
 .login-form-control {
     border: 0.5px solid #0855a25c; /* Borde azul predominante */
     padding: 10px;
@@ -62,40 +63,37 @@ h1 {
     box-shadow: 0 0 5px rgba(29, 132, 243, 0.5);
 }
 
-/* Estilo específico para el link de "Olvidé la contraseña" */
 .forgot-password-link-container {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-top: 10px; /* Ajustar la separación si es necesario */
+    margin-top: 10px; 
 }
 
 .forgot-password-link {
     font-size: 0.8rem;
     margin-top: -10px!important;
-    color: #0854A2; /* Naranja para resaltar */
+    color: #0854A2;
     text-decoration: none;
     transition: color 0.3s;
 }
 
 .forgot-password-link:hover {
-    color: #0854A2; /* Azul predominante al pasar el cursor */
+    color: #0854A2; 
 }
 
-/* Botón de log in y sign up con más separación */
 .auth-buttons {
     display: flex;
-    gap: 20px; /* Añadir un espacio adecuado entre los botones */
+    gap: 20px; 
     align-items: center;
-    justify-content: center; /* Centra los botones */
+    justify-content: center;
 }
 
-/* Imagen de bienvenida con borde redondeado */
 .login-image {
-    width: 100px; /* Ajusta el tamaño según necesites */
-    height: 100px; /* Asegúrate de que sea un cuadrado para un círculo perfecto */
-    object-fit: cover; /* Asegura que la imagen se ajuste sin distorsionarse */
-    border-radius: 50%; /* Borde redondo */
-    border: 3px solid #1D84F3; /* Añadir un borde azul brillante */
-    margin-bottom: 20px; /* Separación con el título */
+    width: 100px;
+    height: 100px;
+    object-fit: cover; 
+    border-radius: 50%; 
+    border: 3px solid #1D84F3; 
+    margin-bottom: 20px; 
 }

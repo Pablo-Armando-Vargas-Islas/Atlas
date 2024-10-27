@@ -133,8 +133,8 @@ const GestionCursosProfesor = () => {
                 {cursos.length === 0 ? (
                     <p className="text-center">No tienes cursos activos en este momento.</p>
                 ) : (
-                    <Table responsive bordered hover className="gestion-cursos-table no-hover mt-4">
-                        <thead className="table-header">
+                    <Table responsive bordered hover className="gestion-cursos-table mt-4">
+                        <thead className="table-header"> 
                             <tr>
                                 <th className="text-center">Nombre del Curso</th>
                                 <th className="text-center">Periodo Escolar</th>

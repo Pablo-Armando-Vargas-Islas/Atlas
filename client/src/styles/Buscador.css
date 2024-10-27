@@ -3,15 +3,15 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    height: auto; /* Ajustar la altura según el contenido */
+    height: auto; 
     min-height: 550px;
-    overflow-y: auto; /* Permitir scroll si el contenido es extenso */
+    overflow-y: auto; 
     max-width: 1000px;
-    margin: 2% auto; /* Reducir el margen superior para que esté más arriba */
+    margin: 2% auto; 
     background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    justify-content: center; /* Centrar el contenido verticalmente */
+    justify-content: center; 
 }
 
 .buscador-title {
@@ -49,20 +49,20 @@
 }
 
 .button-card {
-    width: 240px; /* Aumentar el tamaño de las tarjetas */
-    height: 140px; /* Aumentar el tamaño de las tarjetas */
+    width: 240px; 
+    height: 140px; 
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
+    background-color: #fbfbfb;
     color: #000;
 }
 
 .button-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    background-color: #0052A6; /* Cambiar a azul */
-    color: #fff; /* Cambiar el texto a blanco */
+    background-color: #0052A6; 
+    color: #fff; 
 }
 
 .button-card .card-body {
@@ -71,6 +71,6 @@
     justify-content: center;
     text-align: center;
     font-weight: bold;
-    font-size: 1.2rem; /* Aumentar el tamaño del texto */
+    font-size: 1.2rem; 
     height: 100%;
 }

@@ -1,41 +1,140 @@
-.admin-dashboard-container {
-    padding: 20px;
-    background-color: #f9f9f9;
+/* Caja principal del Dashboard */
+.admin-dashboard-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 1100px;
 }
 
+/* Contenedor de Métricas Generales */
+.admin-metricas-generales {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* Tarjetas de Métricas Generales */
+.admin-card {
+    background: #fbfbfb;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 12px 17px rgba(0, 0, 0, 0.182);
+    text-align: center;
+    height: 100%;
+}
+
+/* Listas dentro de las tarjetas */
+.admin-card ul {
+    list-style-position: inside; /* Asegura que los puntos se alineen con el texto */
+    padding-left: 0; /* Quita el margen izquierdo de las listas */
+    text-align: left; /* Alinear el contenido de las listas a la izquierda para mejor legibilidad */
+    display: inline-block; /* Permite centrar el contenido dentro de la tarjeta */
+}
+
+.admin-card li {
+    margin-bottom: 5px; /* Espacio entre los elementos de la lista */
+    text-indent: -1.5em; /* Indentación negativa para alinear correctamente la segunda línea con el texto */
+    padding-left: 1.5em; /* Espacio para que el punto quede correctamente separado */
+}
+
+/* Contenedor de Gráficas */
+.admin-graficas-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+/* Tarjetas de Gráficas */
+.admin-grafica-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 12px 17px rgba(0, 0, 0, 0.182);
+    text-align: center;
+    flex: 1 1 45%;
+    min-width: 300px;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Título del Dashboard */
 .admin-dashboard-title {
     font-size: 1.8em;
     color: #333;
     margin-bottom: 20px;
+    text-align: center;
 }
 
-.admin-metricas-generales {
+/* Título de las Tarjetas */
+.admin-card-title {
+    font-size: 1.3em;
+    color: #4995dd;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Paginación */
+.pagination {
+    margin-top: 15px;
     display: flex;
-    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 20px;
 }
 
-.admin-card {
-    background: #ffffff;
+/* Botones de Paginación */
+.pagination-button {
+    background-color: transparent;
+    color: #007bff;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.pagination-button:disabled {
+    color: #cccccc;
+    cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+    color: #0056b3;
+}
+
+/* Número de Página */
+.pagination-page {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Alertas y Notificaciones */
+.alertas-card {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffecb5;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    flex: 1;
-    min-width: 200px;
+    text-align: center;
 }
 
-.admin-card-title {
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    color: #007bff;
+/* Estilo para el Link que envuelve la tarjeta */
+.admin-card-link {
+    text-decoration: none; /* Quitar el subrayado del enlace */
+    color: inherit; /* Mantener el color del texto original */
 }
 
-.admin-card-list-item {
-    margin-bottom: 5px;
-    color: #555;
+/* Estilo para el Link en estado hover */
+.admin-card-link:hover {
+    text-decoration: none; /* Quitar el subrayado también cuando se pasa el ratón */
 }
 
-.admin-card-text {
-    font-size: 1em;
-    color: #333;
+/* Efecto al pasar el ratón sobre el enlace que envuelve la tarjeta */
+.admin-card-link:hover .admin-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease-in-out;
 }

@@ -180,7 +180,7 @@ const BusquedaGlobal = () => {
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
                     enviarSolicitud={enviarSolicitud}
-                    omitDetails={true} // Omitir la vista de detalles y mostrar directamente el formulario de solicitud
+                    omitDetails={true}
                 />
             )}
         </div>

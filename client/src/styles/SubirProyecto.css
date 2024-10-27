@@ -57,13 +57,13 @@
 
 .contenedor-boton-subir {
     display: flex;
-    justify-content: center; /* Centrar horizontalmente */
-    align-items: center; /* Centrar verticalmente, si es necesario */
-    height: 100%; /* Ajusta según tus necesidades */
+    justify-content: center; 
+    align-items: center; 
+    height: 100%; 
 }
 
 .btn-subir-proyecto{
-    background-color: #91cb1b; /* Verde de la universidad */
+    background-color: #91cb1b; 
     color: #ffffff;
     border: none;
     width: 900px;
@@ -84,7 +84,7 @@
 }
 
 .btn-validar{
-    background-color: #91cb1b; /* Verde de la universidad */
+    background-color: #91cb1b; 
     color: #ffffff;
     border-color: #91cb1b;
     border-radius: 25px;

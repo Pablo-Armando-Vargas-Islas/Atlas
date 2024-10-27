@@ -4,21 +4,25 @@ import ProtectedRoute from '../src/routes/ProtectedRoute';
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import Login from "./views/Login";
 import Register from "./views/Register";
+import RegisterAdmin from "./views/admin/RegisterAdmin";
+import ForgotPassword from "./views/ForgotPassword";
+import ChangePassword from "./views/ChangePassword";
 import Buscador from "./views/Buscador";
-import BusquedaGlobal from "./components/buscador/BusquedaGlobal"
+import BusquedaGlobal from "./views/buscador/BusquedaGlobal"
 import SubirProyecto from "./views/SubirProyecto";
-import DashboardAdministrador from "./components/admin/DashboardAdmin";
-import Solicitudes from "./components/admin/Solicitudes";
-import NavegarPorTitulo from "./components/buscador/NavegarPorTitulo";
-import NavegarPorAutor from "./components/buscador/NavegarPorAutor";
-import NavegarPorCategoria from "./components/buscador/NavegarPorCategoria";
-import NavegarPorFecha from "./components/buscador/NavegarPorFecha";
-import NavegarPorCurso from "./components/buscador/NavegarPorCurso";
-import MisProyectos from "./components/buscador/MisProyectos";
-import CrearCursoProfesor from './components/profesor/cursos/CrearCursoProfesor';
-import GestionCursosProfesor from './components/profesor/cursos/GestionCursosProfesor';
-import VerProyectosCurso from './components/profesor/cursos/VerProyectosCurso';
+import DashboardAdministrador from "./views/admin/DashboardAdmin";
+import Solicitudes from "./views/admin/Solicitudes";
+import NavegarPorTitulo from "./views/buscador/NavegarPorTitulo";
+import NavegarPorAutor from "./views/buscador/NavegarPorAutor";
+import NavegarPorCategoria from "./views/buscador/NavegarPorCategoria";
+import NavegarPorFecha from "./views/buscador/NavegarPorFecha";
+import NavegarPorCurso from "./views/buscador/NavegarPorCurso";
+import MisProyectos from "./views/buscador/MisProyectos";
+import CrearCursoProfesor from './views/profesor/cursos/CrearCursoProfesor';
+import GestionCursosProfesor from './views/profesor/cursos/GestionCursosProfesor';
+import VerProyectosCurso from './views/profesor/cursos/VerProyectosCurso';
 import MisSolicitudes from "./views/MisSolicitudes";
+import EditarUsuarios from "./views/admin/EditarUsuarios";
 import Navbar from "./views/Navbar";
 
 function App() {
@@ -50,6 +54,8 @@ function AppContent() {
                 {/* Rutas públicas */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Register />} />
+                <Route path="/recuperar-contraseña" element={<ForgotPassword />} />
+
 
                 {/* Rutas protegidas */}
                 <Route
@@ -57,6 +63,22 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <Buscador />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/actualiza-contraseña"
+                    element={
+                        <ProtectedRoute>
+                            <ChangePassword />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/registrar-admin"
+                    element={
+                        <ProtectedRoute>
+                            <RegisterAdmin />
                         </ProtectedRoute>
                     }
                 />
@@ -113,6 +135,14 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <DashboardAdministrador />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/usuarios"
+                    element={
+                        <ProtectedRoute>
+                            <EditarUsuarios />
                         </ProtectedRoute>
                     }
                 />

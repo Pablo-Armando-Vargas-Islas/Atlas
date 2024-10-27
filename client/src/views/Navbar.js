@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Navbar.css';
 import { FaBars, FaTimes } from 'react-icons/fa';
-import logo from '../styles/logo-retina5.png'; // Importa la imagen del logo
+import logo from '../styles/logo-retina5.png'; // Imagen del logo
 
 const Navbar = () => {
     const { rol, logout, token } = useContext(AuthContext);
@@ -84,8 +84,11 @@ const Navbar = () => {
 
                     {rol === 1 && (
                         <>
-                            <Link className="nav-link" to="/admin/dashboard" onClick={handleLinkClick}>Admin Dashboard</Link>
-                            <Link className="nav-link" to="/admin/solicitudes" onClick={handleLinkClick}>Solicitudes</Link>
+                            <Link className="nav-link" to="/admin/dashboard" onClick={handleLinkClick}>Dashboard</Link>
+                            <Link className="nav-link" to="/profesor/crearCurso" onClick={handleLinkClick}>Crear Curso</Link>
+                            <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
+                            <Link className="nav-link" to="/profesor/cursos" onClick={handleLinkClick}>Mis Cursos</Link>
+                            <Link className="nav-link" to="/registrar-admin" onClick={handleLinkClick}>Registrar Usuario</Link>
                             <Link className="nav-link" to="/Buscador" onClick={handleLinkClick}>Buscador</Link>
                         </>
                     )}

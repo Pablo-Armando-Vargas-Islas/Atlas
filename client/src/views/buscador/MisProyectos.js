@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { jwtDecode as jwt_decode } from "jwt-decode";
-import ProyectoModal from '../../utils/ProyectoModal'; // Actualizar la importación para que apunte a ProyectoModal.js
+import ProyectoModal from '../../utils/ProyectoModal'; 
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import '../../styles/MisProyectos.css';
 

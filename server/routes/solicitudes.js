@@ -11,9 +11,11 @@ const { verifyToken } = require('../middleware/authMiddleware');
 router.get('/', verifyToken, async (req, res) => {
     try {
         const solicitudes = await pool.query(
-            `SELECT s.id, s.proyecto_id, s.solicitante_id, s.motivo, s.status_solicitud, s.fecha_solicitud, u.nombre, p.titulo
+            `SELECT s.id, s.proyecto_id, s.solicitante_id, s.motivo, s.status_solicitud, s.fecha_solicitud, 
+                    u.nombre, r.nombre_rol AS rol, p.titulo
              FROM solicitudes s
              JOIN usuarios u ON s.solicitante_id = u.id
+             JOIN roles r ON u.rol_id = r.id
              JOIN proyectos p ON s.proyecto_id = p.id`
         );
         res.json(solicitudes.rows);
@@ -62,13 +64,13 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
             return res.status(404).json({ error: "Solicitud no encontrada" });
         }
 
-        // Obtener el correo del solicitante
+        // Obtener el correo del solicitante y su nombre
         const solicitante = await pool.query(
-            `SELECT u.correo_institucional
+            `SELECT u.correo_institucional, u.nombre
              FROM usuarios u
              JOIN solicitudes s ON u.id = s.solicitante_id
              WHERE s.id = $1`,
-            [solicitudId]  // Usar solicitudId para obtener el solicitante
+            [solicitudId]
         );
 
         if (solicitante.rows.length === 0) {
@@ -76,10 +78,11 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
         }
 
         const correoSolicitante = solicitante.rows[0].correo_institucional;
+        const nombreSolicitante = solicitante.rows[0].nombre;
 
         // Obtener el proyecto solicitado
         const proyecto = await pool.query(
-            `SELECT p.ruta_archivo_comprimido
+            `SELECT p.titulo
              FROM proyectos p
              WHERE p.id = $1`,
             [solicitudAceptada.rows[0].proyecto_id]
@@ -89,21 +92,25 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
             return res.status(404).json({ error: "Proyecto no encontrado" });
         }
 
-        const enlaceGitHub = proyecto.rows[0].ruta_archivo_comprimido;
+        const tituloProyecto = proyecto.rows[0].titulo;
 
         // Enviar correo al solicitante
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                <h2 style="color: #4CAF50;">Acceso Aprobado al Proyecto</h2>
+                <p>Estimado/a ${nombreSolicitante},</p>
+                <p>Nos complace informarte que tu solicitud de acceso al proyecto <strong>"${tituloProyecto}"</strong> ha sido <strong>aprobada</strong>.</p>
+                <p>Puedes acceder al proyecto visitando la sección de <strong>“Mis Solicitudes”</strong> y seleccionando la opción para descargar el archivo.</p>
+                <p><strong>IMPORTANTE:</strong> Recuerda que tienes un periodo de <strong>10 días</strong> para descargar el archivo, de lo contrario, tendrás que realizar una nueva solicitud.</p>
+                <p>Saludos cordiales,<br>Repositorio Atlas</p>
+            </div>
+        `;
+
         await sendEmail(
             correoSolicitante,
             "Acceso aprobado a proyecto",
-            `¡Muy bien, tu solicitud ha sido aprovada! 
-
-            Para acceder al código del archivo que solicitaste, por favor ve a la sección de "Mis Solicitudes", busca la solicitud correspondiente y da clic en "Ver detalles", ahí encontrarás la opción de descarga.
-
-            IMPORTANTE:
-            Recuerda que tienes unicamente 10 días para descargar el archivo, de lo contrario tendrás que hacer una nueva solicitud.
-            
-            
-            Saludos coordiales, Repositorio Atlas. `
+            "Tu solicitud ha sido aprobada.", // Texto plano de respaldo
+            htmlContent // Contenido HTML del correo
         );
 
         res.json({ message: "Solicitud aceptada y correo enviado." });
@@ -112,7 +119,6 @@ router.post('/solicitud/aceptar/:solicitudId', verifyToken, async (req, res) => 
         res.status(500).send("Error del servidor");
     }
 });
-
 
 // Ruta para rechazar una solicitud
 router.post('/solicitud/rechazar/:solicitudId', verifyToken, async (req, res) => {
@@ -132,32 +138,41 @@ router.post('/solicitud/rechazar/:solicitudId', verifyToken, async (req, res) =>
             return res.status(404).json({ error: "Solicitud no encontrada" });
         }
 
-        // Obtener el correo del solicitante
+        // Obtener el correo del solicitante, su nombre y el título del proyecto solicitado
         const solicitante = await pool.query(
-            `SELECT u.correo_institucional 
+            `SELECT u.correo_institucional, u.nombre, p.titulo 
              FROM usuarios u
              JOIN solicitudes s ON u.id = s.solicitante_id
+             JOIN proyectos p ON s.proyecto_id = p.id
              WHERE s.id = $1`,
-            [solicitudRechazada.rows[0].id]
+            [solicitudId]
         );
 
         if (solicitante.rows.length === 0) {
-            return res.status(404).json({ error: "Solicitante no encontrado" });
+            return res.status(404).json({ error: "Solicitante o proyecto no encontrado" });
         }
 
         const correoSolicitante = solicitante.rows[0].correo_institucional;
+        const nombreSolicitante = solicitante.rows[0].nombre;
+        const tituloProyecto = solicitante.rows[0].titulo;
 
         // Enviar correo con el motivo del rechazo
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                <h2 style="color: #f44336;">Acceso Denegado al Proyecto</h2>
+                <p style="color: #333;">Estimado/a ${nombreSolicitante},</p>
+                <p style="color: #333;">Lamentamos informarte que tu solicitud de acceso al proyecto <strong>"${tituloProyecto}"</strong> ha sido <strong>denegada</strong>.</p>
+                <p style="color: #333;"><strong>Motivo:</strong><br> ${comentarios}</p>
+                <p style="color: #333;">Si tienes alguna duda, no dudes en ponerte en contacto con el administrador del sistema.</p>
+                <p style="color: #333;">Saludos cordiales,<br>Repositorio Atlas</p>
+            </div>
+        `;
+
         await sendEmail(
             correoSolicitante,
             "Acceso al proyecto denegado",
-            `Lo sentimos, tu solicitud fué rechazada.
-            
-            Estimado usuario, lamentamos informarte que por el momento no podemos brindarte el acceso al código que solicitaste. 
-            
-            Motivo: ${comentarios}
-
-            Saludos coordiales, Repositorio Atlas. `
+            "Tu solicitud ha sido rechazada.", // Texto plano de respaldo
+            htmlContent // Contenido HTML del correo
         );
 
         res.json({ message: "Solicitud rechazada y correo enviado." });
@@ -166,7 +181,6 @@ router.post('/solicitud/rechazar/:solicitudId', verifyToken, async (req, res) =>
         res.status(500).send("Error del servidor");
     }
 });
-
 
 // Ruta para obtener las solicitudes del usuario autenticado (solicitante)
 router.get('/misSolicitudes', verifyToken, async (req, res) => {

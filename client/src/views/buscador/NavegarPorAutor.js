@@ -245,7 +245,7 @@ const NavegarPorAutor = () => {
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
                     enviarSolicitud={enviarSolicitud} // Pasar la función enviarSolicitud
-                    omitDetails={true} // Omitir la vista de detalles y mostrar directamente el formulario de solicitud
+                    omitDetails={true}
                 />
             )}
         </div>

@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [rol, setRol] = useState(null);
     const [userId, setUserId] = useState(null);
     const navigate = useNavigate();
-    const inactivityTimer = useRef(null); // Referencia para el temporizador de inactividad
+    const inactivityTimer = useRef(null); 
 
     // Cargar el token y la información del usuario al montar el componente
     useEffect(() => {
@@ -19,14 +19,14 @@ export const AuthProvider = ({ children }) => {
                 const { exp, rol_id, id } = jwtDecode(storedToken);
                 const currentTime = Math.floor(Date.now() / 1000);
                 if (currentTime > exp) {
-                    logout(); // Si el token ha expirado, realiza el logout
+                    logout(); // Si el token ha expirado, se realiza el logout
                 } else {
                     setToken(storedToken);
                     setRol(rol_id);
                     setUserId(id);
                 }
             } catch (e) {
-                logout(); // Si el token no es válido, realiza el logout
+                logout(); // Si el token no es válido, se relaiza el logout
             }
         }
     }, []);
@@ -76,12 +76,12 @@ export const AuthProvider = ({ children }) => {
         navigate("/login");
     };
 
-    // Tiempo de inactividad en milisegundos (por ejemplo, 30 minutos)
-    const INACTIVITY_LIMIT = 5 * 60 * 1000; 
+    // Tiempo de inactividad en milisegundos (10 minutos)
+    const INACTIVITY_LIMIT = 10 * 60 * 1000; 
 
     // Función para restablecer el temporizador de inactividad
     const resetInactivityTimer = () => {
-        if (token) { // Verificar si hay un token presente
+        if (token) { // Se verifica si hay un token presente
             if (inactivityTimer.current) {
                 clearTimeout(inactivityTimer.current);
             }
