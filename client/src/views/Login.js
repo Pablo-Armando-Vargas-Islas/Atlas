@@ -25,14 +25,11 @@ const Login = () => {
 
                 // Decodificar el token
                 const decoded = jwtDecode(token);
-                console.log("Información decodificada:", decoded);
 
                 // Verificar si el usuario debe cambiar la contraseña
                 if (decoded.debe_cambiar_contrasena) {
-                    console.log("Redirigiendo a /actualiza-contraseña");
                     navigate("/actualiza-contraseña");
                 } else {
-                    console.log("Rol del usuario:", decoded.rol_id);
                     // Redirigir según el rol del usuario
                     switch (decoded.rol_id) {
                         case 1:

@@ -138,8 +138,9 @@ router.post("/login", async (req, res) => {
             [usuario]
         );
 
+        // Si no existe el usuario en la base de datos
         if (user.rows.length === 0) {
-            return res.status(401).json({ error: "Error" });
+            return res.status(404).json({ error: "El usuario aún no está registrado" });
         }
 
         // Validación de contraseñas
@@ -149,7 +150,7 @@ router.post("/login", async (req, res) => {
         );
 
         if (!validPassword) {
-            return res.status(401).json({ error: "El usuario y la contraseña no coinciden o no existen" });
+            return res.status(401).json({ error: "El usuario y la contraseña no coinciden" });
         }
 
         // Generar el token JWT
@@ -170,7 +171,6 @@ router.post("/login", async (req, res) => {
             "UPDATE usuarios SET ultima_actividad = NOW() WHERE id = $1",
             [user.rows[0].id]
         );
-        //console.log("Token generado:", token);
 
         // Devolver el token y la información del usuario
         res.json({

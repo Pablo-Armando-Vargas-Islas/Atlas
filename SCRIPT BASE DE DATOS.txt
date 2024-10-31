@@ -118,6 +118,13 @@ CREATE TABLE proyectos_categorias (
   PRIMARY KEY (proyecto_id, categoria_id)
 );
 
+-- Creación de la tabla para el correo del sistema
+CREATE TABLE email_config (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
 ALTER TABLE cursos
 ADD COLUMN estado text DEFAULT 'abierto' CHECK (estado IN ('abierto', 'cerrado'));
 

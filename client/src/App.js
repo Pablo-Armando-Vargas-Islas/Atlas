@@ -23,6 +23,9 @@ import GestionCursosProfesor from './views/profesor/cursos/GestionCursosProfesor
 import VerProyectosCurso from './views/profesor/cursos/VerProyectosCurso';
 import MisSolicitudes from "./views/MisSolicitudes";
 import EditarUsuarios from "./views/admin/EditarUsuarios";
+import EditarCursos from "./views/admin/EditarCursos";
+import ProyectosPorCurso from "./views/admin/ProyectosPorCurso";
+import ConfiguracionCorreo from "./views/ConfiguracionCorreo";
 import Navbar from "./views/Navbar";
 
 function App() {
@@ -143,6 +146,30 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <EditarUsuarios />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/cursos"
+                    element={
+                        <ProtectedRoute>
+                            <EditarCursos />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/configurar-correo"
+                    element={
+                        <ProtectedRoute>
+                            <ConfiguracionCorreo />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/proyectos-curso/:id"
+                    element={
+                        <ProtectedRoute>
+                            <ProyectosPorCurso />
                         </ProtectedRoute>
                     }
                 />

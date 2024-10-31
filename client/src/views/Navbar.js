@@ -84,6 +84,7 @@ const Navbar = () => {
 
                     {rol === 1 && (
                         <>
+                            <Link className="nav-link" to="/admin/configurar-correo" onClick={handleLinkClick}>Correo</Link>
                             <Link className="nav-link" to="/admin/dashboard" onClick={handleLinkClick}>Dashboard</Link>
                             <Link className="nav-link" to="/profesor/crearCurso" onClick={handleLinkClick}>Crear Curso</Link>
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>

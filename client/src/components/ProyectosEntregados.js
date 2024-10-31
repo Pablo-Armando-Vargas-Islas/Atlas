@@ -27,13 +27,17 @@ const ProyectosEntregados = () => {
         fetchData();
     }, []);
 
+    const formatTipoProyecto = (tipo) => {
+        return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    };
+
     return (
         <div className="admin-card">
             <h3 className="admin-card-title">Proyectos Entregados</h3>
             <ul>
                 {proyectos.map(proyecto => (
                     <li key={proyecto.tipo_proyecto} className="admin-card-list-item">
-                        {proyecto.tipo_proyecto}: {proyecto.cantidad}
+                        {formatTipoProyecto(proyecto.tipo_proyecto)}: {proyecto.cantidad}
                     </li>
                 ))}
             </ul>

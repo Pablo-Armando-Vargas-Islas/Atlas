@@ -85,82 +85,80 @@ router.get("/", verifyToken, async (req, res) => {
 
 // Ruta para la búsqueda global de proyectos
 router.get("/atlas", verifyToken, async (req, res) => {
-    try {
-        const query = req.query.query || '';  // Parámetro de búsqueda
-        const orden = req.query.orden || 'reciente';  // Parámetro de orden
+  try {
+      const query = req.query.query || '';  // Parámetro de búsqueda
+      const orden = req.query.orden || 'reciente';  // Parámetro de orden
 
-        console.log("Parámetros recibidos:", { query, orden });
+      // Si la consulta está vacía, no aplicar condiciones específicas
+      let searchConditions = 'TRUE';
+      let queryParams = [];  // Para almacenar los parámetros de consulta
 
-        // Si la consulta está vacía, no aplicar condiciones específicas
-        let searchConditions = 'TRUE';
-        if (query.trim()) {
-            const keywords = query.split(' ').filter(Boolean);
-            searchConditions = keywords.map(keyword => `(
-                p.titulo ILIKE '%${keyword}%'
-                OR a.nombre_autor ILIKE '%${keyword}%'
-                OR t.nombre ILIKE '%${keyword}%'
-                OR c.nombre ILIKE '%${keyword}%'
-                OR p.descripcion ILIKE '%${keyword}%'
-            )`).join(' AND ');
-        }
+      if (query.trim()) {
+          const keywords = query.split(' ').filter(Boolean);
+          searchConditions = keywords.map((keyword, index) => {
+              queryParams.push(`%${keyword}%`);
+              return `(
+                  p.titulo ILIKE $${queryParams.length}
+                  OR a.nombre_autor ILIKE $${queryParams.length}
+                  OR t.nombre ILIKE $${queryParams.length}
+                  OR c.nombre ILIKE $${queryParams.length}
+                  OR p.descripcion ILIKE $${queryParams.length}
+              )`;
+          }).join(' AND ');
+      }
 
-        console.log("Condición de búsqueda:", searchConditions);
+      // Determinar columna de orden
+      let orderBy;
+      switch (orden) {
+          case 'antiguo':
+              orderBy = 'p.fecha_hora ASC';
+              break;
+          case 'popularidad':
+              orderBy = 'p.popularidad DESC';
+              break;
+          case 'relevancia':
+              orderBy = 'p.relevancia DESC';
+              break;
+          case 'reciente':
+          default:
+              orderBy = 'p.fecha_hora DESC';
+              break;
+      }
 
-        // Determinar columna de orden
-        let orderBy;
-        switch (orden) {
-            case 'antiguo':
-                orderBy = 'p.fecha_hora ASC';
-                break;
-            case 'popularidad':
-                orderBy = 'p.popularidad DESC';
-                break;
-            case 'relevancia':
-                orderBy = 'p.relevancia DESC';
-                break;
-            case 'reciente':
-            default:
-                orderBy = 'p.fecha_hora DESC';
-                break;
-        }
+      // Consulta SQL que devuelve todos los proyectos, autores, tecnologías y categorías
+      const proyectos = await pool.query(
+          `WITH proyecto_filtrado AS (
+              SELECT DISTINCT p.id
+              FROM proyectos p
+              LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
+              LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
+              LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id 
+              LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+              LEFT JOIN categorias c ON pc.categoria_id = c.id
+              WHERE ${searchConditions}
+          )
+          SELECT p.*, 
+                 array_agg(DISTINCT a.nombre_autor) as autores, 
+                 array_agg(DISTINCT t.nombre) as tecnologias,
+                 array_agg(DISTINCT c.nombre) as categorias
+          FROM proyectos p
+          LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
+          LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
+          LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+          LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+          LEFT JOIN categorias c ON pc.categoria_id = c.id
+          WHERE p.id IN (SELECT id FROM proyecto_filtrado)
+          GROUP BY p.id
+          ORDER BY ${orderBy}`,
+          queryParams
+      );
 
-        console.log("Orden:", orderBy);
-
-        // Consulta SQL que devuelve todos los proyectos, autores, tecnologías y categorías
-        const proyectos = await pool.query(
-            `WITH proyecto_filtrado AS (
-                SELECT DISTINCT p.id
-                FROM proyectos p
-                LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
-                LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
-                LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id 
-                LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-                LEFT JOIN categorias c ON pc.categoria_id = c.id
-                WHERE ${searchConditions}
-            )
-            SELECT p.*, 
-                   array_agg(DISTINCT a.nombre_autor) as autores, 
-                   array_agg(DISTINCT t.nombre) as tecnologias,
-                   array_agg(DISTINCT c.nombre) as categorias
-            FROM proyectos p
-            LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
-            LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
-            LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
-            LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
-            LEFT JOIN categorias c ON pc.categoria_id = c.id
-            WHERE p.id IN (SELECT id FROM proyecto_filtrado)
-            GROUP BY p.id
-            ORDER BY ${orderBy}`
-        );
-
-        console.log("Proyectos encontrados:", proyectos.rows.length);
-        res.json(proyectos.rows);
-    } catch (err) {
-        console.error("Error en el servidor:", err.message);
-        res.status(500).send("Error del servidor");
-    }
+      res.json(proyectos.rows);
+  } catch (err) {
+      console.error("Error en el servidor:", err.message);
+      res.status(500).send("Error del servidor");
+  }
 });
-
 
 // Ruta para obtener tecnologías
 router.get("/tecnologias", async (req, res) => {

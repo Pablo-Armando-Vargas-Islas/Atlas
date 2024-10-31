@@ -10,7 +10,6 @@ const SubirProyectoProfesor = () => {
     const [descripcion, setDescripcion] = useState("");
     const [necesitaLicencia, setNecesitaLicencia] = useState(null);
     const [descripcionLicencia, setDescripcionLicencia] = useState("");
-    const [linkGithub, setLinkGithub] = useState("");
     const [archivoComprimido, setArchivoComprimido] = useState(null);
     const [tipo, setTipo] = useState(""); 
     const [codigoCurso, setCodigoCurso] = useState(""); 
@@ -38,7 +37,6 @@ const SubirProyectoProfesor = () => {
             try {
                 const decodedToken = jwtDecode(token);
                 setUserId(decodedToken.id); // Establecer el userId decodificado desde el token
-                console.log("User ID decodificado:", decodedToken.id);
             } catch (error) {
                 console.error("Error al decodificar el token:", error);
             }
@@ -77,8 +75,7 @@ const SubirProyectoProfesor = () => {
         if (!titulo) missing.push("titulo");
         if (!descripcion) missing.push("descripcion");
         if (necesitaLicencia === null) missing.push("necesitaLicencia");
-        if (necesitaLicencia === true && !descripcionLicencia) missing.push("descripcionLicencia"); // Validar solo si necesitaLicencia es true
-        if (!linkGithub) missing.push("linkGithub");
+        if (necesitaLicencia === true && !descripcionLicencia) missing.push("descripcionLicencia");
         if (!archivoComprimido) missing.push("archivoComprimido");
         if (!tipo) missing.push("tipo");
         if (autores.some(autor => !autor)) missing.push("autores");
@@ -98,8 +95,6 @@ const SubirProyectoProfesor = () => {
                         return "¿Necesita alguna licencia?";
                     case "descripcionLicencia":
                         return "Descripción de la Licencia";
-                    case "linkGithub":
-                        return "Link de GitHub";
                     case "archivoComprimido":
                         return "Archivo Comprimido";
                     case "formatoAprobacion":
@@ -153,35 +148,6 @@ const SubirProyectoProfesor = () => {
             setSelectedCategorias([...selectedCategorias, categoria]);
         }
     };
-
-    // Validación de formato de imagen
-    const handleFormatoAprobacionChange = (e) => {
-        const file = e.target.files[0];
-        const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-    
-        if (file && !validImageTypes.includes(file.type)) {
-            setErrorMessage("Solo se permiten archivos de imagen (.png, .jpg, .jpeg) para el formato de aprobación.");
-            e.target.value = null; // Limpiar el input de archivo
-            return;
-        }
-    
-        setFormatoAprobacion(file);
-    };    
-
-    // Validación de formato zip o rar
-    const handleArchivoComprimidoChange = (e) => {
-        const file = e.target.files[0];
-        const validCompressedTypes = ['application/zip', 'application/x-rar-compressed'];
-    
-        if (file && !validCompressedTypes.includes(file.type)) {
-            setErrorMessage("Solo se permiten archivos comprimidos (.zip, .rar) para el archivo comprimido.");
-            e.target.value = null; // Limpiar el input de archivo
-            return;
-        }
-    
-        setArchivoComprimido(file);
-    };
-    
 
     // Validar el código del curso
     const validarCodigoCurso = async () => {
@@ -274,7 +240,7 @@ const SubirProyectoProfesor = () => {
             formData.append("formatoAprobacion", formatoAprobacion);
             formData.append("titulo", titulo);
             formData.append("descripcion", descripcion);
-            formData.append("archivoComprimido", archivoComprimido); // Asegúrate de enviar el archivo
+            formData.append("archivoComprimido", archivoComprimido);
             formData.append("descripcion_licencia", necesitaLicencia ? descripcionLicencia : "");
             formData.append("necesita_licencia", necesitaLicencia);
             formData.append("tipo", tipo);
@@ -467,22 +433,12 @@ const SubirProyectoProfesor = () => {
                                     </div>
                                 )}
                             </div>
-
-                            <div className="form-group">
-                                <label>Link de GitHub</label>
-                                <input
-                                    type="text"
-                                    className={`form-control ${missingFields.includes("linkGithub") ? "border-danger" : ""}`}
-                                    value={linkGithub}
-                                    onChange={(e) => setLinkGithub(e.target.value)}
-                                />
-                            </div>
                             <div className="form-group">
                                 <label>Archivo Comprimido</label>
                                 <input
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
-                                    onChange={handleArchivoComprimidoChange}
+                                    onChange={(e) => setArchivoComprimido(e.target.files[0])}
                                     accept=".zip,.rar"
                                 />
                             </div>
@@ -529,7 +485,7 @@ const SubirProyectoProfesor = () => {
                                 <input
                                     type="file"
                                     className={`form-control ${missingFields.includes("formatoAprobacion") ? "border-danger" : ""}`}
-                                    onChange={handleFormatoAprobacionChange}
+                                    onChange={(e) => setFormatoAprobacion(e.target.files[0])}
                                     accept=".png,.jpg,.jpeg" // Para aceptar solo archivos de imagen
                                 />
                             </div>
@@ -612,22 +568,12 @@ const SubirProyectoProfesor = () => {
                                     </div>
                                 )}
                             </div>
-
-                            <div className="form-group">
-                                <label>Link de GitHub</label>
-                                <input
-                                    type="text"
-                                    className={`form-control ${missingFields.includes("linkGithub") ? "border-danger" : ""}`}
-                                    value={linkGithub}
-                                    onChange={(e) => setLinkGithub(e.target.value)}
-                                />
-                            </div>
                             <div className="form-group">
                                 <label>Archivo Comprimido</label>
                                 <input
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
-                                    onChange={handleArchivoComprimidoChange}
+                                    onChange={(e) => setArchivoComprimido(e.target.files[0])}
                                     accept=".zip,.rar" // Para aceptar solo archivos comprimidos
                                 />
                             </div>
@@ -680,7 +626,6 @@ const SubirProyectoProfesor = () => {
                         {necesitaLicencia && (
                             <p><strong>Descripción de la licencia:</strong> {descripcionLicencia}</p>
                         )}
-                        <p><strong>Link de GitHub:</strong> {linkGithub}</p>
                         <p><strong>Archivo Comprimido:</strong> {archivoComprimido ? archivoComprimido.name : "No se ha subido ningún archivo"}</p>
                         <p><strong>Tipo de Proyecto:</strong> {tipo}</p>
                         <p><strong>Autores:</strong> {autores.join(", ")}</p>

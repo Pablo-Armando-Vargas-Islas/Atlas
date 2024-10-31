@@ -9,7 +9,7 @@ export const BuscadorProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   // Función para realizar la búsqueda
-  const buscarProyectos = async (consulta) => {
+  const buscarProyectos = async (consulta, orden = 'reciente') => {
     setLoading(true);
     setQuery(consulta);
     try {
@@ -17,9 +17,9 @@ export const BuscadorProvider = ({ children }) => {
       if (!token) {
         throw new Error("Token no encontrado. Por favor, inicia sesión nuevamente.");
       }
-
+  
       const response = await fetch(
-        `http://localhost:5000/api/proyectos/atlas?query=${encodeURIComponent(consulta)}`,
+        `http://localhost:5000/api/proyectos/atlas?query=${encodeURIComponent(consulta)}&orden=${orden}`,
         {
           method: 'GET',
           headers: {
@@ -28,11 +28,11 @@ export const BuscadorProvider = ({ children }) => {
           },
         }
       );
-
+  
       if (!response.ok) {
         throw new Error(`Error en la búsqueda: ${response.status} ${response.statusText}`);
       }
-
+  
       const data = await response.json();
       setResultados(data);
     } catch (error) {
@@ -40,7 +40,7 @@ export const BuscadorProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <BuscadorContext.Provider

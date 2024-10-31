@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const CursosActivosVsCerrados = () => {
     const [cursos, setCursos] = useState({ abiertos: 0, cerrados: 0 });
@@ -36,11 +37,15 @@ const CursosActivosVsCerrados = () => {
     }, []);
 
     return (
-        <div className="admin-card">
-            <h3 className="admin-card-title">Cursos Activos vs Cerrados</h3>
-            <p className="admin-card-text">Activos: {cursos.abiertos}</p>
-            <p className="admin-card-text">Cerrados: {cursos.cerrados}</p>
-        </div>
+        <Link to="/admin/cursos" className="admin-card-link">
+            <div className="admin-card">
+                <h3 className="admin-card-title">Cursos</h3>
+                <ul>
+                    <li>Activos: {cursos.abiertos}</li>
+                    <li>Cerrados: {cursos.cerrados}</li>
+                </ul>
+            </div>
+        </Link>
     );
 };
 

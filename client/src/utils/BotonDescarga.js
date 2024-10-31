@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import { Spinner } from 'react-bootstrap';
 
 const BotonDescarga = ({ id }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleDownload = async () => {
+        setIsLoading(true);
         try {
             const token = localStorage.getItem('token');
             if (!token) {
                 alert('Token no encontrado. Por favor, inicia sesión nuevamente.');
+                setIsLoading(false);
                 return;
             }
 
@@ -20,7 +25,7 @@ const BotonDescarga = ({ id }) => {
             // Crear un enlace temporal para descargar el archivo con el nombre correcto
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const contentDisposition = response.headers['content-disposition'];
-            let fileName = 'Proyecto_Repositorio_Atlas.zip'; // Valor predeterminado
+            let fileName = 'solicitud_proyecto.zip'; // Valor predeterminado
 
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
@@ -38,12 +43,26 @@ const BotonDescarga = ({ id }) => {
         } catch (error) {
             console.error('Error al descargar el archivo:', error);
             alert('Error al descargar el archivo. Por favor, inténtalo de nuevo.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <button onClick={handleDownload} className="btn btn-primary">
-            Descargar Archivo
+        <button onClick={handleDownload} className="btn btn-primary" disabled={isLoading}>
+            {isLoading ? (
+                <>
+                    <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                    /> Cargando...
+                </>
+            ) : (
+                'Descargar Archivo'
+            )}
         </button>
     );
 };

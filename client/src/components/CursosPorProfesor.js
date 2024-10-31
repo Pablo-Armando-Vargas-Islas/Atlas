@@ -23,7 +23,7 @@ const CursosPorProfesor = () => {
                 setCursosPorProfesor(data.slice(0, 3));
 
                 // Verificar si hay más profesores para la próxima página
-                setHasMore(data.length > 3);
+                setHasMore(data.length > 4);
             } catch (error) {
                 console.error('Error al obtener los cursos por profesor:', error.message);
             }

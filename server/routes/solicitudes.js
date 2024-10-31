@@ -37,6 +37,12 @@ router.post('/crear', verifyToken, async (req, res) => {
             [proyecto_id, solicitante_id, motivo]
         );
 
+        // Incrementar la popularidad del proyecto
+        await pool.query(
+            `UPDATE proyectos SET popularidad = popularidad + 1 WHERE id = $1`,
+            [proyecto_id]
+        );
+
         res.json(nuevaSolicitud.rows[0]);
     } catch (err) {
         console.error("Error al crear la solicitud:", err.message);
@@ -212,7 +218,7 @@ router.get('/descargar/:id', verifyToken, async (req, res) => {
     try {
         // Obtén la solicitud del usuario autenticado y verifica que esté aceptada y vigente
         const solicitud = await pool.query(
-            `SELECT p.ruta_archivo_comprimido, s.fecha_limite_descarga, s.status_solicitud
+            `SELECT p.ruta_archivo_comprimido, s.fecha_limite_descarga, s.status_solicitud, p.id as proyecto_id
              FROM solicitudes s 
              JOIN proyectos p ON s.proyecto_id = p.id
              WHERE s.id = $1 AND s.solicitante_id = $2`,
@@ -223,7 +229,7 @@ router.get('/descargar/:id', verifyToken, async (req, res) => {
             return res.status(404).json({ error: 'Solicitud no encontrada o acceso no autorizado' });
         }
 
-        const { fecha_limite_descarga, status_solicitud, ruta_archivo_comprimido } = solicitud.rows[0];
+        const { fecha_limite_descarga, status_solicitud, ruta_archivo_comprimido, proyecto_id } = solicitud.rows[0];
         const fechaLimite = new Date(fecha_limite_descarga);
         const hoy = new Date();
 
@@ -244,11 +250,20 @@ router.get('/descargar/:id', verifyToken, async (req, res) => {
 
         const nombreArchivo = path.basename(ruta_archivo_comprimido); // Obtén el nombre del archivo original
 
-        // Incrementar el contador de descargas
+        // Incrementar el contador de descargas en la solicitud
         await pool.query(
             `UPDATE solicitudes SET descargas_count = descargas_count + 1 WHERE id = $1`,
             [id]
         );
+
+        // Incrementar la relevancia del proyecto
+        await pool.query(
+            `UPDATE proyectos SET relevancia = relevancia + 1 WHERE id = $1`,
+            [proyecto_id]
+        );
+
+        // Establecer la cabecera Content-Disposition antes de descargar el archivo
+        res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
 
         // Descargar el archivo
         res.download(path.resolve(ruta_archivo_comprimido), nombreArchivo, (err) => {
@@ -258,7 +273,7 @@ router.get('/descargar/:id', verifyToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error al procesar la solicitud:', error);
+        console.error('Error al procesar la solicitud:', error.message);
         res.status(500).json({ error: 'Error en el servidor' });
     }
 });

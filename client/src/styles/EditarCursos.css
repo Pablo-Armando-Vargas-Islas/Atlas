@@ -1,0 +1,116 @@
+.admin-cursos-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.box-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    max-width: 1200px;
+    width: 100%; 
+}
+
+.titulo-gestion-cursos {
+    color: #0854A2!important;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.buscador-cursos {
+    margin-bottom: 20px;
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.tabla-cursos {
+    border-radius: 10px;
+    overflow: hidden; 
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.tabla-cursos th, .tabla-cursos td {
+    vertical-align: middle;
+    padding: 15px;
+    border: 1px solid #ddd; 
+    text-align: center; 
+}
+
+.tabla-cursos th {
+    font-size: 1em;
+    color: #ffffff;
+    background-color: #0854A2; 
+    text-align: center; 
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.tabla-cursos tr:hover {
+    background-color: #f1f1f1;
+}
+
+.tabla-cursos button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.tabla-cursos button:hover {
+    background-color: #0056b3;
+}
+
+.icono-accion-editar-curso{
+    cursor: pointer;
+    color: #2a76c8; /* Color azul para editar */
+}
+
+
+
+
+
+
+
+
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px; /* Más espacio entre los botones */
+}
+
+.boton-pagina {
+    background-color: #ffffff;
+    border: 1px solid #007bff;
+    color: #007bff;
+    padding: 5px 13px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, color 0.3s;
+    border-radius: 5px; /* Bordes redondeados para un mejor aspecto */
+}
+
+.boton-pagina:hover {
+    background-color: #007bff;
+    color: #ffffff;
+    transform: translateY(-2px); /* Efecto de desplazamiento hacia arriba al pasar el mouse */
+}
+
+.boton-pagina.activo {
+    background-color: #007bff;
+    color: #ffffff;
+    border-color: #007bff;
+    cursor: default;
+    font-weight: bold; /* Resaltar el botón activo */
+}

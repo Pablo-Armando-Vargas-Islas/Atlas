@@ -17,7 +17,7 @@ const DashboardAdministrador = () => {
     return (
         <div className="admin-dashboard-container">
             <div className="admin-dashboard-box">
-                <h2 className="text-center mb-4">Dashboard del Administrador</h2>
+                <h2 className="text-center mb-4">Dashboard</h2>
                 <div className="admin-metricas-generales">
                     {/* Métricas generales */}
                     <UsuariosRegistrados />

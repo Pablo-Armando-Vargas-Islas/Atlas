@@ -1,0 +1,75 @@
+.proyectos-curso-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto; 
+}
+
+.box-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    max-width: 1200px;
+    width: 100%; 
+}
+
+.titulo-proyectos-curso {
+    color: #0854A2!important;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.tabla-proyectos {
+    border-radius: 10px;
+    overflow: hidden; 
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.tabla-proyectos th,
+.tabla-proyectos td {
+    vertical-align: middle;
+    padding: 15px;
+    border: 1px solid #ddd; 
+    text-align: center; 
+}
+
+.tabla-proyectos th {
+    font-size: 1em;
+    color: #ffffff;
+    background-color: #0854A2; 
+    text-align: center; 
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.tabla-proyectos tr:hover {
+    background-color: #f1f1f1;
+}
+
+.link-proyectos {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.link-proyectos:hover {
+    color: #0056b3;
+}
+
+.boton-ver-mas {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.9em;
+}
+
+.boton-ver-mas:hover {
+    color: #0056b3;
+}

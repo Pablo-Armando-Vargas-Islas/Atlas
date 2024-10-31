@@ -1,0 +1,83 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #f0f4ff; /* Color de fondo similar pero diferente */
+}
+
+.configuracion-correo-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -50px; /* Ajustado ligeramente */
+}
+
+.configuracion-correo-box {
+    max-width: 600px; /* Ajuste del ancho del cuadro */
+    width: 100%;
+    border-radius: 20px; /* Ajuste del borde redondeado */
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center; /* Centrar el texto dentro del formulario */
+}
+
+.configuracion-correo-form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar los elementos de cada grupo */
+}
+
+.configuracion-correo-form-control {
+    width: 80%; /* Ancho del input más largo */
+    padding: 10px 40px 10px 10px; /* Espacio adicional a la derecha para el ícono */
+    font-size: 1rem;
+    border-radius: 25px; /* Bordes menos redondeados */
+    border: 1px solid #d3d3d3; /* Color de borde diferente */
+}
+
+.configuracion-correo-btn-primary {
+    background-color: #8fbc1e; /* Color similar */
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, transform 0.2s;
+    padding: 8px 10px;
+    width: 30%;
+    margin-top: 20px; /* Espacio adicional sobre el botón */
+} 
+
+.configuracion-correo-btn-primary:hover {
+    background-color: #e6801e;
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.password-container {
+    position: relative;
+    width: 80%; /* Ancho del contenedor de la contraseña igual que el input */
+    margin: 0 auto; /* Centramos el contenedor */
+}
+
+.password-input {
+    width: 100%;
+    padding-right: 40px; /* Espacio adicional para el ícono */
+}
+
+.toggle-password-icon {
+    position: absolute;
+    right: 10px;
+    top: 43%;
+    left: 90%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.5rem; /* Tamaño del ícono */
+    color: #666666;
+    transition: color 0.3s;
+}
+
+.toggle-password-icon:hover {
+    color: #000000;
+}

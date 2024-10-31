@@ -109,7 +109,7 @@ router.get('/actividad/reciente', verifyToken, async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ error: 'Error al obtener la actividad reciente' });
-    }
+    } 
 });
 
 // Nueva ruta para obtener la cantidad de estudiantes activos

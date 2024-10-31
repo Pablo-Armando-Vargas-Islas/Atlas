@@ -76,7 +76,7 @@ const RegisterAdmin = () => {
             if (response.status === 200) {
                 setAlert({ type: "success", message: "Registro exitoso. Se ha enviado un correo con la contraseña temporal." });
                 setTimeout(() => {
-                    navigate("/login");
+                    navigate("/admin/usuarios");
                 }, 2000);
             } else {
                 const data = await response.json();

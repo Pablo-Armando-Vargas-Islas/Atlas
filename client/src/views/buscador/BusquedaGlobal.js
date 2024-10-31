@@ -27,7 +27,7 @@ const BusquedaGlobal = () => {
     }, [location.search, sortOrder]);
 
     const handleBuscar = () => {
-        buscarProyectos(consultaLocal, sortOrder);
+        buscarProyectos(consultaLocal, sortOrder); 
     };
 
     const handlePageChange = (page) => {

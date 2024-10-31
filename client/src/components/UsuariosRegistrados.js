@@ -31,7 +31,7 @@ const UsuariosRegistrados = () => {
     return (
         <Link to="/admin/usuarios" className="admin-card-link">
             <div className="admin-card">
-                <h3 className="admin-card-title">Registro de usuarios</h3>
+                <h3 className="admin-card-title">Usuarios</h3>
                 <ul>
                     {usuarios.map((usuario, index) => (
                         <li key={index}>{usuario.rol}: {usuario.cantidad}</li>

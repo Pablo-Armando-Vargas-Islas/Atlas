@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/EditarUsuarios.css";
+import { FaEdit, FaCheck, FaTimes, FaUserSlash } from 'react-icons/fa';
 
 const AdminUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBusqueda] = useState("");
     const [editIndex, setEditIndex] = useState(null);
     const [editingUser, setEditingUser] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const usuariosPorPagina = 15;
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchUsuarios();
@@ -29,31 +34,42 @@ const AdminUsuarios = () => {
 
     const handleSearchChange = (e) => {
         setBusqueda(e.target.value);
+        setCurrentPage(1); 
     };
 
-    const highlightText = (text) => {
-        if (!busqueda) return text;
-        const regex = new RegExp(`(${busqueda})`, "gi");
-        return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
-    };
-
-    const filteredUsuarios = usuarios.filter(usuario =>
-        usuario.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        usuario.correo_institucional.toLowerCase().includes(busqueda.toLowerCase()) ||
-        (usuario.cedula || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-        (usuario.codigo_estudiante || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-        usuario.nombre_rol.toLowerCase().includes(busqueda.toLowerCase())
-    );
-
-    const handleEdit = (index) => {
-        setEditIndex(index);
-        setEditingUser({ ...filteredUsuarios[index] });
+    const handleRegistrarNuevoUsuario = () => {
+        navigate('/registrar-admin');
     };
 
     const handleInputChange = (e) => {
-        setEditingUser({
-            ...editingUser,
-            [e.target.name]: e.target.value
+        const { name, value } = e.target;
+
+        setEditingUser((prevUser) => ({
+            ...prevUser,
+            [name]: value,
+        }));
+    };
+
+    const handleRoleChange = (e) => {
+        const newRoleId = parseInt(e.target.value, 10);
+
+        setEditingUser((prevUser) => {
+            let updatedUser = { ...prevUser, rol_id: newRoleId };
+
+            // Lógica para transferir cédula/código según el nuevo rol
+            if (prevUser.rol_id !== newRoleId) {
+                if (newRoleId === 3) {
+                    // Cambió a Alumno - mover cédula a código de estudiante
+                    updatedUser.codigo_estudiante = prevUser.cedula || "";
+                    updatedUser.cedula = "";
+                } else if (newRoleId === 1 || newRoleId === 2) {
+                    // Cambió a Administrador o Docente - mover código de estudiante a cédula
+                    updatedUser.cedula = prevUser.codigo_estudiante || "";
+                    updatedUser.codigo_estudiante = "";
+                }
+            }
+
+            return updatedUser;
         });
     };
 
@@ -80,17 +96,78 @@ const AdminUsuarios = () => {
         }
     };
 
+    const handleCancelEdit = () => {
+        setEditIndex(null);
+        setEditingUser({});
+    };
+
+    const handleEdit = (index) => {
+        setEditIndex(index);
+        setEditingUser({ ...usuarios[index] });
+    };
+
+    const handleInactivate = async (userId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/admin/usuarios/${userId}/inactivar`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+
+            if (response.ok) {
+                alert("Usuario inactivado correctamente");
+                fetchUsuarios();
+            } else {
+                const data = await response.json();
+                console.error("Error al inactivar el usuario:", data.error);
+                alert("Error al inactivar el usuario");
+            }
+        } catch (error) {
+            console.error("Error al inactivar el usuario:", error);
+            alert("Error al inactivar el usuario");
+        }
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
+
+    const highlightText = (text) => {
+        if (!busqueda) return text;
+        const regex = new RegExp(`(${busqueda})`, "gi");
+        return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
+    };
+
+    // Filtrar usuarios según la búsqueda
+    const filteredUsuarios = usuarios.filter(usuario =>
+        usuario.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+        usuario.correo_institucional.toLowerCase().includes(busqueda.toLowerCase()) ||
+        (usuario.cedula || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+        (usuario.codigo_estudiante || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+        usuario.nombre_rol.toLowerCase().includes(busqueda.toLowerCase())
+    );
+
+    // Calcular los usuarios a mostrar en la página actual
+    const indexOfLastUser = currentPage * usuariosPorPagina;
+    const indexOfFirstUser = indexOfLastUser - usuariosPorPagina;
+    const currentUsuarios = filteredUsuarios.slice(indexOfFirstUser, indexOfLastUser);
+
+    const totalPages = Math.ceil(filteredUsuarios.length / usuariosPorPagina);
+
     return (
         <div className="admin-usuarios-container">
             <div className="box-container">
                 <h1 className="titulo-gestion-usuarios">Gestión de Usuarios</h1>
-                <input
-                    type="text"
-                    placeholder="Buscar usuario..."
-                    value={busqueda}
-                    onChange={handleSearchChange}
-                    className="buscador-usuarios"
-                />
+                <div className="buscador-y-boton">
+                    <input
+                        type="text"
+                        placeholder="Buscar en usuarios"
+                        value={busqueda}
+                        onChange={handleSearchChange}
+                        className="buscador-usuarios"
+                    />
+                </div>
                 <table className="tabla-usuarios">
                     <thead>
                         <tr>
@@ -102,35 +179,92 @@ const AdminUsuarios = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredUsuarios.map((usuario, index) => (
-                            <tr key={usuario.id}>
-                                {editIndex === index ? (
-                                    <>
-                                        <td><input type="text" name="nombre" value={editingUser.nombre} onChange={handleInputChange} /></td>
-                                        <td><input type="text" name="correo_institucional" value={editingUser.correo_institucional} onChange={handleInputChange} /></td>
-                                        <td>
-                                            <select name="rol_id" value={editingUser.rol_id} onChange={handleInputChange}>
-                                                <option value="1">Administrador</option>
-                                                <option value="2">Docente</option>
-                                                <option value="3">Alumno</option>
-                                            </select>
-                                        </td>
-                                        <td><input type="text" name="cedula" value={editingUser.cedula || editingUser.codigo_estudiante} onChange={handleInputChange} /></td>
-                                        <td><button onClick={handleSave}>Finalizar</button></td>
-                                    </>
-                                ) : (
-                                    <>
-                                        <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.nombre) }}></td>
-                                        <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.correo_institucional) }}></td>
-                                        <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.nombre_rol) }}></td>
-                                        <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.cedula || usuario.codigo_estudiante) }}></td>
-                                        <td><button onClick={() => handleEdit(index)}>Editar</button></td>
-                                    </>
-                                )}
-                            </tr>
-                        ))}
+                        {currentUsuarios.map((usuario, index) => {
+                            return (
+                                <tr key={usuario.id} className={usuario.status_usuario === 'inactivo' ? 'fila-inactiva' : ''}>
+                                    {editIndex === index + indexOfFirstUser ? (
+                                        <>
+                                            <td><input type="text" name="nombre" value={editingUser.nombre || ""} onChange={handleInputChange} /></td>
+                                            <td><input type="text" name="correo_institucional" value={editingUser.correo_institucional || ""} onChange={handleInputChange} /></td>
+                                            <td>
+                                                <select
+                                                    name="rol_id"
+                                                    value={editingUser.rol_id || ""}
+                                                    onChange={handleRoleChange}
+                                                >
+                                                    <option value="1">Administrador</option>
+                                                    <option value="2">Docente</option>
+                                                    <option value="3">Alumno</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                {(editingUser.rol_id === 1 || editingUser.rol_id === 2) && (
+                                                    <input
+                                                        type="text"
+                                                        name="cedula"
+                                                        value={editingUser.cedula || ""}
+                                                        onChange={handleInputChange}
+                                                    />
+                                                )}
+                                                {editingUser.rol_id === 3 && (
+                                                    <input
+                                                        type="text"
+                                                        name="codigo_estudiante"
+                                                        value={editingUser.codigo_estudiante || ""}
+                                                        onChange={handleInputChange}
+                                                    />
+                                                )}
+                                            </td>
+                                            <td>
+                                                <FaCheck
+                                                    onClick={handleSave}
+                                                    className="icono-accion-listo"
+                                                    title="Guardar cambios"
+                                                />
+                                                <FaTimes
+                                                    onClick={handleCancelEdit}
+                                                    className="icono-accion-cancelar"
+                                                    title="Cancelar edición"
+                                                />
+                                            </td>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.nombre) }}></td>
+                                            <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.correo_institucional) }}></td>
+                                            <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.nombre_rol) }}></td>
+                                            <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.cedula || usuario.codigo_estudiante) }}></td>
+                                            <td>
+                                                <FaEdit
+                                                    onClick={() => handleEdit(index + indexOfFirstUser)}
+                                                    className="icono-accion-editar"
+                                                    title="Editar usuario"
+                                                />
+                                                <FaUserSlash
+                                                    onClick={usuario.status_usuario !== 'inactivo' ? () => handleInactivate(usuario.id) : null}
+                                                    className={`icono-accion-inactivar ${usuario.status_usuario === 'inactivo' ? 'icono-desactivado' : ''}`}
+                                                    title="Baja de usuario"
+                                                    style={{ cursor: usuario.status_usuario === 'inactivo' ? 'not-allowed' : 'pointer' }}
+                                                />
+                                            </td>
+                                        </>
+                                    )}
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
+                <div className="paginacion">
+                    {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                            key={index}
+                            className={`boton-pagina ${currentPage === index + 1 ? 'activo' : ''}`}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     );

@@ -14,6 +14,7 @@
     margin-bottom: 20px;
     max-width: 1200px;
     width: 100%;
+    overflow-x: auto;
 }
 
 .titulo-gestion-usuarios {
@@ -32,18 +33,26 @@
 }
 
 .tabla-usuarios {
+    border-radius: 10px;
+    overflow: hidden; 
     width: 100%;
-    border-collapse: collapse;
+    margin-bottom: 30px;
 }
 
 .tabla-usuarios th, .tabla-usuarios td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
+    vertical-align: middle;
+    padding: 15px;
+    border: 1px solid #ddd; 
+    text-align: center; 
 }
 
 .tabla-usuarios th {
-    background-color: #f2f2f2;
+    font-size: 1em;
+    color: #ffffff;
+    background-color: #0854A2; 
+    text-align: center; 
+    vertical-align: middle;
+    padding: 12px;
 }
 
 .tabla-usuarios tr:nth-child(even) {
@@ -67,7 +76,95 @@
     background-color: #0056b3;
 }
 
-.highlight {
-    background-color: yellow;
-    font-weight: bold;
+.btn-registrar-usuario {
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: #88bf1b;
+    border-color: #88bf1b;
+    padding: 6px 15px; /* Hacer el botón más grande con más relleno */
+    font-size: 1.0em; /* Aumentar el tamaño de la fuente */
+    float: right; /* Alinear el botón a la derecha */
 }
+
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px; /* Más espacio entre los botones */
+}
+
+.boton-pagina {
+    background-color: #ffffff;
+    border: 1px solid #007bff;
+    color: #007bff;
+    padding: 5px 13px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, color 0.3s;
+    border-radius: 5px; /* Bordes redondeados para un mejor aspecto */
+}
+
+.boton-pagina:hover {
+    background-color: #007bff;
+    color: #ffffff;
+    transform: translateY(-2px); /* Efecto de desplazamiento hacia arriba al pasar el mouse */
+}
+
+.boton-pagina.activo {
+    background-color: #007bff;
+    color: #ffffff;
+    border-color: #007bff;
+    cursor: default;
+    font-weight: bold; /* Resaltar el botón activo */
+}
+
+.boton-pagina:disabled {
+    background-color: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.fila-inactiva {
+    color: #a0a0a0; /* Texto gris para los usuarios inactivos */
+    background-color: #f9f9f9; /* Color de fondo más claro para distinguirlo */
+}
+
+
+.icono-accion {
+    font-size: 1.2em; /* Aumentar el tamaño del ícono si lo deseas */
+    vertical-align: middle; /* Asegurarse de que los íconos se alineen verticalmente */
+}
+
+/* Estilos específicos para cada ícono */
+.icono-accion-editar {
+    cursor: pointer;
+    margin-right: 10px;
+    color: #2a76c8; /* Color azul para editar */
+}
+
+.icono-accion-inactivar {
+    cursor: pointer;
+    color: #696969; /* Color naranja/rojo para inactivar */
+}
+
+.icono-accion-listo {
+    cursor: pointer;
+    margin-right: 10px;
+    color: green; /* Color verde para guardar */
+}
+
+.icono-accion-cancelar {
+    cursor: pointer;
+    color: red; /* Color rojo para cancelar */
+}
+
+.alert-fixed {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    max-width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+}
+ 
