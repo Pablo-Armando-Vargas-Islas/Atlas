@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { InputGroup, Form, Button } from "react-bootstrap";
 import { useBuscador } from '../../context/BuscadorContext';
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import ProyectoModal from '../../utils/ProyectoModal';
+import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/BusquedaGlobal.css';
 
 const ITEMS_PER_PAGE = 5;
@@ -16,7 +17,8 @@ const BusquedaGlobal = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
     const [showModal, setShowModal] = useState(false);
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const query = queryParams.get('query');
@@ -28,6 +30,10 @@ const BusquedaGlobal = () => {
 
     const handleBuscar = () => {
         buscarProyectos(consultaLocal, sortOrder); 
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
     };
 
     const handlePageChange = (page) => {
@@ -111,6 +117,9 @@ const BusquedaGlobal = () => {
 
     return (
         <div className="busqueda-global-container d-flex flex-column align-items-center">
+            <div className="navegar-atras-buscador" onClick={handleGoBack}>
+                <FaArrowLeft className="icono-navegar-atras" /> Volver
+            </div>
             <h1 className="busqueda-global-title mb-4">Repositorio Atlas</h1>
             <InputGroup className="busqueda-global-search-bar mb-4">
                 <Form.Control

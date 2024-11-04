@@ -1,9 +1,10 @@
 // VerProyectosCurso.js
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button } from 'react-bootstrap';
 import ProyectoModal from '../../../utils/ProyectoModal';
+import { FaArrowLeft } from 'react-icons/fa';
 import '../../../styles/GestionCursosProfesor.css'; // Utilizar el CSS de GestionCursosProfesor
 
 const VerProyectosCurso = () => {
@@ -12,8 +13,9 @@ const VerProyectosCurso = () => {
     const [curso, setCurso] = useState({});
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
 
-    useEffect(() => {
+    useEffect(() => { 
         const fetchProyectos = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -32,6 +34,10 @@ const VerProyectosCurso = () => {
 
         fetchProyectos();
     }, [cursoId]);
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
+    };
 
     // Función para abrir el modal con los detalles del proyecto seleccionado
     const verDetalles = (proyecto) => {
@@ -105,7 +111,10 @@ const VerProyectosCurso = () => {
 
     return (
         <div className="ver-proyectos-curso-container">
-            <div className="gestion-cursos-main-content"> {/* Usar la clase existente para contenido principal */}
+            <div className="gestion-cursos-main-content">
+                <div className="navegar-atras" onClick={handleGoBack}>
+                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                </div>
                 <h1 className="text-center my-4">Proyectos en {curso.nombre_curso}</h1>
                 {proyectos.length === 0 ? (
                     <p className="text-center">No hay proyectos entregados en este curso.</p>

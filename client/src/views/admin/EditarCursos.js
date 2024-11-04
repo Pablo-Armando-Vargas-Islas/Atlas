@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/EditarCursos.css";
-import { FaEdit, FaCheck, FaTimes, FaArrowLeft} from 'react-icons/fa';
+import { FaEdit, FaCheck, FaTimes, FaArrowLeft } from 'react-icons/fa';
 
 const EditarCursos = () => {
     const [cursos, setCursos] = useState([]);
@@ -188,7 +188,7 @@ const EditarCursos = () => {
                 </button>
             ))}
         </div>
-    );         
+    ); 
 
     return (
         <div className="admin-cursos-container">

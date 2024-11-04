@@ -1,4 +1,5 @@
 .busqueda-global-container {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,6 +18,7 @@
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
+    margin-top: 55px;
 }
 
 .busqueda-global-sort-select {
@@ -50,4 +52,21 @@
 .busqueda-global-search-button {
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
+}
+
+.navegar-atras-buscador {
+    display: flex;
+    align-items: center;
+    color: #0854A2;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    position: absolute; /* Cambiar a posición absoluta */
+    top: 20px; /* Ajustar para colocar en la parte superior */
+    left: 20px; /* Ajustar para colocar en la esquina izquierda */
+}
+
+.icono-navegar-atras-buscador {
+    margin-right: 10px;
 }

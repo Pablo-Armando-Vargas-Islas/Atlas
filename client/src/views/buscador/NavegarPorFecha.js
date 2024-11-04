@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import ProyectoModal from '../../utils/ProyectoModal';
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorFecha.css';
 
 const NavegarPorFecha = () => {
@@ -14,6 +16,7 @@ const NavegarPorFecha = () => {
   const [orden, setOrden] = useState("reciente");
   const [currentPage, setCurrentPage] = useState(1);
   const [years, setYears] = useState([]);
+  const navigate = useNavigate();
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -47,6 +50,10 @@ const NavegarPorFecha = () => {
 
     fetchAniosDisponibles();
   }, []);
+
+  const handleGoBack = () => {
+    navigate(-1); // Regresar a la vista anterior
+  };
 
   useEffect(() => {
     // Obtener todos los proyectos al cargar la vista o cuando no se seleccione año ni mes
@@ -217,6 +224,9 @@ const NavegarPorFecha = () => {
 
   return (
     <div className="navegar-por-fecha-container d-flex flex-column align-items-center">
+      <div className="navegar-atras-buscador" onClick={handleGoBack}>
+          <FaArrowLeft className="icono-navegar-atras" /> Volver
+      </div>
       <h1 className="navegar-fecha-title mb-4">Buscar Proyectos por Fecha</h1>
       <div className="search-bar mb-4">
         <Form.Select

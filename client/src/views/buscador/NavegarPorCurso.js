@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import ProyectoModal from '../../utils/ProyectoModal';
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorCurso.css';
 
 const NavegarPorCurso = () => {
@@ -11,9 +13,11 @@ const NavegarPorCurso = () => {
   const [showModal, setShowModal] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
   const [orden, setOrden] = useState("reciente");
-  const [cursos, setCursos] = useState([]);
-  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [cursos, setCursos] = useState([]);
+  const navigate = useNavigate();
+  const ITEMS_PER_PAGE = 10;
+  
 
   useEffect(() => {
     // Obtener los nombres y códigos de los cursos disponibles
@@ -46,6 +50,10 @@ const NavegarPorCurso = () => {
 
     fetchCursosDisponibles();
   }, []);
+
+  const handleGoBack = () => {
+    navigate(-1); // Regresar a la vista anterior
+  };
 
   useEffect(() => {
     // Obtener todos los proyectos al cargar la vista o cuando no se seleccione curso
@@ -227,6 +235,9 @@ const NavegarPorCurso = () => {
 
   return (
     <div className="navegar-por-curso-container d-flex flex-column align-items-center">
+      <div className="navegar-atras-buscador" onClick={handleGoBack}>
+          <FaArrowLeft className="icono-navegar-atras" /> Volver
+      </div>
       <h1 className="navegar-curso-title mb-4">Buscar Proyectos por Curso</h1>
       <Form.Select
         value={selectedCurso}

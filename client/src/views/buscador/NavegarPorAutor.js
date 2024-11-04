@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import ProyectoModal from '../../utils/ProyectoModal';
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorAutor.css';
 
 const NavegarPorAutor = () => {
@@ -12,6 +14,7 @@ const NavegarPorAutor = () => {
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
     const [orden, setOrden] = useState("reciente");
     const [currentPage, setCurrentPage] = useState(1);
+    const navigate = useNavigate();
     const ITEMS_PER_PAGE = 10;
 
     useEffect(() => {
@@ -45,6 +48,10 @@ const NavegarPorAutor = () => {
 
         fetchProyectosPorAutor();
     }, []);
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
+    };
 
     const handleBuscar = async () => {
         if (!searchTerm) {
@@ -178,6 +185,9 @@ const NavegarPorAutor = () => {
 
     return (
         <div className="navegar-por-autor-container d-flex flex-column align-items-center">
+            <div className="navegar-atras-buscador" onClick={handleGoBack}>
+                <FaArrowLeft className="icono-navegar-atras" /> Volver
+            </div>
             <h1 className="navegar-autor-title mb-4">Buscar Proyectos por Autor</h1>
             <InputGroup className="search-bar mb-4">
                 <Form.Control

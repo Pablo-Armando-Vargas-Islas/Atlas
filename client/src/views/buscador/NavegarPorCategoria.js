@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import ProyectoModal from '../../utils/ProyectoModal';
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorCategoria.css';
 
 const NavegarPorCategoria = () => {
@@ -12,6 +14,7 @@ const NavegarPorCategoria = () => {
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
   const [orden, setOrden] = useState("reciente");
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -45,6 +48,10 @@ const NavegarPorCategoria = () => {
 
     fetchProyectosPorCategoria();
   }, []);
+
+  const handleGoBack = () => {
+    navigate(-1); // Regresar a la vista anterior
+  };
 
   const handleBuscar = async () => {
     if (!searchTerm) {
@@ -178,6 +185,9 @@ const NavegarPorCategoria = () => {
 
   return (
     <div className="navegar-por-categoria-container d-flex flex-column align-items-center">
+      <div className="navegar-atras-buscador" onClick={handleGoBack}>
+          <FaArrowLeft className="icono-navegar-atras" /> Volver
+      </div>
       <h1 className="navegar-categoria-title mb-4">Buscar Proyectos por Categoría</h1>
       <InputGroup className="search-bar mb-4">
         <Form.Control
