@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import ProyectoModal from '../../utils/ProyectoModal'; 
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
+import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/MisProyectos.css';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 10; 
 
 const MisProyectos = () => {
     const [proyectos, setProyectos] = useState([]);
@@ -15,6 +17,7 @@ const MisProyectos = () => {
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortCriterion, setSortCriterion] = useState("reciente");
+    const navigate = useNavigate();
 
     // Obtener el id del usuario del token
     useEffect(() => {
@@ -75,6 +78,10 @@ const MisProyectos = () => {
     const verDetalles = (proyecto) => {
         setProyectoSeleccionado(proyecto);
         setShowModal(true);
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
     };
 
     const cerrarModal = () => {
@@ -179,6 +186,9 @@ const MisProyectos = () => {
 
     return (
         <div className="mis-proyectos-box d-flex flex-column align-items-center">
+            <div className="navegar-atras" onClick={handleGoBack}>
+                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                </div>
             <h1 className="mis-proyectos-title mb-4">Mis Proyectos</h1>
 
             <InputGroup className="search-bar mb-4">

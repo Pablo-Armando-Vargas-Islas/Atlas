@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
 import BotonDescargaAdmin from "../../utils/BotonDescargaAdmin";
-import { FaCheck, FaTimes, FaEdit } from 'react-icons/fa';
+import { FaUpload, FaCheck, FaTimes, FaEdit, FaArrowLeft } from 'react-icons/fa';
 import "../../styles/ProyectosPorCurso.css";
 
 const ProyectosPorCurso = () => {
@@ -11,12 +11,17 @@ const ProyectosPorCurso = () => {
     const [showModal, setShowModal] = useState(false);
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
     const [expandedRows, setExpandedRows] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (cursoId) {
             fetchProyectos();
         }
     }, [cursoId]);
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
+    };
 
     const fetchProyectos = async () => {
         try {
@@ -48,7 +53,6 @@ const ProyectosPorCurso = () => {
         }
     };
     
-
     const handleVerDetalles = (proyecto) => {
         setProyectoSeleccionado(proyecto);
         setShowModal(true);
@@ -75,13 +79,30 @@ const ProyectosPorCurso = () => {
     
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setEditingProyecto((prevProyecto) => ({
-            ...prevProyecto,
-            [name]: type === "checkbox" ? checked : value
-        }));
+    
+        setEditingProyecto((prevProyecto) => {
+            // Si el campo es "necesita_licencia" y se cambia a false, limpiar "descripcion_licencia"
+            if (name === "necesita_licencia" && !checked) {
+                return {
+                    ...prevProyecto,
+                    [name]: checked,
+                    descripcion_licencia: ""
+                };
+            }
+    
+            return {
+                ...prevProyecto,
+                [name]: type === "checkbox" ? checked : value
+            };
+        });
     };
     
     const handleSave = async () => {
+        if (editingProyecto.necesita_licencia && !editingProyecto.descripcion_licencia) {
+            alert("Debe proporcionar una descripción de la licencia si el proyecto necesita una.");
+            return;
+        }
+    
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(`http://localhost:5000/api/admin/proyectos/${editingProyecto.id}`, {
@@ -108,9 +129,9 @@ const ProyectosPorCurso = () => {
         } catch (error) {
             console.error("Error al actualizar el proyecto:", error);
         }
-    };
+    };    
     
-    const handleCancelEdit = () => {
+    const handleCancelEdit = () => { 
         setEditIndex(null);
         setEditingProyecto({
             titulo: "",
@@ -125,6 +146,9 @@ const ProyectosPorCurso = () => {
     return (
         <div className="proyectos-curso-container">
             <div className="box-container">
+                <div className="navegar-atras" onClick={handleGoBack}>
+                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                </div>
                 <h1 className="titulo-proyectos-curso">Proyectos del Curso</h1>
                 <table className="tabla-proyectos">
                 <thead>
@@ -138,115 +162,115 @@ const ProyectosPorCurso = () => {
                     </tr>
                 </thead>
                 <tbody>
-    {proyectos.map((proyecto, index) => (
-        <tr key={proyecto.id}>
-            {editIndex === index ? (
-                <>
-                    <td>
-                        <input
-                            type="text"
-                            name="titulo"
-                            value={editingProyecto.titulo}
-                            onChange={handleInputChange}
-                        />
-                    </td>
-                    <td>
-                        <input
-                            type="text"
-                            name="descripcion"
-                            value={editingProyecto.descripcion}
-                            onChange={handleInputChange}
-                        />
-                    </td>
-                    <td>
-                        <input
-                            type="checkbox"
-                            name="necesita_licencia"
-                            checked={editingProyecto.necesita_licencia}
-                            onChange={handleInputChange}
-                        />
-                    </td>
-                    <td>
-                        <input
-                            type="text"
-                            name="descripcion_licencia"
-                            value={editingProyecto.descripcion_licencia}
-                            onChange={handleInputChange}
-                            disabled={!editingProyecto.necesita_licencia}
-                        />
-                    </td>
-                    <td>
-                        {editingProyecto.ruta_archivo_comprimido
-                            ? editingProyecto.ruta_archivo_comprimido.split("\\").pop()
-                            : "No se ha subido ningún archivo"}
-                    </td>
-                    <td>
-                        <FaCheck
-                            onClick={handleSave}
-                            className="icono-accion-listo"
-                            title="Guardar cambios"
-                            style={{ cursor: "pointer", marginRight: "10px" }}
-                        />
-                        <FaTimes
-                            onClick={handleCancelEdit}
-                            className="icono-accion-cancelar"
-                            title="Cancelar edición"
-                            style={{ cursor: "pointer" }}
-                        />
-                    </td>
-                </>
-            ) : (
-                <>
-                    <td>{proyecto.titulo}</td>
-                    <td>
-                        {expandedRows.includes(index)
-                            ? proyecto.descripcion
-                            : proyecto.descripcion.length > 50
-                                ? `${proyecto.descripcion.substring(0, 50)}...`
-                                : proyecto.descripcion}
-                        {proyecto.descripcion.length > 50 && (
-                            <button
-                                className="boton-ver-mas"
-                                onClick={() => handleToggleExpand(index)}
-                            >
-                                {expandedRows.includes(index) ? "Ver menos" : "Ver más"}
-                            </button>
-                        )}
-                    </td>
-                    <td>{proyecto.necesita_licencia ? "Sí" : "No"}</td>
-                    <td>
-                        {expandedRows.includes(index)
-                            ? proyecto.descripcion_licencia
-                            : proyecto.descripcion_licencia.length > 50
-                                ? `${proyecto.descripcion_licencia.substring(0, 50)}...`
-                                : proyecto.descripcion_licencia}
-                        {proyecto.descripcion_licencia.length > 50 && (
-                            <button
-                                className="boton-ver-mas"
-                                onClick={() => handleToggleExpand(index)}
-                            >
-                                {expandedRows.includes(index) ? "Ver menos" : "Ver más"}
-                            </button>
-                        )}
-                    </td>
-                    <td>
-                        {proyecto.ruta_archivo_comprimido
-                            ? proyecto.ruta_archivo_comprimido.split("\\").pop()
-                            : "No se ha subido ningún archivo"}
-                    </td>
-                    <td>
-                        <FaEdit
-                            onClick={() => handleEdit(index)}
-                            className="icono-accion-editar"
-                            title="Editar proyecto"
-                            style={{ cursor: "pointer" }}
-                        />
-                    </td>
-                </>
-            )}
-        </tr>
-    ))}
-</tbody>
+                        {proyectos.map((proyecto, index) => (
+                            <tr key={proyecto.id}>
+                                {editIndex === index ? (
+                                    <>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="titulo"
+                                                value={editingProyecto.titulo}
+                                                onChange={handleInputChange}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="descripcion"
+                                                value={editingProyecto.descripcion}
+                                                onChange={handleInputChange}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                name="necesita_licencia"
+                                                checked={editingProyecto.necesita_licencia}
+                                                onChange={handleInputChange}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="descripcion_licencia"
+                                                value={editingProyecto.descripcion_licencia}
+                                                onChange={handleInputChange}
+                                                disabled={!editingProyecto.necesita_licencia}
+                                            />
+                                        </td>
+                                        <td>
+                                            {editingProyecto.ruta_archivo_comprimido
+                                                ? editingProyecto.ruta_archivo_comprimido.split("\\").pop()
+                                                : "No se ha subido ningún archivo"}
+                                        </td>
+                                        <td>
+                                            <FaCheck
+                                                onClick={handleSave}
+                                                className="icono-accion-listo"
+                                                title="Guardar cambios"
+                                                style={{ cursor: "pointer", marginRight: "10px" }}
+                                            />
+                                            <FaTimes
+                                                onClick={handleCancelEdit}
+                                                className="icono-accion-cancelar"
+                                                title="Cancelar edición"
+                                                style={{ cursor: "pointer" }}
+                                            />
+                                        </td>
+                                    </>
+                                ) : (
+                                    <>
+                                        <td>{proyecto.titulo}</td>
+                                        <td>
+                                            {expandedRows.includes(index)
+                                                ? proyecto.descripcion
+                                                : proyecto.descripcion.length > 50
+                                                    ? `${proyecto.descripcion.substring(0, 50)}...`
+                                                    : proyecto.descripcion}
+                                            {proyecto.descripcion.length > 50 && (
+                                                <button
+                                                    className="boton-ver-mas"
+                                                    onClick={() => handleToggleExpand(index)}
+                                                >
+                                                    {expandedRows.includes(index) ? "Ver menos" : "Ver más"}
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td>{proyecto.necesita_licencia ? "Sí" : "No"}</td>
+                                        <td>
+                                            {expandedRows.includes(index)
+                                                ? proyecto.descripcion_licencia
+                                                : proyecto.descripcion_licencia.length > 50
+                                                    ? `${proyecto.descripcion_licencia.substring(0, 50)}...`
+                                                    : proyecto.descripcion_licencia}
+                                            {proyecto.descripcion_licencia.length > 50 && (
+                                                <button
+                                                    className="boton-ver-mas"
+                                                    onClick={() => handleToggleExpand(index)}
+                                                >
+                                                    {expandedRows.includes(index) ? "Ver menos" : "Ver más"}
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td>
+                                            {proyecto.ruta_archivo_comprimido
+                                                ? proyecto.ruta_archivo_comprimido.split("\\").pop()
+                                                : "No se ha subido ningún archivo"}
+                                        </td>
+                                        <td>
+                                            <FaEdit
+                                                onClick={() => handleEdit(index)}
+                                                className="icono-accion-editar"
+                                                title="Editar proyecto"
+                                                style={{ cursor: "pointer" }}
+                                            />
+                                        </td>
+                                    </>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
                 </table>
     
                 {/* Modal para mostrar detalles del proyecto */}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import '../../styles/GestionCursosProfesor.css';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form} from 'react-bootstrap';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const Solicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -8,6 +10,7 @@ const Solicitudes = () => {
     const [showModal, setShowModal] = useState(false);
     const [showRechazoModal, setShowRechazoModal] = useState(false);
     const [motivoRechazo, setMotivoRechazo] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSolicitudes = async () => {
@@ -31,6 +34,10 @@ const Solicitudes = () => {
     const handleClose = () => {
         setShowModal(false);
         setSolicitudSeleccionada(null);
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
     };
 
     const handleRechazoClose = () => {
@@ -103,6 +110,9 @@ const Solicitudes = () => {
     return (
         <div className="gestion-cursos-profesor-container">
             <div className="gestion-cursos-main-content">
+                <div className="navegar-atras" onClick={handleGoBack}>
+                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                </div>
                 <h2 className='text-center'>Solicitudes de Acceso a Proyectos</h2>
                 {solicitudes.length === 0 ? (
                     <p>No hay solicitudes pendientes.</p>

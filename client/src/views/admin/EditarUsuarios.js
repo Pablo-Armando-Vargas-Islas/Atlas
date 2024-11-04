@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/EditarUsuarios.css";
-import { FaEdit, FaCheck, FaTimes, FaUserSlash } from 'react-icons/fa';
+import { FaEdit, FaCheck, FaTimes, FaUserSlash, FaArrowLeft} from 'react-icons/fa';
 
 const AdminUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
@@ -12,7 +12,7 @@ const AdminUsuarios = () => {
     const usuariosPorPagina = 15;
     const navigate = useNavigate();
 
-    useEffect(() => {
+    useEffect(() => { 
         fetchUsuarios();
     }, []);
 
@@ -30,6 +30,10 @@ const AdminUsuarios = () => {
         } catch (error) {
             console.error("Error al obtener los usuarios:", error);
         }
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
     };
 
     const handleSearchChange = (e) => {
@@ -158,6 +162,9 @@ const AdminUsuarios = () => {
     return (
         <div className="admin-usuarios-container">
             <div className="box-container">
+                <div className="navegar-atras" onClick={handleGoBack}>
+                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                </div>
                 <h1 className="titulo-gestion-usuarios">Gestión de Usuarios</h1>
                 <div className="buscador-y-boton">
                     <input

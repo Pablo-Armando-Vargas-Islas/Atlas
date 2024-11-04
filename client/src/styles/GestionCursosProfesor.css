@@ -98,3 +98,18 @@
     background-color: #ec881d!important;
     border-color: #ec881d!important;
 }
+
+.navegar-atras {
+    display: flex;
+    align-items: center;
+    color: #0854A2;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.icono-navegar-atras {
+    margin-right: 10px;
+}
+ 

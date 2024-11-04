@@ -65,7 +65,7 @@ router.put('/proyectos/:id', verifyToken, async (req, res) => {
 
         const result = await pool.query(
             `UPDATE proyectos
-             SET titulo = $1, descripcion = $2, necesita_licencia = $3, descripcion_licencia = $4, fecha_actualizacion = now()
+             SET titulo = $1, descripcion = $2, necesita_licencia = $3, descripcion_licencia = $4
              WHERE id = $5 RETURNING *`,
             [titulo, descripcion, necesita_licencia, descripcion_licencia, id]
         );
@@ -80,7 +80,6 @@ router.put('/proyectos/:id', verifyToken, async (req, res) => {
         res.status(500).json({ error: "Error del servidor" });
     }
 });
-
 
 // Obtener todos los usuarios
 router.get('/usuarios', verifyToken, async (req, res) => {

@@ -76,8 +76,8 @@ export const AuthProvider = ({ children }) => {
         navigate("/login");
     };
 
-    // Tiempo de inactividad en milisegundos (7 minutos)
-    const INACTIVITY_LIMIT = 7 * 60 * 1000; 
+    // Tiempo de inactividad en milisegundos (10 minutos)
+    const INACTIVITY_LIMIT = 10 * 60 * 1000; 
 
     // Función para restablecer el temporizador de inactividad
     const resetInactivityTimer = () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/EditarCursos.css";
-import { FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaCheck, FaTimes, FaArrowLeft} from 'react-icons/fa';
 
 const EditarCursos = () => {
     const [cursos, setCursos] = useState([]);
@@ -57,6 +57,10 @@ const EditarCursos = () => {
 
     const handleSearchChange = (e) => {
         setBusqueda(e.target.value.toLowerCase());
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
     };
 
     const handleEdit = (index) => {
@@ -189,6 +193,9 @@ const EditarCursos = () => {
     return (
         <div className="admin-cursos-container">
             <div className="box-container">
+                <div className="navegar-atras" onClick={handleGoBack}>
+                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                </div>
                 <h1 className="titulo-gestion-cursos">Gestión de Cursos</h1>
                 <div className="buscador-y-boton">
                     <input

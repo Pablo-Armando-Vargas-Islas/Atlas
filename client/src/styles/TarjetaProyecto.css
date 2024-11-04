@@ -37,12 +37,13 @@
 }
 
 .badge-tipo-grado {
-  background-color: #28a745 !important; 
+  background-color: #31c954 !important; 
   color: white !important;
+
 }
 
 .badge-tipo-aula {
-  background-color: #007bff !important; 
+  background-color: #049ef7 !important; 
   color: white !important;
 }
 
@@ -52,13 +53,11 @@
 }
 
 .badge-tecnologia {
-  background-color: #17a2b8 !important; 
+  background-color: #15bce2 !important; 
   color: white !important;
 }
 
 .badge-categoria {
   background-color: #ffbf00 !important; 
-  color: black !important;
+  color: rgb(255, 255, 255) !important;
 }
-
-
