@@ -7,7 +7,7 @@ import ProyectoModal from '../../utils/ProyectoModal';
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/BusquedaGlobal.css';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const BusquedaGlobal = () => {
     const location = useLocation();
@@ -118,7 +118,7 @@ const BusquedaGlobal = () => {
     return (
         <div className="busqueda-global-container d-flex flex-column align-items-center">
             <div className="navegar-atras-buscador" onClick={handleGoBack}>
-                <FaArrowLeft className="icono-navegar-atras" /> Volver
+                <FaArrowLeft className="icono-navegar-atras-global" /> Volver
             </div>
             <h1 className="busqueda-global-title mb-4">Repositorio Atlas</h1>
             <InputGroup className="busqueda-global-search-bar mb-4">
@@ -128,6 +128,11 @@ const BusquedaGlobal = () => {
                     value={consultaLocal}
                     onChange={(e) => setConsultaLocal(e.target.value)}
                     className="busqueda-global-search-input"
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleBuscar();
+                        }
+                    }}
                 />
                 <Button variant="primary" onClick={handleBuscar} className="busqueda-global-search-button">
                     Buscar

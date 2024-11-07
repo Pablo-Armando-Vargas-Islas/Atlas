@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import '../../styles/GestionCursosProfesor.css';
 import { Modal, Button, Form} from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
+import { Spinner } from 'react-bootstrap';
 
 const Solicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -10,6 +11,9 @@ const Solicitudes = () => {
     const [showModal, setShowModal] = useState(false);
     const [showRechazoModal, setShowRechazoModal] = useState(false);
     const [motivoRechazo, setMotivoRechazo] = useState('');
+    const [loadingAccept, setLoadingAccept] = useState(false);
+    const [loadingReject, setLoadingReject] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,6 +55,7 @@ const Solicitudes = () => {
     };
 
     const aceptarSolicitud = async (solicitudId) => {
+        setLoadingAccept(true);
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:5000/api/solicitudes/solicitud/aceptar/${solicitudId}`, {
@@ -62,7 +67,6 @@ const Solicitudes = () => {
             });
 
             if (response.ok) {
-                alert('Solicitud aceptada con éxito');
                 setSolicitudes((prevSolicitudes) =>
                     prevSolicitudes.filter((solicitud) => solicitud.id !== solicitudId)
                 );
@@ -72,10 +76,13 @@ const Solicitudes = () => {
             }
         } catch (error) {
             console.error('Error al aceptar la solicitud:', error);
+        } finally {
+            setLoadingAccept(false);
         }
     };
 
     const rechazarSolicitud = async () => {
+        setLoadingReject(true);
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:5000/api/solicitudes/solicitud/rechazar/${solicitudSeleccionada.id}`, {
@@ -88,7 +95,6 @@ const Solicitudes = () => {
             });
 
             if (response.ok) {
-                alert('Solicitud rechazada con éxito');
                 setSolicitudes((prevSolicitudes) =>
                     prevSolicitudes.filter((solicitud) => solicitud.id !== solicitudSeleccionada.id)
                 );
@@ -99,6 +105,8 @@ const Solicitudes = () => {
             }
         } catch (error) {
             console.error('Error al rechazar la solicitud:', error);
+        } finally {
+            setLoadingReject(false);
         }
     };
 
@@ -111,7 +119,7 @@ const Solicitudes = () => {
         <div className="gestion-cursos-profesor-container">
             <div className="gestion-cursos-main-content">
                 <div className="navegar-atras" onClick={handleGoBack}>
-                    <FaArrowLeft className="icono-navegar-atras" /> Volver
+                    <FaArrowLeft className="icono-navegar-atras-solicitudesAdmin" /> Volver
                 </div>
                 <h2 className='text-center'>Solicitudes de Acceso a Proyectos</h2>
                 {solicitudes.length === 0 ? (
@@ -164,12 +172,26 @@ const Solicitudes = () => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button
-                        className='aceptar-solicitud-btn'
-                        onClick={() => aceptarSolicitud(solicitudSeleccionada.id)}
-                    >
-                        Aceptar
-                    </Button>
+                <Button
+                    className='aceptar-solicitud-btn'
+                    onClick={() => aceptarSolicitud(solicitudSeleccionada.id)}
+                    disabled={loadingAccept} // Desactiva el botón cuando está cargando
+                >
+                    {loadingAccept ? (
+                        <>
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />{' '}
+                            Aceptando...
+                        </>
+                    ) : (
+                        'Aceptar'
+                    )}
+                </Button>
                     <Button
                         className='rechazar-solicitud-btn'
                         onClick={handleRechazoModal}
@@ -199,12 +221,25 @@ const Solicitudes = () => {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleRechazoClose}>Cancelar</Button>
                     <Button
-                        className='rechazar-solicitud-btn'
-                        onClick={rechazarSolicitud}
-                        disabled={!motivoRechazo.trim()} // Deshabilitar si no hay motivo
-                    >
-                        Confirmar
-                    </Button>
+                    className='rechazar-solicitud-btn'
+                    onClick={rechazarSolicitud}
+                    disabled={loadingReject || !motivoRechazo.trim()} // Desactiva el botón cuando está cargando o no hay motivo
+                >
+                    {loadingReject ? (
+                        <>
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />{' '}
+                            Confirmando...
+                        </>
+                    ) : (
+                        'Confirmar'
+                    )}
+                </Button>
                 </Modal.Footer>
             </Modal>
         </div>

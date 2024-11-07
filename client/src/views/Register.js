@@ -102,7 +102,7 @@ const Register = () => {
     return (
         <div className="container vh-100 d-flex align-items-center justify-content-center">
             <div className="col-md-6 col-lg-5 p-4 shadow register-box">
-                <h1 className="register-title text-center mb-4">Bienvenido</h1>
+                <h1 className="register-title text-center mb-4">Registro</h1>
                 {alert.message && (
                     <div className={`alert alert-${alert.type}`} role="alert">
                         {alert.message}

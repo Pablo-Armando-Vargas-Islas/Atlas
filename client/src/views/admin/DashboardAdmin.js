@@ -6,8 +6,8 @@ import ProyectosEntregados from '../../components/ProyectosEntregados';
 import SolicitudesPendientes from '../../components/SolicitudesPendientes';
 import EstadoSolicitudes from '../../components/EstadoSolicitudes';
 import ActividadReciente from '../../components/ActividadReciente';
-import EstudiantesActivos from '../../components/EstudiantesActivos';
-import ProfesoresActivos from '../../components/ProfesoresActivos';
+import UsuariosActivos from '../../components/UsuariosActivos';
+import UsuariosInactivos from '../../components/UsuariosInactivos';
 import ProyectosMasSolicitados from '../../components/ProyectosMasSolicitados';
 import CursosPorProfesor from '../../components/CursosPorProfesor';
 import ProyectosPorCurso from '../../components/ProyectosPorCurso';
@@ -24,8 +24,8 @@ const DashboardAdministrador = () => {
                     <CursosActivosVsCerrados />
                     <ProyectosEntregados />
                     <SolicitudesPendientes />
-                    <EstudiantesActivos />
-                    <ProfesoresActivos />
+                    <UsuariosActivos />
+                    <UsuariosInactivos />
                     <ProyectosMasSolicitados />
                     <CursosPorProfesor />
                     <ProyectosPorCurso />

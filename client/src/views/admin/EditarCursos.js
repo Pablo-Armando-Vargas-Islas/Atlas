@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/EditarCursos.css";
-import { FaEdit, FaCheck, FaTimes, FaArrowLeft } from 'react-icons/fa';
+import { FaEdit, FaCheck, FaTimes, FaArrowLeft, FaPlus } from 'react-icons/fa';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const EditarCursos = () => {
     const [cursos, setCursos] = useState([]);
@@ -101,7 +102,12 @@ const EditarCursos = () => {
 
     const handleSave = async () => {
         const hoy = new Date().toISOString().split("T")[0]; // Obtener la fecha de hoy en formato "aaaa-mm-dd"
-    
+        
+        // Validar que ningún campo sea nulo
+        if (!editingCurso.nombre_curso || !editingCurso.profesor_id || !editingCurso.periodo || !editingCurso.fecha_inicio || !editingCurso.fecha_fin || !editingCurso.codigo_curso) {
+            alert("Todos los campos son obligatorios. Por favor, complete todos los campos antes de guardar.");
+            return;
+        }
         // Validar que si el curso se abre, tenga una fecha de cierre válida
         if (editingCurso.estado === "abierto" && (!editingCurso.fecha_fin || editingCurso.fecha_fin < hoy)) {
             alert("Debe seleccionar una nueva fecha de cierre.");
@@ -200,23 +206,34 @@ const EditarCursos = () => {
                 <div className="buscador-y-boton">
                     <input
                         type="text"
-                        placeholder="Buscar en cursos"
+                        placeholder="Buscar curso"
                         value={busqueda}
                         onChange={handleSearchChange}
                         className="buscador-cursos"
                     />
+                    <OverlayTrigger
+                        placement="top" // Ubicación del tooltip
+                        overlay={<Tooltip>Crear nuevo curso</Tooltip>}
+                    >
+                        <button
+                            className="boton-crear-curso"
+                            onClick={() => navigate("/admin/crear-curso")}
+                        >
+                            <FaPlus />
+                        </button>
+                    </OverlayTrigger>
                 </div>
                 <table className="tabla-cursos">
                     <thead>
                         <tr>
-                            <th>Nombre del Curso</th>
+                            <th>Curso</th>
                             <th>Profesor</th>
                             <th>Periodo</th>
-                            <th>Fecha de Inicio</th>
-                            <th>Fecha de Cierre</th>
-                            <th>Código del Curso</th>
+                            <th>Inicio</th>
+                            <th>Cierre</th>
+                            <th>Código</th>
                             <th>Estado</th>
-                            <th>Cantidad de Proyectos</th>
+                            <th>Proyectos</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -258,9 +275,7 @@ const EditarCursos = () => {
                                             <td>
                                                 <input type="text" name="periodo" value={editingCurso.periodo} onChange={handleInputChange} />
                                             </td>
-                                            <td>
-                                                <input type="date" name="fecha_inicio" value={editingCurso.fecha_inicio} onChange={handleInputChange} />
-                                            </td>
+                                            <td>{resaltarCoincidencias(curso.fecha_inicio)}</td>
                                             <td>
                                                 <input
                                                     type="date"
@@ -270,9 +285,7 @@ const EditarCursos = () => {
                                                     onChange={handleInputChange}
                                                 />
                                             </td>
-                                            <td>
-                                                <input type="text" name="codigo_curso" value={editingCurso.codigo_curso} onChange={handleInputChange} />
-                                            </td>
+                                            <td>{resaltarCoincidencias(curso.codigo_curso)}</td>
                                             <td>
                                                 <select name="estado" value={editingCurso.estado} onChange={handleInputChange}>
                                                     <option value="abierto">Abierto</option>
@@ -305,17 +318,28 @@ const EditarCursos = () => {
                                             <td>{resaltarCoincidencias(curso.codigo_curso)}</td>
                                             <td>{resaltarCoincidencias(capitalize(curso.estado))}</td>
                                             <td>
-                                                <a href={`/proyectos-curso/${curso.id}`} className="link-proyectos">
-                                                    {resaltarCoincidencias(curso.cantidad_proyectos.toString())}
-                                                </a>
+                                                <OverlayTrigger
+                                                    placement="top" // Ubicación del tooltip
+                                                    overlay={<Tooltip>Ver proyectos</Tooltip>} // Texto del tooltip
+                                                >
+                                                    <a href={`/proyectos-curso/${curso.id}`} className="link-proyectos">
+                                                        {resaltarCoincidencias(curso.cantidad_proyectos.toString())}
+                                                    </a>
+                                                </OverlayTrigger>
                                             </td>
                                             <td>
-                                                <FaEdit
-                                                    onClick={() => handleEdit(index)}
-                                                    className="icono-accion-editar-curso"
-                                                    title="Editar curso"
-                                                    style={{ cursor: "pointer" }}
-                                                />
+                                                <OverlayTrigger
+                                                    placement="top" // Ubicación del tooltip
+                                                    overlay={<Tooltip>Editar curso</Tooltip>} // Texto del tooltip
+                                                >
+                                                    <span>
+                                                        <FaEdit
+                                                            onClick={() => handleEdit(index)}
+                                                            className="icono-accion-editar-curso"
+                                                            style={{ cursor: "pointer" }}
+                                                        />
+                                                    </span>
+                                                </OverlayTrigger>
                                             </td>
                                         </>
                                     )}

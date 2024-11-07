@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from 'react-bootstrap';
 
 const ForgotPassword = () => {
     const [correo, setCorreo] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
         setAlert({ type: "", message: "" }); // Resetear alertas previas
+        setLoading(true); 
 
         try {
             const response = await fetch("http://localhost:5000/api/auth/forgot-password", {
@@ -30,6 +33,8 @@ const ForgotPassword = () => {
         } catch (err) {
             console.error(err.message);
             setAlert({ type: "danger", message: "Error de conexión" });
+        } finally {
+            setLoading(false); // Desactiva el spinner al finalizar
         }
     };
 
@@ -37,7 +42,7 @@ const ForgotPassword = () => {
         <div className="backgroud-container-login">
             <div className="container login-container d-flex align-items-center justify-content-center min-vh-100">
                 <div className="login-box col-md-6 shadow p-5 rounded-4 bg-white">
-                    <h1 className="text-center mb-4">Recuperar Contraseña</h1>
+                    <h2 className="text-center mb-4">Recuperar Contraseña</h2>
                     {alert.message && (
                         <div className={`alert alert-${alert.type}`} role="alert">
                             {alert.message}
@@ -55,8 +60,25 @@ const ForgotPassword = () => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary login-btn-primary w-100 mt-3 rounded-pill">
-                            Enviar Código
+                        <button
+                            type="submit"
+                            className={`btn btn-primary login-btn-primary w-100 mt-3 rounded-pill ${loading ? "loading-button" : ""}`}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />{' '}
+                                    Enviando correo...
+                                </>
+                            ) : (
+                                'Enviar correo'
+                            )}
                         </button>
                     </form>
                 </div>

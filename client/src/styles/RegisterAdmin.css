@@ -41,7 +41,13 @@ html, body {
 } 
 
 .register-btn-primary:hover {
-    background-color: #ec881d;
+    background-color: #91cb1b;
+    color: #ffffff;
+    transform: scale(1.01);
+}
+
+.register-btn-primary:focus {
+    background-color: #91cb1b;
     color: #ffffff;
     transform: scale(1.01);
 }
@@ -53,4 +59,18 @@ html, body {
 
 .btn-link:hover {
     color: #003d99;
+}
+
+.navegar-atras-registerAdmin {
+    display: flex;
+    align-items: center;
+    color: #28537E; 
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.icono-navegar-atras-registerAdmin {
+    margin-right: 10px;
 }

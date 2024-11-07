@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table, OverlayTrigger, Tooltip, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaClipboard, FaEye, FaLock, FaUnlock } from 'react-icons/fa';
+import { FaClipboard, FaEye, FaLock, FaUnlock, FaPlusCircle } from 'react-icons/fa';
 import '../../../styles/GestionCursosProfesor.css';
 
 const GestionCursosProfesor = () => {
@@ -63,6 +63,11 @@ const GestionCursosProfesor = () => {
         }, 1500);
     };
 
+    // Función para manejar la creación de un nuevo curso
+    const irACrearCurso = () => {
+        navigate('/profesor/crearCurso');
+    };
+
     // Función para manejar la apertura del modal de confirmación de acción
     const abrirModalAccionCurso = (cursoId, accion) => {
         setCursoIdModificar(cursoId);
@@ -81,6 +86,12 @@ const GestionCursosProfesor = () => {
 
     // Función para modificar el estado de un curso (abrir o cerrar)
     const modificarEstadoCurso = async () => {
+
+        if (accion === 'abrir' && !nuevaFechaLimite) {
+            alert('Por favor, seleccione una fecha límite antes.');
+            return;
+        }
+
         if (cursoIdModificar) {
             try {
                 const token = localStorage.getItem('token');
@@ -96,7 +107,6 @@ const GestionCursosProfesor = () => {
                     body: body,
                 });
                 if (response.ok) {
-                    alert(`Curso ${accion === 'cerrar' ? 'cerrado' : 'abierto'} exitosamente.`);
                     // Actualizar el estado del curso según la acción realizada
                     setCursos(cursos.map(curso =>
                         curso.id === cursoIdModificar
@@ -130,6 +140,13 @@ const GestionCursosProfesor = () => {
         <div className="gestion-cursos-profesor-container">
             <div className="gestion-cursos-main-content">
                 <h1 className="text-center my-4">Gestión de Cursos</h1>
+                    <Button 
+                        variant="primary" 
+                        onClick={irACrearCurso} 
+                        className="crear-curso-button"
+                    >
+                        <FaPlusCircle className="mr-2" /> Crear Curso
+                    </Button>
                 {cursos.length === 0 ? (
                     <p className="text-center">No tienes cursos activos en este momento.</p>
                 ) : (

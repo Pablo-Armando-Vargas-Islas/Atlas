@@ -1,0 +1,11 @@
+/* Caja de advertencia - entre 5 y 10 solicitudes */
+.admin-card-warning {
+    background: #fff3cd; /* Color de advertencia (amarillo) */
+    border-left: 4px solid #ffecb5;
+}
+
+/* Caja de peligro - más de 10 solicitudes */
+.admin-card-danger {
+    background: #f8d7da; /* Color de peligro (rojo) */
+    border-left: 4px solid #f5c6cb;
+}

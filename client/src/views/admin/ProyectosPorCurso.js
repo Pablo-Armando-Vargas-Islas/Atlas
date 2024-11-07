@@ -153,10 +153,10 @@ const ProyectosPorCurso = () => {
                 <table className="tabla-proyectos">
                 <thead>
                     <tr>
-                        <th>Título del Proyecto</th>
+                        <th>Proyecto</th>
                         <th>Descripción</th>
                         <th>Licencia</th>
-                        <th>Descripción de la Licencia</th>
+                        <th>Descripción</th>
                         <th>Archivo</th>
                         <th>Acciones</th>
                     </tr>
@@ -261,7 +261,7 @@ const ProyectosPorCurso = () => {
                                         <td>
                                             <FaEdit
                                                 onClick={() => handleEdit(index)}
-                                                className="icono-accion-editar"
+                                                className="icono-accion-editar-proyecto"
                                                 title="Editar proyecto"
                                                 style={{ cursor: "pointer" }}
                                             />

@@ -28,7 +28,7 @@ const Login = () => {
 
                 // Verificar si el usuario debe cambiar la contraseña
                 if (decoded.debe_cambiar_contrasena) {
-                    navigate("/actualiza-contraseña");
+                    navigate("/actualiza-contrasena");
                 } else {
                     // Redirigir según el rol del usuario
                     switch (decoded.rol_id) {

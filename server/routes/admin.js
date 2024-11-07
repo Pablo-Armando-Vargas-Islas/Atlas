@@ -253,7 +253,7 @@ router.put('/cursos/:id', verifyToken, async (req, res) => {
     }
 });
 
-// Obtener todos los usuarios con roles específicos
+// Obtener todos los usuarios con roles específicos y que estén activos
 router.get('/usuariosRol', verifyToken, async (req, res) => {
     try {
         const roles = req.query.roles.split(',').map(Number);
@@ -262,7 +262,7 @@ router.get('/usuariosRol', verifyToken, async (req, res) => {
                     usuarios.cedula, usuarios.codigo_estudiante, roles.nombre_rol
              FROM usuarios
              LEFT JOIN roles ON usuarios.rol_id = roles.id
-             WHERE usuarios.rol_id = ANY($1)
+             WHERE usuarios.rol_id = ANY($1) AND usuarios.status_usuario = 'activo'
              ORDER BY usuarios.fecha_creacion DESC`,
             [roles]
         );

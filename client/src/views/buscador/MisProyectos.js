@@ -75,10 +75,12 @@ const MisProyectos = () => {
 
     // Función para mostrar el modal con el formulario de solicitud de acceso directamente
     const verDetalles = (proyecto) => {
-        setProyectoSeleccionado(proyecto);
-        setShowModal(true);
+        if (userId && proyecto && proyecto.usuario_id) {
+            setProyectoSeleccionado(proyecto);
+            setShowModal(true);
+        }
     };
-
+      
     const handleGoBack = () => {
         navigate(-1); // Regresar a la vista anterior
     };
@@ -250,13 +252,14 @@ const MisProyectos = () => {
                 </div>
             )}
 
-            {proyectoSeleccionado && (
-                <ProyectoModal
-                    show={showModal}
-                    handleClose={cerrarModal}
-                    proyecto={proyectoSeleccionado}
-                    enviarSolicitud={enviarSolicitud}
-                />
+            {proyectoSeleccionado && userId && (
+            <ProyectoModal
+                show={showModal}
+                handleClose={cerrarModal}
+                proyecto={proyectoSeleccionado}
+                enviarSolicitud={enviarSolicitud}
+                userId={userId} // Asegúrate de pasar el userId correctamente
+            />
             )}
         </div>
     );

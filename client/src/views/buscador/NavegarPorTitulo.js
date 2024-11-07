@@ -190,7 +190,7 @@ const NavegarPorTitulo = () => {
   return (
     <div className="navegar-por-titulo-container d-flex flex-column align-items-center">
       <div className="navegar-atras-buscador" onClick={handleGoBack}>
-          <FaArrowLeft className="icono-navegar-atras" /> Volver
+          <FaArrowLeft className="icono-navegar-atras-titulo" /> Volver
       </div>
       <h1 className="navegar-title mb-4">Buscar Proyectos por Título</h1>
       <InputGroup className="search-bar mb-4">

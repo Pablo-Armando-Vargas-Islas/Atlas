@@ -50,8 +50,10 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
 
   // Manejar el clic en la tarjeta para abrir el modal
   const handleCardClick = () => {
-    setProyectoSeleccionado(proyecto);
-    setShowModal(true);
+    if (proyecto && proyecto.usuario_id) {
+      setProyectoSeleccionado(proyecto);
+      setShowModal(true);
+    }
   };
 
   const cerrarModal = () => {

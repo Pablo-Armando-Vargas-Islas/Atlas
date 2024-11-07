@@ -1,0 +1,85 @@
+.crear-curso-profesor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.crear-curso-main-content {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    width: 100%;
+}
+
+
+.crear-curso-input {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.crear-curso-submit-button {
+    background-color: #5DB85C; /* Verde de la universidad */
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.crear-curso-submit-button:hover {
+    background-color: #449D44;
+    color: #ffffff;
+    transform: scale(1.01);
+}
+
+.crear-curso-submit-button:active {
+    background-color: #449D44!important;
+    color: #ffffff;
+}
+
+.crear-curso-codigo {
+    font-family: 'Inter', sans-serif;
+    color: #1980e6;
+}
+
+.crear-curso-copiar-button {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.crear-curso-copiar-button:hover {
+    background-color: #0056b3;
+}
+
+.crear-curso-cerrar-button {
+    background-color: #6c757d;
+    border: none;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.crear-curso-cerrar-button:hover {
+    background-color: #5a6268;
+    color: #ffffff;
+}
+
+.navegar-atras {
+    display: flex;
+    align-items: center;
+    color: #1f3e5e;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.icono-navegar-atras {
+    margin-right: 10px;
+}

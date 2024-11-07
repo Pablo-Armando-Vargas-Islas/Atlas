@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../../styles/RegisterAdmin.css';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const RegisterAdmin = () => {
     const [nombre, setNombre] = useState("");
@@ -13,6 +14,10 @@ const RegisterAdmin = () => {
     const validateEmail = (email) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
     };
 
     const validateNombre = (nombre) => {
@@ -92,6 +97,9 @@ const RegisterAdmin = () => {
         <div className="backgroud-container-register">
             <div className="container register-container d-flex align-items-center justify-content-center min-vh-100">
                 <div className="register-box col-md-6 shadow p-5 rounded-4 bg-white">
+                    <div className="navegar-atras-registerAdmin" onClick={handleGoBack}>
+                        <FaArrowLeft className="icono-navegar-atras" /> Volver
+                    </div>
                     <h1 className="text-center mb-4">Registro de Usuario</h1>
                     {alert.message && (
                         <div className={`alert alert-${alert.type}`} role="alert">

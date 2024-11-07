@@ -25,6 +25,11 @@ const BuscadorBox = () => {
                     className="search-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSearch();
+                        }
+                    }}
                 />
                 <Button variant="primary" className="search-button-buscador" onClick={handleSearch}>
                     Buscar

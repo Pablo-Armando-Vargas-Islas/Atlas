@@ -19,6 +19,7 @@ import NavegarPorFecha from "./views/buscador/NavegarPorFecha";
 import NavegarPorCurso from "./views/buscador/NavegarPorCurso";
 import MisProyectos from "./views/buscador/MisProyectos";
 import CrearCursoProfesor from './views/profesor/cursos/CrearCursoProfesor';
+import CrearCursoAdmin from "./views/admin/CrearCursoAdmin";
 import GestionCursosProfesor from './views/profesor/cursos/GestionCursosProfesor';
 import VerProyectosCurso from './views/profesor/cursos/VerProyectosCurso';
 import MisSolicitudes from "./views/MisSolicitudes";
@@ -26,6 +27,13 @@ import EditarUsuarios from "./views/admin/EditarUsuarios";
 import EditarCursos from "./views/admin/EditarCursos";
 import ProyectosPorCurso from "./views/admin/ProyectosPorCurso";
 import ConfiguracionCorreo from "./views/ConfiguracionCorreo";
+import VerProyectoSolicitado from "./views/admin/VerProyectoSolicitado";
+import ActividadUsuarios from "./views/admin/ActividadUsuarios"
+import InactividadUsuarios from "./views/admin/InactividadUsuarios"
+import ProfesorCursos from "./views/admin/ProfesorCursos"
+import CursosProyectos from "./views/admin/CursosProyectos";
+import GestionCursosAlumno from "./views/alumno/GestionCursosAlumno";
+import VerProyectosAlumnoCurso from "./views/alumno/VerProyectosAlumnoCurso";
 import Navbar from "./views/Navbar";
 
 function App() {
@@ -70,7 +78,7 @@ function AppContent() {
                     }
                 />
                 <Route
-                    path="/actualiza-contraseña"
+                    path="/actualiza-contrasena"
                     element={
                         <ProtectedRoute>
                             <ChangePassword />
@@ -158,10 +166,74 @@ function AppContent() {
                     }
                 />
                 <Route
+                    path="/admin/crear-curso"
+                    element={
+                        <ProtectedRoute>
+                            <CrearCursoAdmin />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/admin/configurar-correo"
                     element={
                         <ProtectedRoute>
                             <ConfiguracionCorreo />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/proyectos-mas-solicitados"
+                    element={
+                        <ProtectedRoute>
+                            <VerProyectoSolicitado />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/proyectos-mas-cursos"
+                    element={
+                        <ProtectedRoute>
+                            <CursosProyectos />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/actividad-usuarios"
+                    element={
+                        <ProtectedRoute>
+                            <ActividadUsuarios />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/usuarios-inactivos"
+                    element={
+                        <ProtectedRoute>
+                            <InactividadUsuarios />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/profesor-mas-cursos"
+                    element={
+                        <ProtectedRoute>
+                            <ProfesorCursos />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/alumno/mis-cursos"
+                    element={
+                        <ProtectedRoute>
+                            <GestionCursosAlumno />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/alumno/curso/:cursoId/proyectos"
+                    element={
+                        <ProtectedRoute>
+                            <VerProyectosAlumnoCurso />
                         </ProtectedRoute>
                     }
                 />

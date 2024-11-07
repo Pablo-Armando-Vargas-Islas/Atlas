@@ -1,0 +1,53 @@
+.profesores-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: auto;
+    text-align: center;
+}
+
+.card-header {
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 1.5em;
+    color: #333;
+}
+
+.profesores-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.profesores-list-item {
+    font-size: 1em;
+    color: #555;
+    margin: 8px 0;
+}
+
+.card-toggle {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 1.2em;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}

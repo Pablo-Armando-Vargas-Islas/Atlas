@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { AuthContext } from '../context/AuthContext'; // Importar AuthContext
-import BotonDescargaAdmin from '../utils/BotonDescargaAdmin'; // Importar BotonDescargaAdmin
+import { AuthContext } from '../context/AuthContext'; 
+import BotonDescargaAdmin from '../utils/BotonDescargaAdmin'; 
 import '../styles/ProyectoModal.css';
 
 const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetails = false }) => {
-    const { rol: userRole } = useContext(AuthContext); // Obtener el rol del contexto de autenticación
+    const { rol: userRole, userId } = useContext(AuthContext); 
     const [isMotivoStage, setIsMotivoStage] = useState(omitDetails);
     const [motivo, setMotivo] = useState('');
     const [isMotivoValid, setIsMotivoValid] = useState(false);
+    const [puedeDescargar, setPuedeDescargar] = useState(false);
 
     const handleMotivoChange = (e) => {
         const value = e.target.value;
@@ -29,12 +30,25 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
         setIsMotivoStage(omitDetails);
     }, [omitDetails]);
 
+    useEffect(() => {
+        if (userId && proyecto && proyecto.usuario_id) {
+            const usuarioIdProyecto = String(proyecto.usuario_id);
+            const idUsuarioAutenticado = String(userId);
+            
+            if (userRole === 1 || usuarioIdProyecto === idUsuarioAutenticado || userRole === 2 && proyecto.codigo_curso) {
+                setPuedeDescargar(true);
+            } else {
+                setPuedeDescargar(false);
+            }
+        }
+    }, [userRole, userId, proyecto]);
+    
     // Verificar el rol y mostrar el modal correspondiente
-    if (userRole === 1) {
+    if (puedeDescargar) {
         return (
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} centered size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>Detalles del Proyecto (Administrador)</Modal.Title>
+                    <Modal.Title>Detalles del Proyecto</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <>
@@ -44,8 +58,11 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
                         {proyecto.necesita_licencia && (
                             <p><strong>Descripción de la licencia:</strong> {proyecto.descripcion_licencia}</p>
                         )}
-                        <p><strong>Archivo Comprimido:</strong> {proyecto.ruta_archivo_comprimido ? proyecto.ruta_archivo_comprimido : "No se ha subido ningún archivo"}</p>
+                        <p><strong>Archivo Comprimido:</strong> {userRole === 1 ? proyecto.ruta_archivo_comprimido : proyecto.ruta_archivo_comprimido.split('\\').pop()}</p>
                         <p><strong>Tipo de Proyecto:</strong> {proyecto.tipo}</p>
+                        {proyecto.tipo === 'aula' && (
+                            <p><strong>Curso:</strong> {proyecto.nombre_curso}</p>
+                        )}
                         <p><strong>Autores:</strong> {proyecto.autores.join(", ")}</p>
                         <p><strong>Tecnologías:</strong> {proyecto.tecnologias.join(", ")}</p>
                         <p><strong>Categorías:</strong> {proyecto.categorias.join(", ")}</p>
@@ -56,7 +73,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
                         Cerrar
                     </Button>
                     {proyecto.ruta_archivo_comprimido && (
-                        <BotonDescargaAdmin id={proyecto.id} /> // Usar BotonDescargaAdmin
+                        <BotonDescargaAdmin id={proyecto.id} />
                     )}
                 </Modal.Footer>
             </Modal>
@@ -65,7 +82,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
 
     // Modal para roles que no son administradores
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} centered size="lg">
             <Modal.Header closeButton>
                 <Modal.Title>{isMotivoStage ? 'Solicitar Acceso al Proyecto' : 'Detalles del Proyecto'}</Modal.Title>
             </Modal.Header>
@@ -86,6 +103,9 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
                         <>
                             <p><strong>Título:</strong> {proyecto.titulo}</p>
                             <p><strong>Descripción:</strong> {proyecto.descripcion}</p>
+                            {proyecto.tipo === 'aula' && (
+                                <p><strong>Curso:</strong> {proyecto.nombre_curso}</p>
+                            )}
                             <p><strong>Autores:</strong> {proyecto.autores.join(', ')}</p>
                             <p><strong>Tecnologías:</strong> {proyecto.tecnologias.join(', ')}</p>
                             <p><strong>Categorías:</strong> {proyecto.categorias.join(', ')}</p>

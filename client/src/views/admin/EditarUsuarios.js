@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/EditarUsuarios.css";
-import { FaEdit, FaCheck, FaTimes, FaUserSlash, FaArrowLeft} from 'react-icons/fa';
+import { FaEdit, FaCheck, FaTimes, FaUserSlash, FaArrowLeft, FaPlus } from 'react-icons/fa';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const AdminUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
@@ -39,10 +40,6 @@ const AdminUsuarios = () => {
     const handleSearchChange = (e) => {
         setBusqueda(e.target.value);
         setCurrentPage(1); 
-    };
-
-    const handleRegistrarNuevoUsuario = () => {
-        navigate('/registrar-admin');
     };
 
     const handleInputChange = (e) => {
@@ -107,8 +104,23 @@ const AdminUsuarios = () => {
 
     const handleEdit = (index) => {
         setEditIndex(index);
-        setEditingUser({ ...usuarios[index] });
+    
+        // Clonar el usuario y asegurarse de que los valores de rol y cédula/código se establezcan correctamente
+        const selectedUser = { ...usuarios[index] };
+        
+        if (selectedUser.rol_id === 3) {
+            // Si el rol es de Alumno, asegúrate de que `codigo_estudiante` tenga un valor
+            selectedUser.codigo_estudiante = selectedUser.codigo_estudiante || "";
+            selectedUser.cedula = ""; // Asegúrate de que `cedula` esté vacío
+        } else if (selectedUser.rol_id === 1 || selectedUser.rol_id === 2) {
+            // Si el rol es de Administrador o Docente, asegúrate de que `cedula` tenga un valor
+            selectedUser.cedula = selectedUser.cedula || "";
+            selectedUser.codigo_estudiante = ""; // Asegúrate de que `codigo_estudiante` esté vacío
+        }
+    
+        setEditingUser(selectedUser);
     };
+    
 
     const handleInactivate = async (userId) => {
         try {
@@ -169,11 +181,22 @@ const AdminUsuarios = () => {
                 <div className="buscador-y-boton">
                     <input
                         type="text"
-                        placeholder="Buscar en usuarios"
+                        placeholder="Buscar usuario"
                         value={busqueda}
                         onChange={handleSearchChange}
                         className="buscador-usuarios"
                     />
+                    <OverlayTrigger
+                        placement="top" // Ubicación del tooltip
+                        overlay={<Tooltip>Registrar nuevo usuario</Tooltip>}
+                    >
+                        <button
+                            className="boton-crear-curso"
+                            onClick={() => navigate("/registrar-admin")}
+                        >
+                            <FaPlus />
+                        </button>
+                    </OverlayTrigger>
                 </div>
                 <table className="tabla-usuarios">
                     <thead>
@@ -242,18 +265,32 @@ const AdminUsuarios = () => {
                                             <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.nombre_rol) }}></td>
                                             <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.cedula || usuario.codigo_estudiante) }}></td>
                                             <td>
-                                                <FaEdit
-                                                    onClick={() => handleEdit(index + indexOfFirstUser)}
-                                                    className="icono-accion-editar"
-                                                    title="Editar usuario"
-                                                />
-                                                <FaUserSlash
-                                                    onClick={usuario.status_usuario !== 'inactivo' ? () => handleInactivate(usuario.id) : null}
-                                                    className={`icono-accion-inactivar ${usuario.status_usuario === 'inactivo' ? 'icono-desactivado' : ''}`}
-                                                    title="Baja de usuario"
-                                                    style={{ cursor: usuario.status_usuario === 'inactivo' ? 'not-allowed' : 'pointer' }}
-                                                />
-                                            </td>
+    <OverlayTrigger
+        placement="top" // Ubicación del tooltip
+        overlay={<Tooltip>Editar usuario</Tooltip>} // Texto del tooltip para FaEdit
+    >
+        <span>
+            <FaEdit
+                onClick={() => handleEdit(index + indexOfFirstUser)}
+                className="icono-accion-editar"
+                style={{ cursor: "pointer" }}
+            />
+        </span>
+    </OverlayTrigger>
+    
+    <OverlayTrigger
+        placement="top" // Ubicación del tooltip
+        overlay={<Tooltip>{usuario.status_usuario !== 'inactivo' ? 'Baja de usuario' : 'Usuario inactivo'}</Tooltip>}
+    >
+        <span>
+            <FaUserSlash
+                onClick={usuario.status_usuario !== 'inactivo' ? () => handleInactivate(usuario.id) : null}
+                className={`icono-accion-inactivar ${usuario.status_usuario === 'inactivo' ? 'icono-desactivado' : ''}`}
+                style={{ cursor: usuario.status_usuario === 'inactivo' ? 'not-allowed' : 'pointer' }}
+            />
+        </span>
+    </OverlayTrigger>
+</td>
                                         </>
                                     )}
                                 </tr>

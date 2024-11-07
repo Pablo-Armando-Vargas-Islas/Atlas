@@ -74,7 +74,6 @@ const Navbar = () => {
                 <div className={`navbar-links ${menuOpen ? 'active' : ''}`}>
                     {rol === 2 && (
                         <>
-                            <Link className="nav-link" to="/profesor/crearCurso" onClick={handleLinkClick}>Crear Curso</Link>
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
                             <Link className="nav-link" to="/profesor/cursos" onClick={handleLinkClick}>Mis Cursos</Link>
                             <Link className="nav-link" to="/MisSolicitudes" onClick={handleLinkClick}>Mis Solicitudes</Link>
@@ -86,10 +85,8 @@ const Navbar = () => {
                         <>
                             <Link className="nav-link" to="/admin/configurar-correo" onClick={handleLinkClick}>Correo</Link>
                             <Link className="nav-link" to="/admin/dashboard" onClick={handleLinkClick}>Dashboard</Link>
-                            <Link className="nav-link" to="/profesor/crearCurso" onClick={handleLinkClick}>Crear Curso</Link>
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
                             <Link className="nav-link" to="/profesor/cursos" onClick={handleLinkClick}>Mis Cursos</Link>
-                            <Link className="nav-link" to="/registrar-admin" onClick={handleLinkClick}>Registrar Usuario</Link>
                             <Link className="nav-link" to="/Buscador" onClick={handleLinkClick}>Buscador</Link>
                         </>
                     )}
@@ -98,6 +95,7 @@ const Navbar = () => {
                         <>
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
                             <Link className="nav-link" to="/MisSolicitudes" onClick={handleLinkClick}>Mis Solicitudes</Link>
+                            <Link className="nav-link" to="/alumno/mis-cursos" onClick={handleLinkClick}>Mis cursos</Link>
                             <Link className="nav-link" to="/Buscador" onClick={handleLinkClick}>Buscador</Link>
                         </>
                     )}
@@ -123,13 +121,13 @@ const Navbar = () => {
                             className={`btn ${isLoginPage ? 'btn-primary' : 'btn-outline-primary'} btn-login`}
                             onClick={() => navigate('/login')}
                         >
-                            Log in
+                            Iniciar sesión
                         </button>
                         <button
                             className={`btn ${isSignUpPage ? 'btn-primary' : 'btn-outline-primary'} btn-signup`}
                             onClick={() => navigate('/signup')}
                         >
-                            Sign up
+                            Regístrate
                         </button>
                     </div>
                 )}

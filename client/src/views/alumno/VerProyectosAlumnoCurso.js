@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button } from 'react-bootstrap';
-import ProyectoModal from '../../../utils/ProyectoModal';
+import ProyectoModal from '../../utils/ProyectoModal';
 import { FaArrowLeft } from 'react-icons/fa';
-import '../../../styles/GestionCursosProfesor.css';
+import '../../styles/GestionCursosProfesor.css';
 
-const VerProyectosCurso = () => {
+const VerProyectosAlumnoCurso = () => {
     const { cursoId } = useParams();
     const [proyectos, setProyectos] = useState([]);
     const [curso, setCurso] = useState({});
@@ -17,21 +17,24 @@ const VerProyectosCurso = () => {
         const fetchProyectos = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:5000/api/cursos/curso/${cursoId}/proyectos`, {
+                const response = await fetch(`http://localhost:5000/api/cursos/curso/${cursoId}/proyectos/alumno`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
                 const data = await response.json();
+                console.log("Datos del curso obtenidos:", data.curso); // Depuración
+                console.log("Proyectos obtenidos:", data.proyectos);   // Depuración
                 setProyectos(data.proyectos);
                 setCurso(data.curso);
             } catch (error) {
                 console.error('Error al obtener los proyectos:', error);
             }
         };
-
+    
         fetchProyectos();
     }, [cursoId]);
+    
 
     const handleGoBack = () => {
         navigate(-1); // Regresar a la vista anterior
@@ -49,6 +52,19 @@ const VerProyectosCurso = () => {
         setShowModal(false);
         setProyectoSeleccionado(null);
     };
+
+    function VerProyectosAlumnoCurso({ curso, proyectos }) {
+        if (!curso) {
+            return <div>Loading...</div>;
+        }
+    
+        return (
+            <div>
+                <h2>{curso.nombre_curso}</h2>
+                {/* Renderizar los proyectos aquí */}
+            </div>
+        );
+    }    
 
     // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
@@ -114,7 +130,9 @@ const VerProyectosCurso = () => {
                 <div className="navegar-atras" onClick={handleGoBack}>
                     <FaArrowLeft className="icono-navegar-atras" /> Volver
                 </div>
-                <h1 className="text-center my-4">Proyectos en {curso.nombre_curso}</h1>
+                <h1 className="text-center my-4">
+                    {curso ? `Proyectos en ${curso.nombre_curso}` : 'Cargando curso...'}
+                </h1>
                 {proyectos.length === 0 ? (
                     <p className="text-center">No hay proyectos entregados en este curso.</p>
                 ) : (
@@ -146,18 +164,17 @@ const VerProyectosCurso = () => {
                     </Table>
                 )}
             </div>
-
-            {/* Modal reutilizable para mostrar detalles del proyecto */}
+    
             {proyectoSeleccionado && (
                 <ProyectoModal
                     show={showModal}
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
-                    enviarSolicitud={enviarSolicitud} // Pasando enviarSolicitud como prop
+                    enviarSolicitud={enviarSolicitud}
                 />
             )}
         </div>
-    );
+    );    
 };
 
-export default VerProyectosCurso;
+export default VerProyectosAlumnoCurso;

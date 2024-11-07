@@ -1,25 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
+import { Spinner } from 'react-bootstrap'; 
+import '../styles/ChangePassword.css';
 
 const ChangePassword = () => {
     const [nuevaContrasena, setNuevaContrasena] = useState("");
     const [confirmarContrasena, setConfirmarContrasena] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
+    const [loading, setLoading] = useState(false); // Estado para el spinner
     const navigate = useNavigate();
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
 
-        // Validar que ambas contraseñas coincidan
         if (nuevaContrasena !== confirmarContrasena) {
             setAlert({ type: "danger", message: "Las contraseñas no coinciden" });
             return;
         }
 
-        // Enviar la nueva contraseña al servidor
+        setLoading(true); // Activa el estado de carga
+
         try {
-            const token = localStorage.getItem("token"); // Obtener el token del almacenamiento local
+            const token = localStorage.getItem("token");
             const response = await fetch("http://localhost:5000/api/auth/change-password", {
                 method: "POST",
                 headers: {
@@ -33,12 +36,8 @@ const ChangePassword = () => {
 
             if (response.ok) {
                 setAlert({ type: "success", message: "Contraseña actualizada exitosamente" });
-
-                // Decodificar el token para obtener el rol del usuario
                 const decoded = jwtDecode(token);
-                console.log("Rol del usuario:", decoded.rol_id);
 
-                // Redirigir según el rol del usuario
                 switch (decoded.rol_id) {
                     case 1:
                         navigate("/admin/dashboard");
@@ -56,6 +55,8 @@ const ChangePassword = () => {
         } catch (error) {
             console.error("Error al cambiar la contraseña:", error);
             setAlert({ type: "danger", message: "Error de conexión" });
+        } finally {
+            setLoading(false); // Desactiva el estado de carga
         }
     };
 
@@ -89,11 +90,29 @@ const ChangePassword = () => {
                                 value={confirmarContrasena}
                                 onChange={(e) => setConfirmarContrasena(e.target.value)}
                                 required
-                                minLength={6}
+                                minLength={8}
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary w-100 mt-3 rounded-pill">
-                            Cambiar Contraseña
+                        <button
+                            type="submit"
+                            className={`btn btn-primary-cambio w-100 mt-3 rounded-pill ${loading ? "loading-button" : ""}`}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        style={{ marginRight: '8px', color: '#ffffff' }} // Color del spinner en blanco
+                                    />
+                                    <span style={{ color: '#ffffff' }}>Cambiando...</span> {/* Texto en blanco */}
+                                </>
+                            ) : (
+                                'Cambiar Contraseña'
+                            )}
                         </button>
                     </form>
                 </div>

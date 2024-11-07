@@ -38,7 +38,7 @@ html, body {
 }
 
 .configuracion-correo-btn-primary {
-    background-color: #8fbc1e; /* Color similar */
+    background-color: #5DB85C; /* Color similar */
     color: #ffffff;
     border: none;
     border-radius: 25px;
@@ -50,7 +50,7 @@ html, body {
 } 
 
 .configuracion-correo-btn-primary:hover {
-    background-color: #e6801e;
+    background-color: #449D44;
     color: #ffffff;
     transform: scale(1.02);
 }

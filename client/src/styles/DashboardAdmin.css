@@ -5,7 +5,7 @@
     padding: 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
-    max-width: 1100px;
+    max-width: 1200px;
 }
 
 /* Contenedor de Métricas Generales */
@@ -73,7 +73,7 @@
 /* Título de las Tarjetas */
 .admin-card-title {
     font-size: 1.3em;
-    color: #4995dd;
+    color: #28537E;
     margin-bottom: 15px;
     text-align: center;
 }
@@ -138,3 +138,26 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s ease-in-out;
 }
+
+/* Caja de advertencia - entre 5 y 10 solicitudes */
+.admin-card-warning {
+    background: #fff3cd; /* Color de advertencia (amarillo) */
+    border-left: 4px solid #ffecb5;
+}
+
+/* Caja de peligro - más de 10 solicitudes */
+.admin-card-danger {
+    background: #f8d7da; /* Color de peligro (rojo) */
+    border-left: 4px solid #f5c6cb;
+}
+
+.admin-card.clickeable {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.admin-card.clickeable:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease-in-out;
+}
+

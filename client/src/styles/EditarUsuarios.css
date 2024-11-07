@@ -18,7 +18,7 @@
 }
 
 .titulo-gestion-usuarios {
-    color: #0854A2!important;
+    color: #28537E!important;
     font-weight: bold;
     margin-bottom: 30px;
     text-align: center;
@@ -49,7 +49,7 @@
 .tabla-usuarios th {
     font-size: 1em;
     color: #ffffff;
-    background-color: #0854A2; 
+    background-color: #28537E; 
     text-align: center; 
     vertical-align: middle;
     padding: 12px;
@@ -96,8 +96,8 @@
 
 .boton-pagina {
     background-color: #ffffff;
-    border: 1px solid #007bff;
-    color: #007bff;
+    border: 1px solid #28537E;
+    color: #28537E;
     padding: 5px 13px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, color 0.3s;
@@ -144,7 +144,7 @@
 
 .icono-accion-inactivar {
     cursor: pointer;
-    color: #696969; /* Color naranja/rojo para inactivar */
+    color: #D9534F; /* Color naranja/rojo para inactivar */
 }
 
 .icono-accion-listo {
@@ -171,7 +171,7 @@
 .navegar-atras {
     display: flex;
     align-items: center;
-    color: #0854A2;
+    color: #28537E;
     font-weight: bold;
     cursor: pointer;
     margin-bottom: 10px;
@@ -180,4 +180,28 @@
 
 .icono-navegar-atras {
     margin-right: 10px;
+}
+
+
+
+.resaltado-busqueda {
+    background-color: #d3d3d3; 
+    font-weight: bold;        
+    padding: 0 2px;           
+    border-radius: 3px;     
+}
+
+
+.toggle-button {
+    background-color: #ffffff;
+    border-color: #71767a25;
+    color: #71767a;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.toggle-button:hover {
+    transform: translateY(-2px);
 }

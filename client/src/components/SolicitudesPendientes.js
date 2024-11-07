@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/SolicitudesPendientes.css'; 
 
 const SolicitudesPendientes = () => {
     const [solicitudes, setSolicitudes] = useState(0);
@@ -28,13 +29,30 @@ const SolicitudesPendientes = () => {
         fetchData();
     }, []);
 
+    // Determinar el color de fondo en función del número de solicitudes
+    let cardStyle = "admin-card";
+    if (solicitudes >= 5 && solicitudes <= 10) {
+        cardStyle += " admin-card-warning"; // Se agrega clase de advertencia (amarillo)
+    } else if (solicitudes > 10) {
+        cardStyle += " admin-card-danger"; // Se agrega clase de peligro (rojo)
+    }
+
     return (
-        <Link to="/admin/solicitudes" className="admin-card-link">
-            <div className="admin-card">
-                <h3 className="admin-card-title">Solicitudes Pendientes</h3>
-                <p className="admin-card-text">{solicitudes}</p>
-            </div>
-        </Link>
+        <>
+            {solicitudes > 0 ? (
+                <Link to="/admin/solicitudes" className="admin-card-link">
+                    <div className={cardStyle}>
+                        <h3 className="admin-card-title">Solicitudes Pendientes</h3>
+                        <p className="admin-card-text">{solicitudes}</p>
+                    </div>
+                </Link>
+            ) : (
+                <div className={cardStyle}>
+                    <h3 className="admin-card-title">Solicitudes Pendientes</h3>
+                    <p className="admin-card-text">{solicitudes}</p>
+                </div>
+            )}
+        </>
     );
 };
 

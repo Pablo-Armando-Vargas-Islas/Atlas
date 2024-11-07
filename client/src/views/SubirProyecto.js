@@ -119,8 +119,18 @@ const SubirProyectoProfesor = () => {
     };      
 
     const addAutorField = () => {
+        if (tipo === 'aula' && autores.length >= 5) {
+            setErrorMessage("Solo se permiten hasta 5 autores en proyectos de aula.");
+            return;
+        } else if (tipo === 'grado' && autores.length >= 3) {
+            setErrorMessage("Solo se permiten hasta 3 autores en proyectos de grado.");
+            return;
+        }
+    
         setAutores([...autores, ""]);
+        setErrorMessage(""); 
     };
+    
 
     const removeAutorField = (index) => {
         const newAutores = autores.filter((_, i) => i !== index);

@@ -17,7 +17,7 @@
 }
 
 .titulo-proyectos-curso {
-    color: #0854A2!important;
+    color: #28537E!important;
     font-weight: bold;
     margin-bottom: 30px;
     text-align: center;
@@ -41,7 +41,7 @@
 .tabla-proyectos th {
     font-size: 1em;
     color: #ffffff;
-    background-color: #0854A2; 
+    background-color: #28537E; 
     text-align: center; 
     vertical-align: middle;
     padding: 12px;
@@ -58,7 +58,7 @@
 }
 
 .link-proyectos:hover {
-    color: #0056b3;
+    color: #0056b3; 
 }
 
 .boton-ver-mas {
@@ -88,3 +88,7 @@
     margin-right: 10px;
 }
  
+.icono-accion-editar-proyecto{
+    cursor: pointer;
+    color: #2a76c8; /* Color azul para editar */
+}

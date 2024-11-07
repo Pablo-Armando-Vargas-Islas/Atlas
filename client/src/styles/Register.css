@@ -29,13 +29,13 @@ html, body {
 }
 
 .register-btn-primary:hover {
-    background-color: #ec881d;
+    background-color: #91cb1b!important;
     color: #ffffff;
     transform: scale(1.01);
 }
 
 .register-btn-primary:active {
-    background-color: #ec881d!important;
+    background-color: #91cb1b!important;
     color: #ffffff!important;
 }
 

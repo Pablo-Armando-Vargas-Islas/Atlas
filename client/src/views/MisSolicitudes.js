@@ -56,7 +56,7 @@ const MisSolicitudes = () => {
                         <thead className="table-header">
                             <tr>
                                 <th className="text-center">Proyecto</th>
-                                <th className="text-center">Fecha de Solicitud</th>
+                                <th className="text-center">Fecha</th>
                                 <th className="text-center">Estatus</th>
                                 <th className="text-center">Acciones</th>
                             </tr>
@@ -110,7 +110,14 @@ const MisSolicitudes = () => {
                         )}
                         {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'cerrado' && (
                             <>
+                                <p>Tu solicitud ya finalizó.</p>
                                 <p>Esta solicitud ya alcanzó el máximo de días disponible.</p>
+                            </>
+                        )}
+                        {solicitudSeleccionada && solicitudSeleccionada.status_solicitud === 'expirado' && (
+                            <>
+                                <p>Tu solicitud ha expirado.</p>
+                                <p>Esta solicitud ya alcanzó el máximo de días disponible para su descarga desde que fué aceptada.</p>
                             </>
                         )}
                     </Modal.Body>

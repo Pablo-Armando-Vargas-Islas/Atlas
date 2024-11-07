@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/DashboardAdmin.css';
 
 const ProyectosPorCurso = () => {
-    const [proyectosPorCurso, setProyectosPorCurso] = useState([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(false);
+    const [cursos, setCursos] = useState([]);
+    const [cara, setCara] = useState('mas'); // Estado para controlar la cara de la tarjeta
+    const API_URL = 'http://localhost:5000/api/metricas';
+    const token = localStorage.getItem('token');
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
-        const token = localStorage.getItem('token');
-
-        const fetchData = async () => {
+        const fetchCursos = async () => {
             try {
-                const response = await fetch(`${API_URL}/proyectos/por-curso?page=${page}&limit=3`, {
+                const endpoint = cara === 'mas' ? '/cursos/mas-proyectos' : '/cursos/menos-proyectos';
+                const response = await fetch(`${API_URL}${endpoint}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -20,43 +22,41 @@ const ProyectosPorCurso = () => {
                     throw new Error(`Error en la autenticación o en la solicitud. Status: ${response.status}`);
                 }
                 const data = await response.json();
-                setProyectosPorCurso(data);
-
-                // Se verifica si hay más cursos para la próxima página.
-                setHasMore(data.length > 4);
+                setCursos(data);
             } catch (error) {
-                console.error('Error al obtener los proyectos por curso:', error.message);
+                console.error('Error al obtener los cursos:', error.message);
             }
         };
 
-        fetchData();
-    }, [page]);
+        fetchCursos();
+    }, [cara]);
+
+    // Manejar el clic en la tarjeta para redirigir a la vista correspondiente
+    const handleCardClick = () => {
+        navigate('/admin/proyectos-mas-cursos');
+    };
+
+    // Cambiar entre "más proyectos" y "menos proyectos"
+    const toggleCara = (e) => {
+        e.stopPropagation(); // Evitar que el clic en el botón propague el evento al contenedor
+        setCara((prevCara) => (prevCara === 'mas' ? 'menos' : 'mas'));
+    };
 
     return (
-        <div className="admin-card">
-            <h3 className="admin-card-title">Proyectos Subidos por Curso</h3>
-            <ul>
-                {proyectosPorCurso.map((curso, index) => (
-                    <li key={`${curso.nombre_curso}-${index}`} className="admin-card-list-item">
+        <div className="admin-card clickeable" onClick={handleCardClick}>
+            <h3 className="admin-card-title">
+                {cara === 'mas' ? 'Cursos con más proyectos' : 'Cursos con menos proyectos'}
+            </h3>
+            <ul className="profesores-list">
+                {cursos.map((curso, index) => (
+                    <li key={index} className="profesores-list-item">
                         {curso.nombre_curso}: {curso.cantidad_proyectos} proyectos
                     </li>
                 ))}
             </ul>
             <div className="pagination">
-                <button
-                    className="pagination-button"
-                    disabled={page === 1}
-                    onClick={() => setPage(page - 1)}
-                >
-                    &lt;
-                </button>
-                <span className="pagination-page">{page}</span>
-                <button
-                    className="pagination-button"
-                    disabled={!hasMore}
-                    onClick={() => setPage(page + 1)}
-                >
-                    &gt;
+                <button className="pagination-button" onClick={toggleCara}>
+                    {cara === 'mas' ? '>' : '<'}
                 </button>
             </div>
         </div>

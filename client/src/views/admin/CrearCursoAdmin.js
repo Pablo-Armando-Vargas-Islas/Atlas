@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Modal } from 'react-bootstrap';
+import '../../styles/CrearCursoAdmin.css';
 import { FaArrowLeft } from 'react-icons/fa';
-import '../../../styles/CrearCursoProfesor.css';
- 
-const CrearCursoProfesor = () => {
+
+const CrearCursoAdmin = () => {
     const [nombreCurso, setNombreCurso] = useState('');
     const [periodo, setPeriodo] = useState('');
     const [fechaLimite, setFechaLimite] = useState('');
@@ -25,15 +25,15 @@ const CrearCursoProfesor = () => {
         return codigo;
     };
 
+    const handleGoBack = () => {
+        navigate(-1); // Regresar a la vista anterior
+    };
+
     // Función para copiar el código al portapapeles
     const copiarMensaje = () => {
         const mensaje = `Hola este es el código del curso *${nombreCurso}*:\n${codigoCurso}`;
         navigator.clipboard.writeText(mensaje);
         setCopied(true);
-    };
-
-    const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
     };
 
     const crearCurso = async (e) => {
@@ -179,4 +179,4 @@ const CrearCursoProfesor = () => {
     );
 };
 
-export default CrearCursoProfesor;
+export default CrearCursoAdmin;
