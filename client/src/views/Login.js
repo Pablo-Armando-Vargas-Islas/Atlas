@@ -1,15 +1,20 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from "../context/AuthContext";
 import '../styles/Login.css';
 
 const Login = () => {
+    const { logout } = useContext(AuthContext);
     const [usuario, setUsuario] = useState("");
     const [contraseña, setContraseña] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        logout();
+    }, []);
 
     const onSubmitForm = async (e) => {
         e.preventDefault();

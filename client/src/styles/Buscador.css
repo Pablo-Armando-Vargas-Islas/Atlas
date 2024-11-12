@@ -88,3 +88,21 @@
     font-size: 1.2rem; 
     height: 100%;
 }
+
+
+.button-card-config {
+    width: 300px;  /* Cambia este valor para hacer la tarjeta más ancha */
+    height: 180px; /* Cambia este valor para hacer la tarjeta más alta */
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fbfbfb;
+    color: #000;
+}
+
+.button-card-config:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    background-color: #28537E; 
+    color: #fff; 
+}

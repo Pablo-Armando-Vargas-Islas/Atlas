@@ -396,5 +396,219 @@ router.put('/correo/actualizar', verifyToken, async (req, res) => {
     }
 });
 
+// Obtener todas las tecnologías
+router.get('/tecnologias', verifyToken, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM tecnologias ORDER BY nombre ASC');
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener tecnologías:', error);
+        res.status(500).json({ error: 'Error al obtener las tecnologías' });
+    }
+});
+
+// Añadir nueva tecnología
+router.post('/add/tecnologias', verifyToken, async (req, res) => {
+    const { nombre } = req.body;
+    if (!nombre) {
+        return res.status(400).json({ error: 'El nombre de la tecnología es obligatorio' });
+    }
+
+    try {
+        // Verificar si ya existe una tecnología con el mismo nombre
+        const existingTecnologia = await pool.query(
+            'SELECT * FROM tecnologias WHERE nombre = $1',
+            [nombre]
+        );
+
+        if (existingTecnologia.rowCount > 0) {
+            return res.status(400).json({ error: 'Ya existe una tecnología con este nombre' });
+        }
+
+        // Si no existe, insertar la nueva tecnología
+        const result = await pool.query(
+            'INSERT INTO tecnologias (nombre) VALUES ($1) RETURNING *',
+            [nombre]
+        );
+
+        res.status(201).json(result.rows[0]);
+
+    } catch (error) {
+        console.error('Error al añadir tecnología:', error);
+        res.status(500).json({ error: 'Error al añadir la tecnología' });
+    }
+});
+
+// Editar una tecnología existente
+router.put('/edit/tecnologias/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { nombre } = req.body;
+    
+    if (!nombre) {
+        return res.status(400).json({ error: 'El nombre de la tecnología es obligatorio' });
+    }
+
+    try {
+        // Verificar si ya existe una tecnología con el nombre que estamos tratando de editar
+        const existingTecnologia = await pool.query(
+            'SELECT * FROM tecnologias WHERE nombre = $1 AND id != $2',
+            [nombre, id]
+        );
+
+        if (existingTecnologia.rowCount > 0) {
+            return res.status(400).json({ error: 'Ya existe una tecnología con este nombre' });
+        }
+
+        // Actualizar la tecnología
+        const result = await pool.query(
+            'UPDATE tecnologias SET nombre = $1 WHERE id = $2 RETURNING *',
+            [nombre, id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Tecnología no encontrada' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error al editar tecnología:', error);
+        res.status(500).json({ error: 'Error al editar la tecnología' });
+    }
+});
+
+// Eliminar una tecnología
+router.delete('/delete/tecnologias/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query('DELETE FROM tecnologias WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Tecnología no encontrada' });
+        }
+
+        res.status(200).json({ message: 'Tecnología eliminada correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar tecnología:', error);
+
+        // Verifica si el error es de violación de llave foránea
+        if (error.code === '23503') {
+            // Código 23503 en PostgreSQL indica una violación de llave foránea
+            return res.status(400).json({
+                error: 'No es posible eliminar esta tecnología porque ya ha sido utilizada en el registro de algún proyecto.',
+            });
+        }
+
+        res.status(500).json({ error: 'Error al eliminar la tecnología' });
+    }
+});
+
+// Obtener todas las categorías
+router.get('/categorias', verifyToken, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM categorias ORDER BY nombre ASC');
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener categorías:', error);
+        res.status(500).json({ error: 'Error al obtener las categorías' });
+    }
+});
+
+// Añadir nueva Categoría
+router.post('/add/categorias', verifyToken, async (req, res) => {
+    const { nombre } = req.body;
+    if (!nombre) {
+        return res.status(400).json({ error: 'El nombre de la categoría es obligatorio' });
+    }
+
+    try {
+        // Verificar si ya existe una categoría con el mismo nombre
+        const existingCategoria = await pool.query(
+            'SELECT * FROM categorias WHERE nombre = $1',
+            [nombre]
+        );
+
+        if (existingCategoria.rowCount > 0) {
+            return res.status(400).json({ error: 'Ya existe una categoría con este nombre' });
+        }
+
+        // Si no existe, insertar la nueva Categoría
+        const result = await pool.query(
+            'INSERT INTO categorias (nombre) VALUES ($1) RETURNING *',
+            [nombre]
+        );
+
+        res.status(201).json(result.rows[0]);
+
+    } catch (error) {
+        console.error('Error al añadir categoría:', error);
+        res.status(500).json({ error: 'Error al añadir la categoría' });
+    }
+});
+
+// Editar una categoría existente
+router.put('/edit/categorias/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { nombre } = req.body;
+    
+    if (!nombre) {
+        return res.status(400).json({ error: 'El nombre de la categoría es obligatorio' });
+    }
+
+    try {
+        // Verificar si ya existe una categoría con el nombre que estamos tratando de editar
+        const existingCategoria = await pool.query(
+            'SELECT * FROM categorias WHERE nombre = $1 AND id != $2',
+            [nombre, id]
+        );
+
+        if (existingCategoria.rowCount > 0) {
+            return res.status(400).json({ error: 'Ya existe una categoría con este nombre' });
+        }
+
+        // Actualizar la tecnología
+        const result = await pool.query(
+            'UPDATE categorias SET nombre = $1 WHERE id = $2 RETURNING *',
+            [nombre, id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Categoría no encontrada' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error al editar la categoría:', error);
+        res.status(500).json({ error: 'Error al editar la categoría' });
+    }
+});
+
+// Eliminar una categoría
+router.delete('/delete/categorias/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query('DELETE FROM categorias WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Categoría no encontrada' });
+        }
+
+        res.status(200).json({ message: 'Categoría eliminada correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar categoría:', error);
+
+        // Verifica si el error es de violación de llave foránea
+        if (error.code === '23503') {
+            // Código 23503 en PostgreSQL indica una violación de llave foránea
+            return res.status(400).json({
+                error: 'No es posible eliminar esta categoría porque ya ha sido utilizada en el registro de algún proyecto.',
+            });
+        }
+
+        res.status(500).json({ error: 'Error al eliminar la categoría' });
+    }
+});
+
 module.exports = router;
 

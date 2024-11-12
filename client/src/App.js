@@ -34,6 +34,9 @@ import ProfesorCursos from "./views/admin/ProfesorCursos"
 import CursosProyectos from "./views/admin/CursosProyectos";
 import GestionCursosAlumno from "./views/alumno/GestionCursosAlumno";
 import VerProyectosAlumnoCurso from "./views/alumno/VerProyectosAlumnoCurso";
+import ConfiguracionSistema from "./views/admin/ConfiguracionSistema";
+import GestionTecnologias from "./views/admin/GestionTecnologias";
+import GestionCategorias from "./views/admin/GestionCategorias";
 import Navbar from "./views/Navbar";
 
 function App() {
@@ -174,7 +177,7 @@ function AppContent() {
                     }
                 />
                 <Route
-                    path="/admin/configurar-correo"
+                    path="/configuracion/configurar-correo"
                     element={
                         <ProtectedRoute>
                             <ConfiguracionCorreo />
@@ -218,6 +221,30 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <ProfesorCursos />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/configuración"
+                    element={
+                        <ProtectedRoute>
+                            <ConfiguracionSistema />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/configuracion/editar-tecnologias"
+                    element={
+                        <ProtectedRoute>
+                            <GestionTecnologias />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/configuracion/editar-categorias"
+                    element={
+                        <ProtectedRoute>
+                            <GestionCategorias />
                         </ProtectedRoute>
                     }
                 />
