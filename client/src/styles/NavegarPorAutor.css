@@ -70,3 +70,21 @@
 .icono-navegar-atras-buscador {
     margin-right: 10px;
 }
+
+.search-button-autor {
+  background-color: #28537E;
+  border-color: #28537E;
+  color: #ffffff;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.search-button-autor:hover,
+.search-button-autor:active,
+.search-button-autor:focus {
+  background-color: #28537E !important;
+  border-color: #28537E !important;
+  color: #ffffff;
+  outline: none; 
+  box-shadow: none; 
+}

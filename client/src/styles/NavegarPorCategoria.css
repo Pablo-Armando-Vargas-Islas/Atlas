@@ -70,3 +70,21 @@
 .icono-navegar-atras-buscador {
   margin-right: 10px;
 }
+
+.search-button-categoria {
+  background-color: #28537E;
+  border-color: #28537E;
+  color: #ffffff;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.search-button-categoria:hover,
+.search-button-categoria:active,
+.search-button-categoria:focus {
+  background-color: #28537E !important;
+  border-color: #28537E !important;
+  color: #ffffff;
+  outline: none; 
+  box-shadow: none; 
+}

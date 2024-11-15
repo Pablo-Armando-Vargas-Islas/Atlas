@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/EditarUsuarios.css';  // Usamos los mismos estilos
 import { FaEdit, FaCheck, FaTimes, FaTrash, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import axios from 'axios';
 
 const GestionTecnologias = () => {
     const [tecnologias, setTecnologias] = useState([]);
@@ -123,12 +122,6 @@ const GestionTecnologias = () => {
             alert("Hubo un problema al intentar eliminar la tecnología. Inténtalo de nuevo.");
         }
     };
-    
-    const handleEdit = (id) => {
-        setEditIndex(id); // Guardamos el ID de la tecnología que está siendo editada
-        const tecnologia = tecnologias.find(tec => tec.id === id); // Buscamos la tecnología por ID
-        setNombreEditar(tecnologia.nombre); // Ponemos el nombre de la tecnología en el estado para editarlo
-    };    
 
     return (
         <div className="admin-usuarios-container">

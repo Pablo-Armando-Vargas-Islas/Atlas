@@ -195,12 +195,18 @@ router.get('/misSolicitudes', verifyToken, async (req, res) => {
     try {
         const solicitudes = await pool.query(
             `SELECT s.id, s.proyecto_id, s.motivo, s.status_solicitud, s.comentarios, s.fecha_solicitud, 
-                    p.titulo, p.ruta_archivo_comprimido,
-                    to_char(s.fecha_limite_descarga, 'YYYY-MM-DD"T"HH24:MI:SSZ') as fecha_limite_descarga
-             FROM solicitudes s
-             JOIN proyectos p ON s.proyecto_id = p.id
-             WHERE s.solicitante_id = $1
-             ORDER BY s.fecha_solicitud DESC`,  // Ordenar de más reciente a más antiguo
+                p.titulo, p.ruta_archivo_comprimido,
+                to_char(s.fecha_limite_descarga, 'YYYY-MM-DD"T"HH24:MI:SSZ') as fecha_limite_descarga
+            FROM solicitudes s
+            JOIN proyectos p ON s.proyecto_id = p.id
+            WHERE s.solicitante_id = $1
+            ORDER BY 
+                CASE 
+                    WHEN s.status_solicitud = 'pendiente' THEN 1
+                    WHEN s.status_solicitud = 'abierto' THEN 2
+                    ELSE 3
+                END,
+                s.fecha_solicitud DESC;`,
             [userId]
         );
         res.json(solicitudes.rows);

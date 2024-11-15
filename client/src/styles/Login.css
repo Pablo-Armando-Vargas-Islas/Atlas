@@ -52,6 +52,11 @@ h2 {
     color: #ffffff!important;
 }
 
+.login-btn-primary:focus {
+    background-color: #91cb1b!important;
+    color: #ffffff!important;
+}
+
 .login-form-control {
     border: 0.5px solid #0855a25c; /* Borde azul predominante */
     padding: 10px;

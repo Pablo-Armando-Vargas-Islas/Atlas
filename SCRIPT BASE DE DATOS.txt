@@ -6,7 +6,7 @@ CREATE TABLE roles (
 
 -- Inserción de roles iniciales
 INSERT INTO roles (nombre_rol) VALUES
-('super_administrador'),
+('administrador'),
 ('docente'),
 ('alumno');
 
@@ -20,7 +20,7 @@ CREATE TABLE usuarios (
   status_usuario text DEFAULT 'activo' CHECK (status_usuario IN ('activo', 'inactivo')),
   fecha_creacion timestamptz DEFAULT now(),
   fecha_actualizacion timestamptz DEFAULT now(),
-  debe_cambiar_contrasena boolean DEFAULT true
+  debe_cambiar_contrasena boolean DEFAULT false
 );
 
 -- Creación de la tabla de proyectos
@@ -49,7 +49,6 @@ CREATE TABLE proyectos_autores (
 CREATE TABLE cursos (
   id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   nombre_curso text NOT NULL,
-  descripcion text,
   profesor_id bigint REFERENCES usuarios (id), -- Referencia al profesor
   periodo text NOT NULL,
   fecha_inicio date NOT NULL,
@@ -81,8 +80,7 @@ CREATE TABLE solicitudes (
 -- Creación de la tabla de tecnologías
 CREATE TABLE tecnologias (
   id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  nombre text UNIQUE NOT NULL,
-  icono bytea
+  nombre text UNIQUE NOT NULL
 );
 
 -- Inserción inicial de tecnologías
@@ -161,6 +159,10 @@ ALTER TABLE proyectos
 ADD COLUMN popularidad INT DEFAULT 0, -- Almacena cuántas veces se ha solicitado acceso al proyecto
 ADD COLUMN relevancia INT DEFAULT 0; -- Almacena cuántas veces se ha descargado el proyecto
 
+ALTER TABLE usuarios
+ADD COLUMN intentos_fallidos INT DEFAULT 0,         -- Contador de intentos fallidos
+ADD COLUMN tiempo_bloqueo TIMESTAMP NULL;           -- Tiempo en que la cuenta será desbloqueada
+
 CREATE OR REPLACE FUNCTION incrementar_popularidad() RETURNS TRIGGER AS $$
 BEGIN
     UPDATE proyectos
@@ -193,6 +195,14 @@ EXECUTE FUNCTION incrementar_relevancia();
 
 ALTER TABLE usuarios ADD COLUMN ultima_actividad TIMESTAMP;
 
+ALTER TABLE solicitudes
+DROP CONSTRAINT IF EXISTS solicitudes_status_solicitud_check1;
+
+ALTER TABLE solicitudes
+DROP CONSTRAINT IF EXISTS solicitudes_status_solicitud_check2;
+
+ALTER TABLE usuarios
+ADD COLUMN inactividad BOOLEAN DEFAULT FALSE;
 
 
 
@@ -218,3 +228,26 @@ CREATE INDEX idx_proyectos_codigo_curso ON proyectos (codigo_curso);
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
+
+-- Insert a non-deletable user
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM usuarios WHERE cedula = 'defaultAdmin') THEN
+        INSERT INTO usuarios (nombre, correo_institucional, "contraseña", rol_id, cedula)
+        VALUES ('SuperAdministrador', 'default@admin.com', '$2b$10$K.v1zf1ijoEcN6tD4GIgzOJJptbZ9KKCy6t/QhCrGKorDbowDyuvG', 1, 'defaultAdmin');
+    END IF;
+END $$;
+
+-- Create a trigger to prevent deletion of the non-deletable user
+CREATE OR REPLACE FUNCTION prevent_deletion() RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.cedula = 'defaultAdmin' THEN
+        RAISE EXCEPTION 'Cannot delete the default admin user';
+    END IF;
+    RETURN OLD;
+END $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_deletion_trigger
+BEFORE DELETE ON usuarios
+FOR EACH ROW
+EXECUTE FUNCTION prevent_deletion();

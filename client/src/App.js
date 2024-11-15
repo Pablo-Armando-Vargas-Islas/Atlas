@@ -37,6 +37,8 @@ import VerProyectosAlumnoCurso from "./views/alumno/VerProyectosAlumnoCurso";
 import ConfiguracionSistema from "./views/admin/ConfiguracionSistema";
 import GestionTecnologias from "./views/admin/GestionTecnologias";
 import GestionCategorias from "./views/admin/GestionCategorias";
+import ConfirmarInactividadUsuarios from "./views/admin/ConfirmarInactividadUsuarios";
+import EditarProyecto from "./views/admin/EditarProyecto";
 import Navbar from "./views/Navbar";
 
 function App() {
@@ -177,6 +179,14 @@ function AppContent() {
                     }
                 />
                 <Route
+                    path="/admin/editar-proyecto/:id"
+                    element={
+                        <ProtectedRoute>
+                            <EditarProyecto />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/configuracion/configurar-correo"
                     element={
                         <ProtectedRoute>
@@ -229,6 +239,14 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <ConfiguracionSistema />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/editar/usuarios-inactivos"
+                    element={
+                        <ProtectedRoute>
+                            <ConfirmarInactividadUsuarios />
                         </ProtectedRoute>
                     }
                 />

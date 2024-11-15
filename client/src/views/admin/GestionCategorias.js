@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/EditarUsuarios.css';  // Usamos los mismos estilos
 import { FaEdit, FaCheck, FaTimes, FaTrash, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import axios from 'axios';
 
 const GestionCategorias = () => {
     const [categorias, setCategorias] = useState([]);
@@ -123,12 +122,6 @@ const GestionCategorias = () => {
             alert("Hubo un problema al intentar eliminar la categoría. Inténtalo de nuevo.");
         }
     };
-    
-    const handleEdit = (id) => {
-        setEditIndex(id); // Guardamos el ID de la categoría que está siendo editada
-        const categoria = categorias.find(cat => cat.id === id); // Buscamos la categoría por ID
-        setNombreEditar(categoria.nombre); // Ponemos el nombre de la categoría en el estado para editarlo
-    };    
 
     return (
         <div className="admin-usuarios-container">

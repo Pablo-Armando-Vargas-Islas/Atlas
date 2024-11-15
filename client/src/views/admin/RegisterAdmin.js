@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../../styles/RegisterAdmin.css';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa'; 
+import { Spinner } from 'react-bootstrap';
 
 const RegisterAdmin = () => {
     const [nombre, setNombre] = useState("");
@@ -9,6 +10,7 @@ const RegisterAdmin = () => {
     const [cedula, setCedula] = useState("");
     const [rol, setRol] = useState(""); 
     const [alert, setAlert] = useState({ type: "", message: "" });
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const validateEmail = (email) => {
@@ -40,21 +42,25 @@ const RegisterAdmin = () => {
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
+        setLoading(true); 
         setAlert({ type: "", message: "" });
 
         // Validaciones
         if (!validateNombre(nombre)) {
             setAlert({ type: "warning", message: "El nombre no puede contener caracteres especiales." });
+            setLoading(false);
             return;
         }
 
         if (!validateEmail(correoInstitucional)) {
             setAlert({ type: "warning", message: "Por favor ingrese un correo electrónico válido." });
+            setLoading(false);
             return;
         }
 
         if (!cedula) {
             setAlert({ type: "warning", message: "Por favor ingrese la cédula o el código de estudiante." });
+            setLoading(false);
             return;
         }
 
@@ -62,6 +68,7 @@ const RegisterAdmin = () => {
             const rol_id = getRolId(rol);
             if (!rol_id) {
                 setAlert({ type: "warning", message: "Seleccione un rol válido." });
+                setLoading(false);
                 return;
             }
 
@@ -90,6 +97,8 @@ const RegisterAdmin = () => {
         } catch (err) {
             console.error(err.message);
             setAlert({ type: "danger", message: "Error de conexión" });
+        } finally {
+            setLoading(false); // Desactiva el spinner al finalizar
         }
     };
 
@@ -154,9 +163,25 @@ const RegisterAdmin = () => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary register-btn-primary w-100 mt-4 rounded-pill">
-                            Registrar
-                        </button>
+                        <button
+                        type="submit"
+                        className={`btn btn-primary register-btn-primary w-100 mt-4 rounded-pill ${loading ? "loading-button" : ""}`}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                            </>
+                        ) : (
+                            'Registrar'
+                        )}
+                    </button>
                     </form>
                 </div>
             </div>

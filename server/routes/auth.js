@@ -132,7 +132,7 @@ router.post("/login", async (req, res) => {
     try {
         const { usuario, contraseña } = req.body;
 
-        // Verificación de usuarios (puede ser por correo institucional, código de estudiante o cédula)
+        // Verificación de usuarios (puede ser por código de estudiante o cédula)
         const user = await pool.query(
             "SELECT * FROM usuarios WHERE codigo_estudiante = $1 OR cedula = $1",
             [usuario]
@@ -143,6 +143,30 @@ router.post("/login", async (req, res) => {
             return res.status(404).json({ error: "El usuario aún no está registrado" });
         }
 
+        // Verificación de usuarios inactivos
+        const usuarioActivo = user.rows[0].status_usuario;
+        if (usuarioActivo !== 'activo') {
+            return res.status(403).json({ error: "Tu cuenta está inactiva. Por favor, comunícate con el administrador del sistema para revisar tu caso." });
+        }
+
+        // Verificar si la cuenta está bloqueada
+        const tiempoBloqueo = user.rows[0].tiempo_bloqueo;
+        const intentosFallidos = user.rows[0].intentos_fallidos;
+        const now = new Date();
+
+        // Si el tiempo de bloqueo es mayor que la hora actual, bloquear login
+        if (tiempoBloqueo && new Date(tiempoBloqueo) > now) {
+            return res.status(403).json({ error: "Cuenta bloqueada. Intenta nuevamente más tarde." });
+        }
+
+        // Si el tiempo de bloqueo ha expirado, restablecer los intentos fallidos y limpiar el tiempo de bloqueo
+        if (tiempoBloqueo && new Date(tiempoBloqueo) <= now) {
+            await pool.query(
+                "UPDATE usuarios SET intentos_fallidos = 0, tiempo_bloqueo = NULL WHERE id = $1",
+                [user.rows[0].id]
+            );
+        }
+
         // Validación de contraseñas
         const validPassword = await bcrypt.compare(
             contraseña,
@@ -150,8 +174,31 @@ router.post("/login", async (req, res) => {
         );
 
         if (!validPassword) {
+            // Incrementar el contador de intentos fallidos
+            await pool.query(
+                "UPDATE usuarios SET intentos_fallidos = intentos_fallidos + 1 WHERE id = $1",
+                [user.rows[0].id]
+            );
+
+            // Volver a verificar el número de intentos fallidos para bloquear la cuenta si es necesario
+            if (intentosFallidos + 1 >= 5) {
+                const bloqueoHasta = new Date();
+                bloqueoHasta.setMinutes(bloqueoHasta.getMinutes() + 10); // Bloquear por 10 minutos
+                await pool.query(
+                    "UPDATE usuarios SET tiempo_bloqueo = $1 WHERE id = $2",
+                    [bloqueoHasta, user.rows[0].id]
+                );
+                return res.status(403).json({ error: "Cuenta bloqueada. Intenta nuevamente más tarde." });
+            }
+
             return res.status(401).json({ error: "El usuario y la contraseña no coinciden" });
         }
+
+        // Si la contraseña es correcta, restablecer intentos fallidos y el tiempo de bloqueo
+        await pool.query(
+            "UPDATE usuarios SET intentos_fallidos = 0, tiempo_bloqueo = NULL WHERE id = $1",
+            [user.rows[0].id]
+        );
 
         // Generar el token JWT
         const token = jwt.sign(
@@ -188,8 +235,8 @@ router.post("/login", async (req, res) => {
             }
         });
     } catch (err) {
-        console.error("Error en el login:", err.message);
-        res.status(500).json({ error: "Error del servidor" });
+        console.error("Error en el proceso de inicio de sesión:", err.message);
+        res.status(500).json({ error: "Error en el servidor" });
     }
 });
 
@@ -225,11 +272,11 @@ router.post('/forgot-password', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(tempPassword, salt);
 
-        // Actualizar la contraseña y marcar debe_cambiar_contrasena como true
+        // Actualizar la contraseña, resetear intentos fallidos, y desbloquear cuenta
         await pool.query(
             `UPDATE usuarios 
-             SET contraseña = $1, debe_cambiar_contrasena = true
-             WHERE correo_institucional = $2`,
+            SET contraseña = $1, debe_cambiar_contrasena = true, intentos_fallidos = 0, tiempo_bloqueo = NULL
+            WHERE correo_institucional = $2`,
             [hashedPassword, correo_institucional]
         );
 

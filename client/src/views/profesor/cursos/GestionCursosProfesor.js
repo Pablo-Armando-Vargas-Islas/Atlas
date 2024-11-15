@@ -133,7 +133,7 @@ const GestionCursosProfesor = () => {
         const fechaSeleccionada = e.target.value;
         const hoy = new Date().toISOString().split('T')[0];
         setNuevaFechaLimite(fechaSeleccionada);
-        setFechaInvalida(fechaSeleccionada < hoy);
+        setFechaInvalida(fechaSeleccionada <= hoy);
     };
 
     return (
@@ -145,7 +145,7 @@ const GestionCursosProfesor = () => {
                         onClick={irACrearCurso} 
                         className="crear-curso-button"
                     >
-                        <FaPlusCircle className="mr-2" /> Crear Curso
+                        <FaPlusCircle className="mr-2" /> Crear nuevo curso
                     </Button>
                 {cursos.length === 0 ? (
                     <p className="text-center">No tienes cursos activos en este momento.</p>
@@ -221,19 +221,18 @@ const GestionCursosProfesor = () => {
                 </Modal.Header>
                 <Modal.Body>
                     {accion === 'cerrar' ? (
-                        <p>¿Estás seguro de que deseas cerrar este curso? No se permitirán más entregas.</p>
+                        <p>¿Estás seguro de que deseas cerrar este curso? Ya no se permitirán más entregas.</p>
                     ) : (
                         <>
-                            <p>¿Estás seguro de que deseas abrir este curso? Se permitirá nuevamente la entrega de proyectos.</p>
                             <Form.Group className="mb-3">
-                                <Form.Label>Nueva Fecha Límite</Form.Label>
+                                <Form.Label>Por favor, para abrir el curso elige una nueva fecha límite.</Form.Label>
                                 <Form.Control
                                     type="date"
                                     value={nuevaFechaLimite}
                                     onChange={handleFechaLimiteChange}
                                     required
                                 />
-                                {fechaInvalida && <Form.Text className="text-danger">La fecha no puede ser anterior al día de hoy.</Form.Text>}
+                                {fechaInvalida && <Form.Text className="text-danger">La fecha no puede ser igual o anterior al día de hoy.</Form.Text>}
                             </Form.Group>
                         </>
                     )}

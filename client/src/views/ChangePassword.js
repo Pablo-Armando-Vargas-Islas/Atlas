@@ -100,6 +100,7 @@ const ChangePassword = () => {
                         >
                             {loading ? (
                                 <>
+                                    <span style={{ color: '#ffffff' }}>Guardando </span>
                                     <Spinner
                                         as="span"
                                         animation="border"
@@ -108,7 +109,7 @@ const ChangePassword = () => {
                                         aria-hidden="true"
                                         style={{ marginRight: '8px', color: '#ffffff' }} // Color del spinner en blanco
                                     />
-                                    <span style={{ color: '#ffffff' }}>Cambiando...</span> {/* Texto en blanco */}
+                                    
                                 </>
                             ) : (
                                 'Cambiar Contraseña'

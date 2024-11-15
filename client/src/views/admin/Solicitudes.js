@@ -73,6 +73,7 @@ const Solicitudes = () => {
                 handleClose();
             } else {
                 alert('Error al aceptar la solicitud');
+                setLoadingAccept(false)
             }
         } catch (error) {
             console.error('Error al aceptar la solicitud:', error);
@@ -179,14 +180,14 @@ const Solicitudes = () => {
                 >
                     {loadingAccept ? (
                         <>
+                            Aceptando {' '}
                             <Spinner
                                 as="span"
                                 animation="border"
                                 size="sm"
                                 role="status"
                                 aria-hidden="true"
-                            />{' '}
-                            Aceptando...
+                            />
                         </>
                     ) : (
                         'Aceptar'
@@ -227,14 +228,15 @@ const Solicitudes = () => {
                 >
                     {loadingReject ? (
                         <>
+                            Confirmando{' '}
                             <Spinner
                                 as="span"
                                 animation="border"
                                 size="sm"
                                 role="status"
                                 aria-hidden="true"
-                            />{' '}
-                            Confirmando...
+                            />
+                            
                         </>
                     ) : (
                         'Confirmar'

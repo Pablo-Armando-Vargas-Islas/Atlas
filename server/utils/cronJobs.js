@@ -31,7 +31,7 @@ cron.schedule('59 23 * * *', async () => {
              AND fecha_limite_descarga < NOW()`
         );
 
-        console.log(`Solicitudes expiradas automáticamente: ${resultExpirar.rowCount}`);
+        console.log(`Solicitudes expiradas: ${resultExpirar.rowCount}`);
     } catch (err) {
         console.error("Error al expirar solicitudes automáticamente:", err.message);
     }
@@ -51,9 +51,47 @@ cron.schedule('59 23 * * *', async () => {
              AND fecha_limite_descarga < NOW()`
         );
 
-        console.log(`Solicitudes cerradas automáticamente: ${resultCerrar.rowCount}`);
+        console.log(`Solicitudes cerradas: ${resultCerrar.rowCount}`);
     } catch (err) {
         console.error("Error al cerrar solicitudes automáticamente:", err.message);
+    }
+});
+
+// Tarea mensual el 1ro de cada mes a las 2:00 AM para marcar usuarios inactivos por más de 3 años
+cron.schedule('0 2 1 * *', async () => {
+    try {
+        console.log("Revisando usuarios inactivos...");
+
+        // Marcar usuarios con más de 3 años de inactividad como inactivos
+        const resultInactividad = await pool.query(
+            `UPDATE usuarios 
+             SET inactividad = TRUE 
+             WHERE status_usuario = 'activo' 
+             AND (ultima_actividad IS NULL OR ultima_actividad < NOW() - INTERVAL '5 days')`
+        );
+
+        console.log(`Usuarios inactivos: ${resultInactividad.rowCount}`);
+    } catch (err) {
+        console.error("Error al actualizar usuarios con inactividad:", err.message);
+    }
+});
+
+// Tarea diaria a las 10:10 AM para marcar usuarios inactivos por más de 5 días
+cron.schedule('16 10 * * *', async () => {
+    try {
+        console.log("Revisando usuarios con inactividad prolongada...");
+
+        // Marcar usuarios con más de 5 días de inactividad como inactivos
+        const resultInactividad = await pool.query(
+            `UPDATE usuarios 
+             SET inactividad = TRUE 
+             WHERE status_usuario = 'activo' 
+             AND (ultima_actividad IS NULL OR ultima_actividad < NOW() - INTERVAL '5 days')`
+        );
+
+        console.log(`Usuarios marcados con inactividad prolongada: ${resultInactividad.rowCount}`);
+    } catch (err) {
+        console.error("Error al actualizar usuarios con inactividad prolongada:", err.message);
     }
 });
 

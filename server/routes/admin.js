@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 const pool = require('../db');
+const nodemailer = require("nodemailer");
 const { verifyToken } = require('../middleware/authMiddleware');
 
 
@@ -367,32 +368,40 @@ router.get('/correo', verifyToken, async (req, res) => {
     }
 });
 
-// Endpoint para actualizar o crear la configuración de correo
 router.put('/correo/actualizar', verifyToken, async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Verificar si ya existe un registro de configuración de correo
-        const checkResult = await pool.query('SELECT id FROM email_config LIMIT 1');
+        // Crear el transporte con los datos ingresados
+        const transporter = nodemailer.createTransport({
+            service: 'Outlook', // Asegúrate de configurar el servicio correctamente
+            auth: {
+                user: email,
+                pass: password
+            }
+        });
 
-        if (checkResult.rows.length > 0) {
-            // Si existe, actualizar el registro existente
-            const updateResult = await pool.query(
-                'UPDATE email_config SET email = $1, password = $2 WHERE id = $3',
-                [email, password, checkResult.rows[0].id]
-            );
-            res.json({ message: 'Configuración de correo actualizada correctamente' });
-        } else {
-            // Si no existe, crear un nuevo registro
-            const insertResult = await pool.query(
-                'INSERT INTO email_config (email, password) VALUES ($1, $2) RETURNING *',
-                [email, password]
-            );
-            res.json({ message: 'Configuración de correo creada correctamente', data: insertResult.rows[0] });
-        }
-    } catch (error) {
-        console.error('Error al actualizar o crear la configuración de correo:', error.message);
-        res.status(500).json({ error: 'Error al actualizar o crear la configuración de correo' });
+        // Intentar enviar un correo de prueba
+        await transporter.sendMail({
+            from: email,
+            to: email, // Envía un correo de prueba a sí mismo
+            subject: 'Prueba de Configuración de Correo',
+            text: 'Esta es una prueba de configuración del sistema Atlas.'
+        });
+
+        // Si el correo se envió con éxito, actualiza o inserta la configuración en la base de datos
+        await pool.query(
+            `INSERT INTO email_config (id, email, password)
+             VALUES (1, $1, $2)
+             ON CONFLICT (id) DO UPDATE
+             SET email = EXCLUDED.email, password = EXCLUDED.password`,
+            [email, password]
+        );
+
+        res.json({ message: "Configuración de correo actualizada correctamente y verificada." });
+    } catch (err) {
+        console.error("Error al enviar correo de prueba:", err.message);
+        res.status(500).json({ error: "No se pudo enviar el correo de prueba. Verifica los datos ingresados." });
     }
 });
 

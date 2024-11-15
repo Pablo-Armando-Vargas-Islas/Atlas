@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import BotonDescargaAdmin from "../../utils/BotonDescargaAdmin";
-import { FaUpload, FaCheck, FaTimes, FaEdit, FaArrowLeft } from 'react-icons/fa';
+import { FaList, FaCheck, FaTimes, FaEdit, FaArrowLeft } from 'react-icons/fa';
 import "../../styles/ProyectosPorCurso.css";
 
 const ProyectosPorCurso = () => {
@@ -259,12 +259,24 @@ const ProyectosPorCurso = () => {
                                                 : "No se ha subido ningún archivo"}
                                         </td>
                                         <td>
-                                            <FaEdit
-                                                onClick={() => handleEdit(index)}
-                                                className="icono-accion-editar-proyecto"
-                                                title="Editar proyecto"
-                                                style={{ cursor: "pointer" }}
-                                            />
+                                            <OverlayTrigger placement="top" overlay={<Tooltip>Editar Proyecto</Tooltip>}>
+                                                <Button
+                                                    variant="link"
+                                                    className="p-0 cerrar-curso-btn align-middle"
+                                                    onClick={() => navigate(`/admin/editar-proyecto/${proyecto.id}`)}
+                                                >
+                                                    <FaEdit />
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger placement="top" overlay={<Tooltip>Ver detalles</Tooltip>}>
+                                                <Button
+                                                    variant="link"
+                                                    className="p-0 ver-proyectos-btn align-middle" 
+                                                    onClick={() => handleVerDetalles(proyecto)}
+                                                >
+                                                    <FaList />
+                                                </Button>
+                                            </OverlayTrigger>
                                         </td>
                                     </>
                                 )}
@@ -274,7 +286,7 @@ const ProyectosPorCurso = () => {
                 </table>
     
                 {/* Modal para mostrar detalles del proyecto */}
-                <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
                     <Modal.Header closeButton>
                         <Modal.Title>Detalles del Proyecto</Modal.Title>
                     </Modal.Header>

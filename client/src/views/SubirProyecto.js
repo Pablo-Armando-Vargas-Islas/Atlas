@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Modal, Button } from "react-bootstrap";
+import { Spinner } from 'react-bootstrap';
+import JSZip from "jszip";
 import "../styles/SubirProyecto.css";
 
 const SubirProyectoProfesor = () => {
@@ -21,7 +23,9 @@ const SubirProyectoProfesor = () => {
     const [selectedTecnologias, setSelectedTecnologias] = useState([]);
     const [selectedCategorias, setSelectedCategorias] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const errorRef = useRef(null);
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const [missingFields, setMissingFields] = useState([]);
     const [cursoEstado, setCursoEstado] = useState("");
     const [formatoAprobacion, setFormatoAprobacion] = useState(null);
@@ -29,6 +33,17 @@ const SubirProyectoProfesor = () => {
     const [cursoModalMessage, setCursoModalMessage] = useState("");
     const [cursoValidado, setCursoValidado] = useState(false);
     const navigate = useNavigate();
+
+    // Aquí se realiza el desplazamiento cuando errorMessage cambia
+    useEffect(() => {
+        if (errorMessage) {
+          // Desplazar la página hasta el inicio cuando haya un error
+          window.scrollTo({
+            top: 0, // Desplazamos hacia la parte superior
+            behavior: 'smooth' // Desplazamiento suave
+          });
+        }
+      }, [errorMessage]);
 
     // Recuperar el token del localStorage y decodificarlo
     useEffect(() => {
@@ -110,7 +125,7 @@ const SubirProyectoProfesor = () => {
                 }
             });
     
-            setErrorMessage(`Por favor, completa todos los campos: ${camposFaltantes.join(", ")}`);
+            setErrorMessage(`Por favor, completa los campos: ${camposFaltantes.join(", ")}`);
             return false;
         }
     
@@ -120,10 +135,10 @@ const SubirProyectoProfesor = () => {
 
     const addAutorField = () => {
         if (tipo === 'aula' && autores.length >= 5) {
-            setErrorMessage("Solo se permiten hasta 5 autores en proyectos de aula.");
+            setErrorMessage("Solo se permiten hasta 5 autores.");
             return;
         } else if (tipo === 'grado' && autores.length >= 3) {
-            setErrorMessage("Solo se permiten hasta 3 autores en proyectos de grado.");
+            setErrorMessage("Solo se permiten hasta 3 autores.");
             return;
         }
     
@@ -161,6 +176,8 @@ const SubirProyectoProfesor = () => {
 
     // Validar el código del curso
     const validarCodigoCurso = async () => {
+        setErrorMessage("");
+        setCursoModalMessage("");
         try {
             const response = await fetch(`http://localhost:5000/api/cursos/validarCodigo/${codigoCurso}`);
             const data = await response.json();
@@ -174,13 +191,13 @@ const SubirProyectoProfesor = () => {
                     setCursoModalMessage(`El curso "${data.nombre_curso}" ya no está recibiendo más trabajos.`);
                 } else {
                     setCursoValido(true); // El curso está abierto y permite entregas
-                    setCursoModalMessage(`Muy bien! Se subirá el proyecto en el curso "${data.nombre_curso}"`);
+                    setCursoModalMessage(`Muy bien! Tu proyecto se subirá en el curso "${data.nombre_curso}"`);
                     setCursoValidado(true);
                 }
             } else {
                 setCursoValido(false);
-                setErrorMessage("El código del curso no existe.");
-                setCursoModalMessage("El código del curso no existe.");
+                setErrorMessage("No se encontró el curso, revise el código por favor.");
+                setCursoModalMessage("No se encontró el curso, revise el código por favor.");
             }
         } catch (error) {
             console.error("Error al validar el código del curso:", error);
@@ -191,22 +208,24 @@ const SubirProyectoProfesor = () => {
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
-    
-        // Validar los campos antes de proceder
-        if (!validateFields()) {
-            return; // Si la validación falla, no procedemos
-        }
-    
-        // Obtener el token JWT almacenado en localStorage
-        const token = localStorage.getItem('token');
-    
-        if (!token) {
-            setErrorMessage("No se encontró un token de autenticación.");
-            return;
-        }
+        setLoading(true);
     
         // Validar si el título ya existe en la base de datos
         try {
+
+            // Validar los campos antes de proceder
+            if (!validateFields()) {
+                return; // Si la validación falla, no procedemos
+            }
+        
+            // Obtener el token JWT almacenado en localStorage
+            const token = localStorage.getItem('token');
+        
+            if (!token) {
+                setErrorMessage("No se encontró un token de autenticación.");
+                return;
+            }
+
             const checkResponse = await fetch(`http://localhost:5000/api/proyectos/titulo-existe?titulo=${encodeURIComponent(titulo)}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -225,27 +244,88 @@ const SubirProyectoProfesor = () => {
                 setErrorMessage("El título del proyecto ya está registrado. Por favor, elige otro título.");
                 return; // Si el título ya existe, no procedemos
             }
+
+            if (archivoComprimido) {
+                const fileType = archivoComprimido.type;
+                const fileSize = archivoComprimido.size;
+        
+                // Verificar tipo y tamaño del archivo
+                const validTypes = ["application/zip", "application/x-zip-compressed"];
+                const maxSizeInBytes = 1 * 1024 * 1024 * 1024; // 1GB
+        
+                if (!validTypes.includes(fileType)) {
+                    setErrorMessage("Solo se aceptan archivos .zip");
+                    return;
+                }
+                if (fileSize > maxSizeInBytes) {
+                    setErrorMessage("El archivo no debe pesar más de 1GB, revisa que no contenga las carpetas con librerías o ejecutables.");
+                    return;
+                }
+        
+                // Validar contenido del archivo .zip usando jszip
+                const zip = new JSZip();
+                try {
+                    const zipData = await zip.loadAsync(archivoComprimido);
+        
+                    // Nombres de carpetas no permitidas
+                    const forbiddenFolders = [
+                        "node_modules", "vendor", "packages", "vendor/bundle", 
+                        "target", ".gradle", "build", "dist", ".terraform", ".serverless"
+                    ];                    
+                    let containsForbiddenFolder = false;
+
+                    // Extensiones de archivos no permitidas
+                    const forbiddenExtensions = [".exe", ".msi", ".apk"];
+
+                    let containsForbiddenFile = false;
+                    
+                    // Revisar si alguna ruta empieza con una carpeta prohibida
+                    zipData.forEach((relativePath) => {
+                        forbiddenFolders.forEach((folder) => {
+                            if (relativePath.includes(`/${folder}/`) || relativePath.startsWith(`${folder}/`)) {
+                                containsForbiddenFolder = true;
+                            }
+                        });
+
+                        // Verificar extensiones prohibidas
+                        forbiddenExtensions.forEach((ext) => {
+                            if (relativePath.endsWith(ext)) {
+                                containsForbiddenFile = true;
+                            }
+                        });
+                    });
+        
+                    if (containsForbiddenFolder) {
+                        setErrorMessage("Tu proyecto contiene carpetas no permitidas (node_modules, vendor, packages, vendor/bundle, target, .gradle, build, dist, .terraform, .serverless).");
+                        return;
+                    }
+                    
+                    if (containsForbiddenFile) {
+                        setErrorMessage("Tu proyecto contiene archivos no permitidos (.exe .msi .apk).");
+                        return;
+                    }
+
+                    // Mostrar el modal de confirmación si todas las validaciones pasan
+                    setShowModal(true);
+                } catch (error) {
+                    setErrorMessage("Error al leer el archivo .zip: " + error.message);
+                    return;
+                }
+            }
         } catch (err) {
             console.error("Error al validar el título del proyecto:", err);
             setErrorMessage("Error al validar el título del proyecto: " + err.message);
             return;
+        } finally {
+            setLoading(false); // Desactiva el spinner al finalizar
         }
     
         // Si todo está validado correctamente y el título no existe, mostramos el modal de confirmación
         setShowModal(true);
     };
-    
 
     const handleConfirm = async () => {
         try {
-            // Validar si el título ya existe
-            const checkResponse = await fetch(`http://localhost:5000/api/proyectos/titulo-existe?titulo=${encodeURIComponent(titulo)}`);
-            const checkData = await checkResponse.json();
-            if (checkData.exists) {
-                setErrorMessage("El título del proyecto ya está registrado. Por favor, elige otro título.");
-                return;
-            }
-
             const formData = new FormData();
             formData.append("formatoAprobacion", formatoAprobacion);
             formData.append("titulo", titulo);
@@ -299,7 +379,7 @@ const SubirProyectoProfesor = () => {
                 <h1 className="text-center mt-5">Registrar Proyecto</h1>
                 <form className="mt-5" onSubmit={onSubmitForm}>
                     {errorMessage && (
-                        <div className="alert alert-danger">{errorMessage}</div>
+                        <div className="alert alert-danger" ref={errorRef}>{errorMessage}</div>
                     )}
 
                     {/* Selección del tipo de proyecto */}
@@ -312,8 +392,8 @@ const SubirProyectoProfesor = () => {
                             required
                         >
                             <option value="">Selecciona una opción</option>
-                            <option value="grado">Grado</option>
                             <option value="aula">Aula</option>
+                            <option value="grado">Grado</option>
                         </select>
                     </div>
 
@@ -449,7 +529,7 @@ const SubirProyectoProfesor = () => {
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
                                     onChange={(e) => setArchivoComprimido(e.target.files[0])}
-                                    accept=".zip,.rar"
+                                    accept=".zip"
                                 />
                             </div>
                             <div className="form-group">
@@ -483,7 +563,25 @@ const SubirProyectoProfesor = () => {
                                 </div>
                             </div>
                             <div className="contenedor-boton-subir">
-                                <Button type="submit" className="btn-subir-proyecto mt-3">Registrar</Button>
+                                <button
+                                    type="submit"
+                                    className={`btn-subir-proyecto mt-3 ${loading ? "loading-button" : ""}`}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                            />
+                                        </>
+                                    ) : (
+                                        'Registrar'
+                                    )}
+                                </button>
                             </div>
                         </>
                     )}
@@ -584,7 +682,7 @@ const SubirProyectoProfesor = () => {
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
                                     onChange={(e) => setArchivoComprimido(e.target.files[0])}
-                                    accept=".zip,.rar" // Para aceptar solo archivos comprimidos
+                                    accept=".zip" // Para aceptar solo archivos comprimidos
                                 />
                             </div>
                             <div className="form-group">
@@ -618,7 +716,26 @@ const SubirProyectoProfesor = () => {
                                 </div>
                             </div>
                             <div className="contenedor-boton-subir">
-                                <Button type="submit" className="btn-subir-proyecto mt-3">Registrar</Button>
+                                <button
+                                    type="submit"
+                                    className={`btn-subir-proyecto mt-3 ${loading ? "loading-button" : ""}`}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                                style={{ marginRight: '8px', color: '#ffffff' }}
+                                            />
+                                        </>
+                                    ) : (
+                                        'Registrar'
+                                    )}
+                                </button>
                             </div>
                         </>
                     )}

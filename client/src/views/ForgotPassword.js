@@ -67,14 +67,15 @@ const ForgotPassword = () => {
                         >
                             {loading ? (
                                 <>
+                                    
+                                    Enviando correo{' '}
                                     <Spinner
                                         as="span"
                                         animation="border"
                                         size="sm"
                                         role="status"
                                         aria-hidden="true"
-                                    />{' '}
-                                    Enviando correo...
+                                    />
                                 </>
                             ) : (
                                 'Enviar correo'

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; 
 import BotonDescargaAdmin from '../utils/BotonDescargaAdmin'; 
 import '../styles/ProyectoModal.css';
+
 
 const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetails = false }) => {
     const { rol: userRole, userId } = useContext(AuthContext); 
@@ -10,6 +12,8 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
     const [motivo, setMotivo] = useState('');
     const [isMotivoValid, setIsMotivoValid] = useState(false);
     const [puedeDescargar, setPuedeDescargar] = useState(false);
+    const [puedeEditar, setPuedeEditar] = useState(false);
+    const navigate = useNavigate();
 
     const handleMotivoChange = (e) => {
         const value = e.target.value;
@@ -35,13 +39,53 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
             const usuarioIdProyecto = String(proyecto.usuario_id);
             const idUsuarioAutenticado = String(userId);
             
-            if (userRole === 1 || usuarioIdProyecto === idUsuarioAutenticado || userRole === 2 && proyecto.codigo_curso) {
+            if (userRole === 1) {
+                setPuedeEditar(true);
+            } else if (usuarioIdProyecto === idUsuarioAutenticado || userRole === 2 && proyecto.codigo_curso) {
                 setPuedeDescargar(true);
             } else {
                 setPuedeDescargar(false);
+                setPuedeEditar(false);
             }
         }
     }, [userRole, userId, proyecto]);
+
+    // Verificar el rol y mostrar el modal correspondiente
+    if (puedeEditar) {
+        return (
+            <Modal show={show} onHide={handleClose} centered size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Detalles del Proyecto</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <>
+                        <p><strong>Título:</strong> {proyecto.titulo}</p>
+                        <p><strong>Descripción:</strong> {proyecto.descripcion}</p>
+                        <p><strong>¿Necesita licencia?:</strong> {proyecto.necesita_licencia ? "Sí" : "No"}</p>
+                        {proyecto.necesita_licencia && (
+                            <p><strong>Descripción de la licencia:</strong> {proyecto.descripcion_licencia}</p>
+                        )}
+                        <p><strong>Archivo Comprimido:</strong> {userRole === 1 ? proyecto.ruta_archivo_comprimido : proyecto.ruta_archivo_comprimido.split('\\').pop()}</p>
+                        <p><strong>Tipo de Proyecto:</strong> {proyecto.tipo}</p>
+                        {proyecto.tipo === 'aula' && (
+                            <p><strong>Curso:</strong> {proyecto.nombre_curso}</p>
+                        )}
+                        <p><strong>Autores:</strong> {proyecto.autores.join(", ")}</p>
+                        <p><strong>Tecnologías:</strong> {proyecto.tecnologias.join(", ")}</p>
+                        <p><strong>Categorías:</strong> {proyecto.categorias.join(", ")}</p>
+                    </>
+                </Modal.Body>
+                <Modal.Footer>
+                    {proyecto.ruta_archivo_comprimido && (
+                        <BotonDescargaAdmin id={proyecto.id} />
+                    )}
+                    <Button variant="primary" onClick={() => navigate(`/admin/editar-proyecto/${proyecto.id}`)}>
+                        Editar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
     
     // Verificar el rol y mostrar el modal correspondiente
     if (puedeDescargar) {

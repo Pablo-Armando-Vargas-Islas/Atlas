@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal } from 'react-bootstrap';
+import { Table, Button, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FaList } from 'react-icons/fa';
 import '../styles/MisSolicitudes.css';
 import BotonDescarga from '../utils/BotonDescarga';
 
@@ -8,6 +9,9 @@ const MisSolicitudes = () => {
     const [error, setError] = useState(null);
     const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [expandedRows, setExpandedRows] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchSolicitudes = async () => {
@@ -43,6 +47,37 @@ const MisSolicitudes = () => {
         setSolicitudSeleccionada(null);
     };
 
+    const totalPages = Math.ceil(solicitudes.length / itemsPerPage);
+    const currentSolicitudes = solicitudes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const renderPagination = () => (
+        <div className="paginacion">
+            {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                    key={index}
+                    className={`boton-pagina ${currentPage === index + 1 ? 'activo' : ''}`}
+                    onClick={() => handlePageChange(index + 1)}
+                >
+                    {index + 1}
+                </button>
+            ))}
+        </div>
+    ); 
+
+    const handleToggleExpand = (id) => {
+        if (expandedRows.includes(id)) {
+            setExpandedRows(expandedRows.filter((rowId) => rowId !== id));
+        } else {
+            setExpandedRows([...expandedRows, id]);
+        }
+    };
+    
     return (
         <div className="mis-solicitudes-container">
             <div className="solicitudes-content">
@@ -62,27 +97,49 @@ const MisSolicitudes = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {solicitudes.map((solicitud) => (
+                            {currentSolicitudes.map((solicitud) => (
                                 <tr key={solicitud.id}>
-                                    <td className="text-center">{solicitud.titulo}</td>
+                                    <td className="text-center">
+                                        {expandedRows.includes(solicitud.id) ? (
+                                            solicitud.titulo
+                                        ) : (
+                                            `${solicitud.titulo.slice(0, 50)} ...`
+                                        )}
+                                        {solicitud.titulo.length > 50 && (
+                                        <div className="text-center">
+                                            <Button
+                                                variant="link"
+                                                onClick={() => handleToggleExpand(solicitud.id)}
+                                                className="p-0 d-block mx-auto"
+                                            >
+                                                {expandedRows.includes(solicitud.id) ? 'Ver menos' : 'Ver más'}
+                                            </Button>
+                                        </div>
+                                    )}
+                                    </td>
                                     <td className="text-center">{new Date(solicitud.fecha_solicitud).toLocaleDateString()}</td>
                                     <td className="text-center">
                                         {solicitud.status_solicitud.charAt(0).toUpperCase() + solicitud.status_solicitud.slice(1)}
                                     </td>
                                     <td className="text-center">
-                                        <Button
-                                            variant="outline-primary"
-                                            className="ver-detalles-btn" // Usar la clase ya definida para el botón
-                                            onClick={() => handleVerDetalles(solicitud)}
-                                        >
-                                            Ver Detalles
-                                        </Button>
+                                        <OverlayTrigger placement="top" overlay={<Tooltip>Ver detalles</Tooltip>}>
+                                            <Button
+                                                variant="link"
+                                                className="p-0 ver-proyectos-btn align-middle" 
+                                                onClick={() => handleVerDetalles(solicitud)}
+                                            >
+                                                <FaList />
+                                            </Button>
+                                        </OverlayTrigger>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </Table>
                 )}
+                <div>
+                {renderPagination()}
+                </div>
 
                 {/* Modal para Detalles de la Solicitud */}
                 <Modal show={showModal} onHide={handleCerrarModal} centered>

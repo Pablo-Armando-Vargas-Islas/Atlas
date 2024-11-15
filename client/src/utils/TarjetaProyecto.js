@@ -37,16 +37,18 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
     );
   };
 
-  // Definir el formato del tipo de trabajo (Aula o Grado)
+  /* Definir el formato del tipo de trabajo (Aula o Grado)
   const renderTipoTrabajo = () => {
     if (tipo === "grado") {
-      return <Badge className="badge-tipo-grado ms-2 badge-sm">Trabajo de Grado</Badge>;
+      return <p>Trabajo de Grado</p>
     } else if (tipo === "aula") {
-      return <Badge className="badge-tipo-aula ms-2 badge-sm">Proyecto de Aula</Badge>;
+      return <p>Trabajo de Aula</p>
     } else {
-      return <Badge className="badge-tipo-desconocido ms-2 badge-sm">Tipo desconocido</Badge>;
+      return <p>Desconocido</p>
     }
-  };
+  };*/
+
+  const tipoTrabajo = tipo === "grado" ? "Grado" : "Aula";
 
   // Manejar el clic en la tarjeta para abrir el modal
   const handleCardClick = () => {
@@ -67,9 +69,10 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
         <Card.Body>
           <Card.Title>
             {highlightText(titulo)}
-            {renderTipoTrabajo()}
+            {/*renderTipoTrabajo()*/}
           </Card.Title>
           <div className="tarjeta-info">
+            <p><strong>Proyecto de {highlightText(tipoTrabajo)}</strong></p>
             <p><strong>Descripción:</strong> {highlightText(descripcion)}</p>
             <p><strong>Fecha de Creación:</strong> {fecha_hora ? new Date(fecha_hora).toLocaleDateString() : 'Fecha no disponible'}</p>
             <p><strong>Autores:</strong> {

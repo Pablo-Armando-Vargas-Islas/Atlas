@@ -48,7 +48,13 @@
     padding: 12px;
 }
 
-.ver-proyectos-btn,
+.ver-proyectos-btn {
+    border-radius: 15px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 5px;
+    margin-top: 1px;
+}
+
 .cerrar-curso-btn {
     border-radius: 15px;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -68,15 +74,15 @@
 }
 
 .detalle-proyecto-btn:hover {
-    color: #ec881d;
+    color: #5DB85C;
     background-color: #ffffff;
-    border-color: #ec881d;
+    border-color: #5DB85C;
 }
 
 .detalle-proyecto-btn:active {
     color: #ffffff!important;
-    background-color: #ec881d!important;
-    border-color: #ec881d!important;
+    background-color: #5DB85C!important;
+    border-color: #5DB85C!important;
 }
 
 .ver-solicitud-btn{

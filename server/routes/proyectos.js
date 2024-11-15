@@ -13,7 +13,6 @@ const createDirectoryIfNotExists = (directory) => {
     }
 };
 
-// Configurar Multer para almacenar archivos
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const currentDate = new Date();
@@ -35,11 +34,26 @@ const storage = multer.diskStorage({
     }
 });
 
+// Instancia de multer
+const upload = multer({ 
+    storage: storage, 
+    limits: { fileSize: 1 * 1024 * 1024 * 1024 }, // 1GB máximo
+    fileFilter: (req, file, cb) => {
+        const allowedMimeTypes = [
+            "application/zip", 
+            "application/x-zip-compressed",
+            "image/png",
+            "image/jpeg",
+            "application/pdf"
+        ];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Solo se permiten archivos .zip, .png, .jpg, .jpeg, o .pdf"));
+        }
+    }
+});
 
-const upload = multer({ storage: storage }).fields([
-    { name: 'archivoComprimido', maxCount: 1 },
-    { name: 'formatoAprobacion', maxCount: 1 } // Nuevo campo para el formato de aprobación
-]);
 
 // Ruta para obtener proyectos por usuario_id, con posibilidad de ordenar
 router.get("/", verifyToken, async (req, res) => {
@@ -88,6 +102,143 @@ router.get("/", verifyToken, async (req, res) => {
         res.status(500).send("Error del servidor");
     }
 });
+
+// Ruta para obtener un proyecto específico por su ID
+router.get("/proyecto/:id", verifyToken, async (req, res) => {
+    try {
+        const { id: proyecto_id } = req.params; // Obtener el proyecto_id de los parámetros de la URL
+
+        if (!proyecto_id) {
+            return res.status(400).json({ error: "ID de proyecto no proporcionado" });
+        }
+
+        const proyectos = await pool.query(
+            `SELECT p.id, p.titulo, p.descripcion, p.fecha_hora, p.popularidad, p.relevancia, p.tipo,
+                    p.ruta_archivo_comprimido, p.codigo_curso, p.formato_aprobacion, p.descripcion_licencia, p.necesita_licencia,
+                    p.usuario_id,
+                    array_agg(DISTINCT a.nombre_autor) as autores, 
+                    array_agg(DISTINCT t.id) as tecnologias,  -- Cambiado a t.id
+                    array_agg(DISTINCT c.id) as categorias,   -- Cambiado a c.id
+                    cu.nombre_curso  
+             FROM proyectos p 
+             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id 
+             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id 
+             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
+             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
+             LEFT JOIN categorias c ON pc.categoria_id = c.id
+             LEFT JOIN cursos cu ON cu.codigo_curso = p.codigo_curso 
+             WHERE p.id = $1
+             GROUP BY p.id, cu.nombre_curso`,
+            [proyecto_id]
+        );
+
+        if (proyectos.rows.length === 0) {
+            return res.status(404).json({ error: "Proyecto no encontrado" });
+        }
+
+        res.json(proyectos.rows[0]); // Devolver solo el proyecto encontrado
+    } catch (err) {
+        console.error("Error en el servidor:", err.message);
+        res.status(500).send("Error del servidor");
+    }
+});
+
+//Ruta para actualizar un proyecto específico por su ID
+router.put(
+    "/proyecto/actualizar/:id",
+    verifyToken,
+    upload.fields([
+        { name: "archivoComprimido", maxCount: 1 },
+        { name: "formatoAprobacion", maxCount: 1 }
+    ]),
+    async (req, res) => {
+        try {
+            const { id: proyecto_id } = req.params;
+            const {
+                titulo,
+                descripcion,
+                descripcion_licencia,
+                necesita_licencia,
+                tipo,
+                codigo_curso,
+                tecnologias,
+                categorias,
+                autores,
+            } = req.body;
+
+            const usuario_id = req.user.id;
+
+            // Manejar archivos
+            const archivoComprimido = req.files?.archivoComprimido?.[0]?.path || null;
+            const formatoAprobacion = req.files?.formatoAprobacion?.[0]?.path || null;
+
+            // Validar campos
+            if (!titulo || !descripcion || !tipo) {
+                return res.status(400).json({ error: "Faltan campos obligatorios" });
+            }
+
+            // Parsear datos
+            let tecnologiasArray = [];
+            let categoriasArray = [];
+            let autoresArray = [];
+
+            try {
+                tecnologiasArray = tecnologias ? JSON.parse(tecnologias).filter(tecnologia => tecnologia !== null) : [];
+                categoriasArray = categorias ? JSON.parse(categorias).filter(categoria => categoria !== null) : [];
+                autoresArray = autores ? JSON.parse(autores) : [];
+            } catch (err) {
+                console.error("Error al parsear datos:", err.message);
+                return res.status(400).json({ error: "Datos mal formateados" });
+            }
+
+            // Actualizar proyecto
+            let updatedProject;
+            if (tipo === "aula") {
+                updatedProject = await pool.query(
+                    `UPDATE proyectos SET titulo = $1, descripcion = $2, ruta_archivo_comprimido = COALESCE($3, ruta_archivo_comprimido), descripcion_licencia = $4, necesita_licencia = $5, tipo = $6, codigo_curso = $7
+                    WHERE id = $8 RETURNING *`,
+                    [titulo, descripcion, archivoComprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, proyecto_id]
+                );
+            } else if (tipo === "grado") {
+                updatedProject = await pool.query(
+                    `UPDATE proyectos SET titulo = $1, descripcion = $2, ruta_archivo_comprimido = COALESCE($3, ruta_archivo_comprimido), formato_aprobacion = COALESCE($4, formato_aprobacion), descripcion_licencia = $5, necesita_licencia = $6, tipo = $7
+                    WHERE id = $8 RETURNING *`,
+                    [titulo, descripcion, archivoComprimido, formatoAprobacion, descripcion_licencia, necesita_licencia, tipo, proyecto_id]
+                );
+            } else {
+                return res.status(400).json({ error: "Tipo de proyecto no válido" });
+            }
+
+            // Asociar tecnologías, categorías y autores si son provistos
+            if (tecnologiasArray.length > 0) {
+                await pool.query(`DELETE FROM proyectos_tecnologias WHERE proyecto_id = $1`, [proyecto_id]);
+                for (const tecnologiaId of tecnologiasArray) {
+                    await pool.query(`INSERT INTO proyectos_tecnologias (proyecto_id, tecnologia_id) VALUES ($1, $2)`, [proyecto_id, tecnologiaId]);
+                }
+            }
+
+            if (categoriasArray.length > 0) {
+                await pool.query(`DELETE FROM proyectos_categorias WHERE proyecto_id = $1`, [proyecto_id]);
+                for (const categoriaId of categoriasArray) {
+                    await pool.query(`INSERT INTO proyectos_categorias (proyecto_id, categoria_id) VALUES ($1, $2)`, [proyecto_id, categoriaId]);
+                }
+            }
+
+            if (autoresArray.length > 0) {
+                await pool.query(`DELETE FROM proyectos_autores WHERE proyecto_id = $1`, [proyecto_id]);
+                for (const autor of autoresArray) {
+                    await pool.query(`INSERT INTO proyectos_autores (proyecto_id, nombre_autor) VALUES ($1, $2)`, [proyecto_id, autor]);
+                }
+            }
+
+            res.json(updatedProject.rows[0]);
+        } catch (err) {
+            console.error("Error en el servidor:", err);
+            res.status(500).json({ error: "Error interno del servidor", details: err.message });
+        }
+    }
+);
+
 
 // Ruta para la búsqueda global de proyectos
 router.get("/atlas", verifyToken, async (req, res) => {
@@ -191,99 +342,113 @@ router.get("/categorias", async (req, res) => {
 });
 
 // Ruta para subir un archivo comprimido (para proyectos)
-router.post("/subir", verifyToken, upload, async (req, res) => {
-    try {
-        const {
-            titulo,
-            descripcion,
-            descripcion_licencia,
-            necesita_licencia,
-            tipo,
-            codigo_curso,
-            usuario_id,
-            tecnologias,
-            categorias,
-            autores
-        } = req.body;
+router.post(
+    "/subir",
+    verifyToken,
+    upload.fields([
+        { name: "archivoComprimido", maxCount: 1 },
+        { name: "formatoAprobacion", maxCount: 1 },
+    ]),
+    async (req, res) => {
+        try {
+            const {
+                titulo,
+                descripcion,
+                descripcion_licencia,
+                necesita_licencia,
+                tipo,
+                codigo_curso,
+                usuario_id,
+                tecnologias,
+                categorias,
+                autores
+            } = req.body;
 
-        const archivoComprimido = req.files['archivoComprimido'] ? req.files['archivoComprimido'][0].path : null;
-        const formatoAprobacion = req.files['formatoAprobacion'] ? req.files['formatoAprobacion'][0].path : null;
+            const archivoComprimido = req.files['archivoComprimido'] ? req.files['archivoComprimido'][0].path : null;
+            const formatoAprobacion = req.files['formatoAprobacion'] ? req.files['formatoAprobacion'][0].path : null;
 
-        // Verificar que tecnologías, categorías y autores sean arrays válidos
-        const tecnologiasArray = JSON.parse(tecnologias);  // Convertir a arreglo
-        const categoriasArray = JSON.parse(categorias);    // Convertir a arreglo
-        const autoresArray = JSON.parse(autores);          // Convertir a arreglo
-        let newProject;
-
-        if (tipo === "aula") {
-            // Verificar si el curso está cerrado
-            const curso = await pool.query(
-                `SELECT estado FROM cursos WHERE codigo_curso = $1`,
-                [codigo_curso]
-            );
-
-            if (curso.rows.length === 0) {
-                return res.status(404).json({ error: "Curso no encontrado" });
+            // Verificar y parsear arrays
+            let tecnologiasArray = [];
+            let categoriasArray = [];
+            let autoresArray = [];
+            try {
+                tecnologiasArray = tecnologias ? JSON.parse(tecnologias) : [];
+                categoriasArray = categorias ? JSON.parse(categorias) : [];
+                autoresArray = autores ? JSON.parse(autores) : [];
+            } catch (err) {
+                return res.status(400).json({ error: "Datos mal formateados" });
             }
+            let newProject;
 
-            if (curso.rows[0].estado === 'cerrado') {
-                return res.status(400).json({ error: "El curso ya está cerrado y no permite más entregas" });
-            }
-
-            // Registrar el proyecto de aula
-            newProject = await pool.query(
-                `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-                [titulo, descripcion, archivoComprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
-            );
-        } else if (tipo === "grado") {
-            // Registrar el proyecto de grado con formato de aprobación
-            newProject = await pool.query(
-                `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, formato_aprobacion, descripcion_licencia, necesita_licencia, tipo, usuario_id)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-                [titulo, descripcion, archivoComprimido, formatoAprobacion, descripcion_licencia, necesita_licencia, tipo, usuario_id]
-            );
-        } else {
-            return res.status(400).json({ error: "Tipo de proyecto no válido" });
-        }
-
-        const proyectoId = newProject.rows[0].id;
-
-        // Asociar tecnologías, categorías y autores
-        if (tecnologias && tecnologiasArray.length > 0) {
-            for (const tecnologiaId of tecnologiasArray) {
-                await pool.query(
-                    `INSERT INTO proyectos_tecnologias (proyecto_id, tecnologia_id)
-                    VALUES ($1, $2)`,
-                    [proyectoId, tecnologiaId]
+            if (tipo === "aula") {
+                // Verificar si el curso está cerrado
+                const curso = await pool.query(
+                    `SELECT estado FROM cursos WHERE codigo_curso = $1`,
+                    [codigo_curso]
                 );
-            }
-        }
 
-        if (categorias && categoriasArray.length > 0) {
-            for (const categoriaId of categoriasArray) {
-                await pool.query(
-                    `INSERT INTO proyectos_categorias (proyecto_id, categoria_id)
-                    VALUES ($1, $2)`,
-                    [proyectoId, categoriaId]
+                if (curso.rows.length === 0) {
+                    return res.status(404).json({ error: "Curso no encontrado" });
+                }
+
+                if (curso.rows[0].estado === 'cerrado') {
+                    return res.status(400).json({ error: "El curso ya está cerrado y no permite más entregas" });
+                }
+
+                // Registrar el proyecto de aula
+                newProject = await pool.query(
+                    `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+                    [titulo, descripcion, archivoComprimido, descripcion_licencia, necesita_licencia, tipo, codigo_curso, usuario_id]
                 );
-            }
-        }
-
-        if (autores && autoresArray.length > 0) {
-            for (const autor of autoresArray) {
-                await pool.query(
-                    `INSERT INTO proyectos_autores (proyecto_id, nombre_autor) VALUES ($1, $2)`,
-                    [proyectoId, autor]
+            } else if (tipo === "grado") {
+                // Registrar el proyecto de grado con formato de aprobación
+                newProject = await pool.query(
+                    `INSERT INTO proyectos (titulo, descripcion, ruta_archivo_comprimido, formato_aprobacion, descripcion_licencia, necesita_licencia, tipo, usuario_id)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+                    [titulo, descripcion, archivoComprimido, formatoAprobacion, descripcion_licencia, necesita_licencia, tipo, usuario_id]
                 );
+            } else {
+                return res.status(400).json({ error: "Tipo de proyecto no válido" });
             }
-        }
 
-        res.json(newProject.rows[0]);
-    } catch (err) {
-        console.error("Error en el servidor:", err.message);
-        res.status(500).send("Error del servidor");
-    }
+            const proyectoId = newProject.rows[0].id;
+
+            // Asociar tecnologías, categorías y autores
+            if (tecnologias && tecnologiasArray.length > 0) {
+                for (const tecnologiaId of tecnologiasArray) {
+                    await pool.query(
+                        `INSERT INTO proyectos_tecnologias (proyecto_id, tecnologia_id)
+                        VALUES ($1, $2)`,
+                        [proyectoId, tecnologiaId]
+                    );
+                }
+            }
+
+            if (categorias && categoriasArray.length > 0) {
+                for (const categoriaId of categoriasArray) {
+                    await pool.query(
+                        `INSERT INTO proyectos_categorias (proyecto_id, categoria_id)
+                        VALUES ($1, $2)`,
+                        [proyectoId, categoriaId]
+                    );
+                }
+            }
+
+            if (autores && autoresArray.length > 0) {
+                for (const autor of autoresArray) {
+                    await pool.query(
+                        `INSERT INTO proyectos_autores (proyecto_id, nombre_autor) VALUES ($1, $2)`,
+                        [proyectoId, autor]
+                    );
+                }
+            }
+
+            res.json(newProject.rows[0]);
+        } catch (err) {
+            console.error("Error en el servidor:", err.message);
+            res.status(500).send("Error del servidor");
+        }
 });
 
 // Ruta para validar si el titulo del proyecto ya existe

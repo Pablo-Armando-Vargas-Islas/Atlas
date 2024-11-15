@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/ConfiguracionCorreo.css'; // Importa el estilo exclusivo
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importa los íconos de react-icons
+import '../styles/ConfiguracionCorreo.css';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { Spinner } from 'react-bootstrap';
 
 const ConfiguracionCorreo = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         // Obtener la configuración de correo actual al cargar el componente
@@ -26,11 +28,13 @@ const ConfiguracionCorreo = () => {
             }
         };
 
-        fetchEmailConfig();
+        fetchEmailConfig(); 
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); 
+
         try {
             const response = await fetch("http://localhost:5000/api/admin/correo/actualizar", {
                 method: "PUT",
@@ -42,14 +46,16 @@ const ConfiguracionCorreo = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                //alert('Configuración de correo actualizada correctamente');
+                alert('Cuenta de correo actualizada correctamente');
             } else {
                 console.error(data.error);
-                alert('Error al actualizar la configuración de correo');
+                alert('No se pudo cambiar la cuenta, por favor verifique que sus credenciales sean correctas y que su cuenta de Microsoft Outlook tenga una configuración de seguridad simple.');
             }
         } catch (error) {
             console.error("Error al actualizar la configuración de correo:", error);
             alert("Error al actualizar la configuración de correo");
+        } finally {
+            setLoading(false); // Desactiva el spinner al finalizar
         }
     };
 
@@ -86,8 +92,25 @@ const ConfiguracionCorreo = () => {
                             </span>
                         </div>
                     </div>
-                    <button type="submit" className="configuracion-correo-btn-primary">
-                        Guardar
+                    <button
+                        type="submit"
+                        className={`configuracion-correo-btn-primary ${loading ? "loading-button" : ""}`}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <>
+                                Validando cuenta{' '} 
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                            </>
+                        ) : (
+                            'Guardar'
+                        )}
                     </button>
                 </form>
             </div>

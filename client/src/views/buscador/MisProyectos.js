@@ -33,10 +33,7 @@ const MisProyectos = () => {
 
     // Fetch para obtener los proyectos del usuario
     useEffect(() => {
-        let retryCount = 0;
-        const maxRetries = 5;
-
-        const fetchProyectosWithRetry = async () => {
+        const fetchProyectos = async () => {
             if (userId) {
                 const token = localStorage.getItem('token');
                 if (token) {
@@ -48,30 +45,22 @@ const MisProyectos = () => {
                                 'Authorization': `Bearer ${token}`,
                             }
                         });
-
+    
                         if (!response.ok) {
                             throw new Error(`Error ${response.status}: ${response.statusText}`);
                         }
-
+    
                         const data = await response.json();
                         setProyectos(data);
                     } catch (err) {
                         console.error("Error al obtener los proyectos:", err);
-                        if (retryCount < maxRetries) {
-                            retryCount++;
-                            setTimeout(fetchProyectosWithRetry, 2000);
-                        } else {
-                            console.error("Se alcanzó el número máximo de reintentos");
-                        }
                     }
                 }
             }
         };
-
-        if (userId) {
-            fetchProyectosWithRetry();
-        }
-    }, [userId]);
+    
+        fetchProyectos();
+    }, [userId]);    
 
     // Función para mostrar el modal con el formulario de solicitud de acceso directamente
     const verDetalles = (proyecto) => {
@@ -211,6 +200,7 @@ const MisProyectos = () => {
                     onChange={(e) => setSortCriterion(e.target.value)}
                 >
                     <option value="reciente">Reciente</option>
+                    <option value="antiguo">Más Antiguo</option>
                     <option value="popularidad">Popularidad</option>
                     <option value="relevancia">Relevancia</option>
                 </Form.Select>

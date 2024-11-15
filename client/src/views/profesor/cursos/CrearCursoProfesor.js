@@ -41,8 +41,8 @@ const CrearCursoProfesor = () => {
         setErrorMessage('');
 
         const today = new Date().toISOString().split('T')[0];
-        if (fechaLimite < today) {
-            setErrorMessage('La fecha límite no puede ser anterior al día de hoy.');
+        if (fechaLimite <= today) {
+            setErrorMessage('La fecha límite no puede ser igual o anterior al día de hoy.');
             return;
         }
 
@@ -128,6 +128,7 @@ const CrearCursoProfesor = () => {
                         <Form.Control
                             as="select"
                             value={periodo}
+                            min={new Date().toISOString().split("T")[0]}
                             onChange={(e) => setPeriodo(e.target.value)}
                             required
                             className="crear-curso-input"

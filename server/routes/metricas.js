@@ -387,5 +387,71 @@ router.get('/alertas', verifyToken, async (req, res) => {
     }
 });
 
+// Ruta para obtener la lista de usuarios con inactividad
+router.get('/usuarios-inactivos', verifyToken, async (req, res) => {
+    try {
+        const usuariosInactivos = await pool.query(
+            `SELECT usuarios.id, usuarios.nombre, usuarios.correo_institucional, 
+                    roles.nombre_rol AS nombre_rol, usuarios.ultima_actividad, 
+                    usuarios.codigo_estudiante, usuarios.cedula
+             FROM usuarios
+             JOIN roles ON usuarios.rol_id = roles.id
+             WHERE inactividad = TRUE`
+        );
+
+        res.json(usuariosInactivos.rows);
+    } catch (err) {
+        console.error("Error al obtener usuarios con inactividad:", err.message);
+        res.status(500).json({ error: "Error del servidor" });
+    }
+});
+
+// Ruta para aceptar la inactivación de un usuario
+router.put('/usuarios/:id/aceptar', verifyToken, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(
+            `UPDATE usuarios 
+             SET status_usuario = 'inactivo', inactividad = FALSE
+             WHERE id = $1 AND status_usuario = 'activo'
+             RETURNING *`,
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado o ya inactivo' });
+        }
+
+        res.json({ message: 'Usuario bloqueado correctamente', usuario: result.rows[0] });
+    } catch (err) {
+        console.error('Error al bloquear al usuario:', err.message);
+        res.status(500).json({ error: 'Error al bloquear al usuario' });
+    }
+});
+
+// Ruta para cancelar la inactivación de un usuario
+router.put('/usuarios/:id/cancelar', verifyToken, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(
+            `UPDATE usuarios 
+             SET inactividad = FALSE
+             WHERE id = $1 AND status_usuario = 'activo'
+             RETURNING *`,
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.json({ message: 'Cancelar inactividad correctamente', usuario: result.rows[0] });
+    } catch (err) {
+        console.error('Error al cancelar inactividad:', err.message);
+        res.status(500).json({ error: 'Error al cancelar inactividad' });
+    }
+});
 
 module.exports = router;

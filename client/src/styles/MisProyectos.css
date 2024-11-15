@@ -119,3 +119,21 @@
 .icono-navegar-atras-buscador {
     margin-right: 10px;
 }
+
+.search-button-misProyectos {
+    background-color: #28537E;
+    border-color: #28537E;
+    color: #ffffff;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.search-button-misProyectos:hover,
+.search-button-misProyectos:active,
+.search-button-misProyectos:focus {
+    background-color: #28537E !important;
+    border-color: #28537E !important;
+    color: #ffffff;
+    outline: none; 
+    box-shadow: none; 
+}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, OverlayTrigger, Tooltip  } from 'react-bootstrap';
 import ProyectoModal from '../../utils/ProyectoModal';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaList } from 'react-icons/fa';
 import '../../styles/GestionCursosProfesor.css';
 
 const VerProyectosAlumnoCurso = () => {
@@ -150,14 +150,16 @@ const VerProyectosAlumnoCurso = () => {
                                     <td className="text-center">{proyecto.titulo}</td>
                                     <td className="text-center">{proyecto.descripcion}</td>
                                     <td className="text-center">
+                                    <OverlayTrigger placement="top" overlay={<Tooltip>Ver detalles</Tooltip>}>
                                         <Button
-                                            variant="outline-primary"
-                                            className="detalle-proyecto-btn" 
+                                            variant="link"
+                                            className="p-0 ver-proyectos-btn align-middle" 
                                             onClick={() => verDetalles(proyecto)}
                                         >
-                                            Ver Detalles
+                                            <FaList />
                                         </Button>
-                                    </td>
+                                    </OverlayTrigger>
+                                    </td> 
                                 </tr>
                             ))}
                         </tbody>
