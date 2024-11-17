@@ -6,6 +6,8 @@ import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorAutor.css';
 
+const API_URL = 'http://localhost:5000';
+
 const NavegarPorAutor = () => {
     const [proyectos, setProyectos] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +28,7 @@ const NavegarPorAutor = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/api/proyectos/autor', {
+                const response = await fetch(`${API_URL}/api/proyectos/autor`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -50,7 +52,7 @@ const NavegarPorAutor = () => {
     }, []);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1);
     };
 
     const handleBuscar = async () => {
@@ -66,7 +68,7 @@ const NavegarPorAutor = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/proyectos/autor?query=${searchTerm}`, {
+            const response = await fetch(`${API_URL}/api/proyectos/autor?query=${searchTerm}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -115,7 +117,6 @@ const NavegarPorAutor = () => {
         setProyectoSeleccionado(null);
     };
 
-    // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
       try {
           const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -125,7 +126,7 @@ const NavegarPorAutor = () => {
           }
 
           const token = localStorage.getItem('token');
-          const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+          const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
               method: 'POST',
               headers: {
                   'Authorization': `Bearer ${token}`,
@@ -152,7 +153,7 @@ const NavegarPorAutor = () => {
     const verificarSolicitudPendiente = async (proyectoId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -196,6 +197,11 @@ const NavegarPorAutor = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleBuscar();
+                        }
+                    }}
                 />
                 <Button variant="primary" onClick={handleBuscar} className="search-button-autor">
                     Buscar
@@ -222,6 +228,7 @@ const NavegarPorAutor = () => {
                             key={proyecto.id}
                             proyecto={proyecto}
                             query={searchTerm}
+                            scope="autor"
                             verDetalles={verDetalles}
                             enviarSolicitud={enviarSolicitud}
                         />
@@ -254,7 +261,7 @@ const NavegarPorAutor = () => {
                     show={showModal}
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
-                    enviarSolicitud={enviarSolicitud} // Pasar la función enviarSolicitud
+                    enviarSolicitud={enviarSolicitud} 
                     omitDetails={true}
                 />
             )}

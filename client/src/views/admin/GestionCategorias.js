@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/EditarUsuarios.css';  // Usamos los mismos estilos
+import '../../styles/EditarUsuarios.css';
 import { FaEdit, FaCheck, FaTimes, FaTrash, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+
+const API_URL = 'http://localhost:5000';
 
 const GestionCategorias = () => {
     const [categorias, setCategorias] = useState([]);
@@ -13,16 +15,15 @@ const GestionCategorias = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Obtener Categorías desde la base de datos
         fetchCategorias();
     }, []);
 
     const fetchCategorias = async () => {
         try {
-            const token = localStorage.getItem('token'); // Obtener el token almacenado
-            const response = await fetch('http://localhost:5000/api/admin/categorias', {
+            const token = localStorage.getItem('token'); 
+            const response = await fetch(`${API_URL}/api/admin/categorias`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Pasar el token en el encabezado
+                    'Authorization': `Bearer ${token}`, 
                 },
             });
             const data = await response.json();
@@ -36,11 +37,11 @@ const GestionCategorias = () => {
         if (nuevaCategoria.trim()) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/admin/add/categorias', {
+                const response = await fetch(`${API_URL}/api/admin/add/categorias`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`, // Pasar el token en el encabezado
+                        'Authorization': `Bearer ${token}`, 
                     },
                     body: JSON.stringify({ nombre: nuevaCategoria }),
                 });
@@ -49,10 +50,10 @@ const GestionCategorias = () => {
     
                 if (response.ok) {
                     setCategorias([...categorias, data]);
-                    setNuevaCategoria("");  // Limpiar el campo de texto
-                    setError("");  // Limpiar cualquier error previo
+                    setNuevaCategoria(""); 
+                    setError(""); 
                 } else {
-                    setError(data.error);  // Guardar el error en el estado
+                    setError(data.error); 
                 }
     
             } catch (error) {
@@ -65,11 +66,11 @@ const GestionCategorias = () => {
     const handleSave = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/admin/edit/categorias/${id}`, {
+            const response = await fetch(`${API_URL}/api/admin/edit/categorias/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Pasar el token en el encabezado
+                    'Authorization': `Bearer ${token}`, 
                 },
                 body: JSON.stringify({ nombre: nombreEditar }),
             });
@@ -77,12 +78,10 @@ const GestionCategorias = () => {
             const data = await response.json();
     
             if (!response.ok) {
-                // Si la respuesta no es exitosa, mostramos el error
-                alert(data.error);  // Mostrar el mensaje de error de la respuesta del servidor
+                alert(data.error);  
                 return;
             }
     
-            // Si la actualización fue exitosa, actualizamos el estado
             setCategorias(categorias.map(cat => cat.id === id ? data : cat));
             setEditIndex(null);
     
@@ -90,13 +89,13 @@ const GestionCategorias = () => {
             console.error("Error al editar categoría:", error);
             alert("Hubo un problema al intentar editar la categoría. Inténtalo de nuevo.");
         }
-    };
+    }; 
     
     
     const handleDelete = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/admin/delete/categorias/${id}`, {
+            const response = await fetch(`${API_URL}/api/admin/delete/categorias/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -106,7 +105,6 @@ const GestionCategorias = () => {
             const data = await response.json();
     
             if (!response.ok) {
-                // Si hay un error en la respuesta, mostramos la alerta con el mensaje de error
                 if (data.error) {
                     alert(data.error);
                 } else {
@@ -115,7 +113,6 @@ const GestionCategorias = () => {
                 return;
             }
     
-            // Actualizar el estado solo si la eliminación fue exitosa
             setCategorias(categorias.filter(cat => cat.id !== id));
         } catch (error) {
             console.error("Error al eliminar categoría:", error);

@@ -81,9 +81,9 @@
     color: #ffffff;
     background-color: #88bf1b;
     border-color: #88bf1b;
-    padding: 6px 15px; /* Hacer el botón más grande con más relleno */
-    font-size: 1.0em; /* Aumentar el tamaño de la fuente */
-    float: right; /* Alinear el botón a la derecha */
+    padding: 6px 15px; 
+    font-size: 1.0em;
+    float: right;
 }
 
 .paginacion {
@@ -91,7 +91,7 @@
     justify-content: center;
     align-items: center;
     margin-top: 20px;
-    gap: 10px; /* Más espacio entre los botones */
+    gap: 10px; 
 }
 
 .boton-pagina {
@@ -101,13 +101,13 @@
     padding: 5px 13px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, color 0.3s;
-    border-radius: 5px; /* Bordes redondeados para un mejor aspecto */
+    border-radius: 5px;
 }
 
 .boton-pagina:hover {
     background-color: #007bff;
     color: #ffffff;
-    transform: translateY(-2px); /* Efecto de desplazamiento hacia arriba al pasar el mouse */
+    transform: translateY(-2px); 
 }
 
 .boton-pagina.activo {
@@ -115,7 +115,7 @@
     color: #ffffff;
     border-color: #007bff;
     cursor: default;
-    font-weight: bold; /* Resaltar el botón activo */
+    font-weight: bold; 
 }
 
 .boton-pagina:disabled {
@@ -125,37 +125,36 @@
 }
 
 .fila-inactiva {
-    color: #a0a0a0; /* Texto gris para los usuarios inactivos */
-    background-color: #f9f9f9; /* Color de fondo más claro para distinguirlo */
+    color: #a0a0a0; 
+    background-color: #f9f9f9; 
 }
 
 
 .icono-accion {
-    font-size: 1.2em; /* Aumentar el tamaño del ícono si lo deseas */
-    vertical-align: middle; /* Asegurarse de que los íconos se alineen verticalmente */
+    font-size: 1.2em; 
+    vertical-align: middle; 
 }
 
-/* Estilos específicos para cada ícono */
 .icono-accion-editar {
     cursor: pointer;
     margin-right: 10px;
-    color: #2a76c8; /* Color azul para editar */
+    color: #2a76c8; 
 }
 
 .icono-accion-inactivar {
     cursor: pointer;
-    color: #D9534F; /* Color naranja/rojo para inactivar */
+    color: #D9534F;
 }
 
 .icono-accion-listo {
     cursor: pointer;
     margin-right: 10px;
-    color: green; /* Color verde para guardar */
+    color: green; 
 }
 
 .icono-accion-cancelar {
     cursor: pointer;
-    color: red; /* Color rojo para cancelar */
+    color: red; 
 }
 
 .alert-fixed {
@@ -199,8 +198,8 @@
 
 .toggle-button {
     background-color: #ffffff;
-    border-color: #71767a25;
-    color: #71767a;
+    border-color: #28537e82;
+    color: #28537ede;
     padding: 10px 15px;
     cursor: pointer;
     border-radius: 5px;
@@ -209,4 +208,9 @@
 
 .toggle-button:hover {
     transform: translateY(-2px);
+}
+
+.icono-accion-eliminar{
+    cursor: pointer;
+    color: rgb(228, 0, 0);
 }

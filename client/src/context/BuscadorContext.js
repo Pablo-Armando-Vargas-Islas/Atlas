@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 const BuscadorContext = createContext();
+const API_URL = 'http://localhost:5000';
 
 export const BuscadorProvider = ({ children }) => {
   const [query, setQuery] = useState('');
@@ -8,18 +9,16 @@ export const BuscadorProvider = ({ children }) => {
   const [resultados, setResultados] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Función para realizar la búsqueda
   const buscarProyectos = async (consulta, orden = 'reciente') => {
     setLoading(true);
     setQuery(consulta);
     try {
-      const token = localStorage.getItem('token'); // Obtener el token para autenticación
+      const token = localStorage.getItem('token'); 
       if (!token) {
         throw new Error("Token no encontrado. Por favor, inicia sesión nuevamente.");
       }
   
-      const response = await fetch(
-        `http://localhost:5000/api/proyectos/atlas?query=${encodeURIComponent(consulta)}&orden=${orden}`,
+      const response = await fetch(`${API_URL}/api/proyectos/atlas?query=${encodeURIComponent(consulta)}&orden=${orden}`,
         {
           method: 'GET',
           headers: {
@@ -51,7 +50,6 @@ export const BuscadorProvider = ({ children }) => {
   );
 };
 
-// Hook personalizado para usar el contexto del buscador
 export const useBuscador = () => {
   return useContext(BuscadorContext);
 };

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../styles/Register.css';
 
+const API_URL = 'http://localhost:5000';
+
 const Register = () => {
     const [nombre, setNombre] = useState("");
     const [correoInstitucional, setCorreoInstitucional] = useState("");
@@ -11,7 +13,6 @@ const Register = () => {
     const [alert, setAlert] = useState({ type: "", message: "" });
     const navigate = useNavigate();
 
-    // Funciones de validación
     const validateEmail = (email) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
@@ -41,14 +42,12 @@ const Register = () => {
         e.preventDefault();
         setAlert({ type: "", message: "" });
 
-        // Eliminar espacios al inicio y al final de los valores
         const nombreTrimmed = nombre.trim();
         const correoTrimmed = correoInstitucional.trim();
         const codigoTrimmed = codigoEstudiante.trim();
         const contraseñaTrimmed = contraseña.trim();
         const confirmarContraseñaTrimmed = confirmarContraseña.trim();
 
-        // Validaciones
         if (!validateNombre(nombreTrimmed)) {
             setAlert({ type: "warning", message: "El nombre no puede contener caracteres especiales." });
             return;
@@ -74,11 +73,11 @@ const Register = () => {
                 nombre: nombreTrimmed,
                 correo_institucional: correoTrimmed,
                 contraseña: contraseñaTrimmed,
-                rol_id: 3, // Siempre será Alumno
+                rol_id: 3, 
                 codigo_estudiante: codigoTrimmed,
             };
 
-            const response = await fetch("http://localhost:5000/api/auth/register", {
+            const response = await fetch(`${API_URL}/api/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),

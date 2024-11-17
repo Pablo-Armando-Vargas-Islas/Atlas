@@ -22,7 +22,7 @@
 }
 
 .crear-curso-submit-button {
-    background-color: #5DB85C; /* Verde de la universidad */
+    background-color: #91cb1b; 
     color: #ffffff;
     border: none;
     border-radius: 25px;
@@ -31,13 +31,13 @@
 }
 
 .crear-curso-submit-button:hover {
-    background-color: #449D44;
+    background-color: #91cb1b;
     color: #ffffff;
     transform: scale(1.01);
 }
 
 .crear-curso-submit-button:active {
-    background-color: #449D44!important;
+    background-color: #91cb1b!important;
     color: #ffffff;
 }
 

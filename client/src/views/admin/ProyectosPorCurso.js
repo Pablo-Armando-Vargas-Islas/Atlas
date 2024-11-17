@@ -5,6 +5,8 @@ import BotonDescargaAdmin from "../../utils/BotonDescargaAdmin";
 import { FaList, FaCheck, FaTimes, FaEdit, FaArrowLeft } from 'react-icons/fa';
 import "../../styles/ProyectosPorCurso.css";
 
+const API_URL = 'http://localhost:5000';
+
 const ProyectosPorCurso = () => {
     const { id: cursoId } = useParams();
     const [proyectos, setProyectos] = useState([]);
@@ -20,13 +22,13 @@ const ProyectosPorCurso = () => {
     }, [cursoId]);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const fetchProyectos = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:5000/api/admin/cursos/proyectos/${cursoId}`, {
+            const response = await fetch(`${API_URL}/api/admin/cursos/proyectos/${cursoId}`, {
                 headers: { 
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -81,7 +83,6 @@ const ProyectosPorCurso = () => {
         const { name, value, type, checked } = e.target;
     
         setEditingProyecto((prevProyecto) => {
-            // Si el campo es "necesita_licencia" y se cambia a false, limpiar "descripcion_licencia"
             if (name === "necesita_licencia" && !checked) {
                 return {
                     ...prevProyecto,
@@ -105,7 +106,7 @@ const ProyectosPorCurso = () => {
     
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:5000/api/admin/proyectos/${editingProyecto.id}`, {
+            const response = await fetch(`${API_URL}/api/admin/proyectos/${editingProyecto.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -115,7 +116,6 @@ const ProyectosPorCurso = () => {
             });
     
             if (response.ok) {
-                // Actualizar la lista de proyectos con el proyecto editado
                 const updatedProyecto = await response.json();
                 setProyectos((prevProyectos) =>
                     prevProyectos.map((proyecto, index) =>
@@ -259,6 +259,15 @@ const ProyectosPorCurso = () => {
                                                 : "No se ha subido ningún archivo"}
                                         </td>
                                         <td>
+                                            <OverlayTrigger placement="top" overlay={<Tooltip>Ver detalles</Tooltip>}>
+                                                <Button
+                                                    variant="link"
+                                                    className="p-0 ver-proyectos-admin-btn align-middle" 
+                                                    onClick={() => handleVerDetalles(proyecto)}
+                                                >
+                                                    <FaList />
+                                                </Button>
+                                            </OverlayTrigger>
                                             <OverlayTrigger placement="top" overlay={<Tooltip>Editar Proyecto</Tooltip>}>
                                                 <Button
                                                     variant="link"
@@ -266,15 +275,6 @@ const ProyectosPorCurso = () => {
                                                     onClick={() => navigate(`/admin/editar-proyecto/${proyecto.id}`)}
                                                 >
                                                     <FaEdit />
-                                                </Button>
-                                            </OverlayTrigger>
-                                            <OverlayTrigger placement="top" overlay={<Tooltip>Ver detalles</Tooltip>}>
-                                                <Button
-                                                    variant="link"
-                                                    className="p-0 ver-proyectos-btn align-middle" 
-                                                    onClick={() => handleVerDetalles(proyecto)}
-                                                >
-                                                    <FaList />
                                                 </Button>
                                             </OverlayTrigger>
                                         </td>

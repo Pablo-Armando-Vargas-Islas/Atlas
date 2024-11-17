@@ -350,4 +350,92 @@ router.post('/change-password', verifyToken, async (req, res) => {
     }
 });
 
+// Obtener datos del perfil
+router.get("/profile", verifyToken, async (req, res) => {
+    try {
+        const user = await pool.query(
+            "SELECT nombre, correo_institucional, cedula, codigo_estudiante, rol_id FROM usuarios WHERE id = $1",
+            [req.user.id]
+        );
+        if (user.rows.length === 0) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        res.json(user.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Error en el servidor");
+    }
+});
+
+// Actualizar datos del perfil
+router.put("/profile/update", verifyToken, async (req, res) => {
+    const { nombre, correo_institucional, usuario } = req.body;
+
+    try {
+        // Verificar si el correo ya está en uso por otro usuario
+        const correoDuplicado = await pool.query(
+            "SELECT id FROM usuarios WHERE correo_institucional = $1 AND id != $2",
+            [correo_institucional, req.user.id]
+        );
+
+        if (correoDuplicado.rows.length > 0) {
+            return res.status(400).json({
+                message: "Lo sentimos, el correo electrónico ya ha sido registrado por otro usuario.",
+            });
+        }
+
+        // Verificar si la cédula o el código de estudiante ya está en uso por otro usuario
+        const usuarioDuplicado = await pool.query(
+            `SELECT id FROM usuarios 
+            WHERE (cedula = $1 OR codigo_estudiante = $1) 
+            AND id != $2`,
+            [usuario, req.user.id]
+        );
+
+        if (usuarioDuplicado.rows.length > 0) {
+            return res.status(400).json({
+                message: "Lo sentimos, el usuario que intentas registrar ya está en uso por otro usuario.",
+            });
+        }
+
+        // Actualizar el perfil
+        const updatedUser = await pool.query(
+            `UPDATE usuarios 
+            SET nombre = $1, correo_institucional = $2, 
+                cedula = CASE WHEN rol_id != 3 THEN $3 ELSE NULL END, 
+                codigo_estudiante = CASE WHEN rol_id = 3 THEN $3 ELSE NULL END 
+            WHERE id = $4 RETURNING *`,
+            [nombre, correo_institucional, usuario, req.user.id]
+        );
+
+        if (updatedUser.rows.length === 0) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+
+        res.json({ message: "Perfil actualizado correctamente.", user: updatedUser.rows[0] });
+    } catch (err) {
+        if (err.code === "23505") {
+            // Manejo específico para errores de unicidad (violación de llave única)
+            if (err.constraint === "usuarios_correo_institucional_key") {
+                return res.status(400).json({
+                    message: "El correo electrónico ya está registrado por otro usuario.",
+                });
+            }
+            if (err.constraint === "usuarios_cedula_key") {
+                return res.status(400).json({
+                    message: "La cédula ya está registrada por otro usuario.",
+                });
+            }
+            if (err.constraint === "usuarios_codigo_estudiante_key") {
+                return res.status(400).json({
+                    message: "El código de estudiante ya está registrado por otro usuario.",
+                });
+            }
+        }
+
+        console.error(err.message);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
 module.exports = router;

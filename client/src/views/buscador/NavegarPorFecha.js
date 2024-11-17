@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorFecha.css';
 
+const API_URL = 'http://localhost:5000';
+
 const NavegarPorFecha = () => {
   const [proyectos, setProyectos] = useState([]);
   const [searchYear, setSearchYear] = useState("");
@@ -20,7 +22,6 @@ const NavegarPorFecha = () => {
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
-    // Obtener los años disponibles para el selector de año
     const fetchAniosDisponibles = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -29,7 +30,7 @@ const NavegarPorFecha = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/proyectos/fecha/anos', {
+        const response = await fetch(`${API_URL}/api/proyectos/fecha/anos`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -52,11 +53,10 @@ const NavegarPorFecha = () => {
   }, []);
 
   const handleGoBack = () => {
-    navigate(-1); // Regresar a la vista anterior
+    navigate(-1); 
   };
 
   useEffect(() => {
-    // Obtener todos los proyectos al cargar la vista o cuando no se seleccione año ni mes
     const fetchTodosLosProyectos = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -65,7 +65,7 @@ const NavegarPorFecha = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/proyectos/todos', {
+        const response = await fetch(`${API_URL}/api/proyectos/todos`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -89,7 +89,6 @@ const NavegarPorFecha = () => {
   }, []);
 
   useEffect(() => {
-    // Realizar la búsqueda cuando se cambie el año o el mes
     const fetchProyectosPorFecha = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -98,7 +97,7 @@ const NavegarPorFecha = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/proyectos/fecha?year=${searchYear}&month=${searchMonth}`, {
+        const response = await fetch(`${API_URL}/api/proyectos/fecha?year=${searchYear}&month=${searchMonth}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -124,7 +123,6 @@ const NavegarPorFecha = () => {
     }
   }, [searchYear, searchMonth, proyectos]);
 
-  // Función para enviar la solicitud de acceso
   const enviarSolicitud = async (proyectoId, motivo) => {
     try {
         const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -134,7 +132,7 @@ const NavegarPorFecha = () => {
         }
 
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+        const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -161,7 +159,7 @@ const NavegarPorFecha = () => {
   const verificarSolicitudPendiente = async (proyectoId) => {
       try {
           const token = localStorage.getItem('token');
-          const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+          const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
               method: 'GET',
               headers: {
                   'Authorization': `Bearer ${token}`,

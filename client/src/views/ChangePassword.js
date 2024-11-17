@@ -4,11 +4,13 @@ import { jwtDecode } from 'jwt-decode';
 import { Spinner } from 'react-bootstrap'; 
 import '../styles/ChangePassword.css';
 
+const API_URL = 'http://localhost:5000';
+
 const ChangePassword = () => {
     const [nuevaContrasena, setNuevaContrasena] = useState("");
     const [confirmarContrasena, setConfirmarContrasena] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
-    const [loading, setLoading] = useState(false); // Estado para el spinner
+    const [loading, setLoading] = useState(false); 
     const navigate = useNavigate();
 
     const handleChangePassword = async (e) => {
@@ -19,11 +21,11 @@ const ChangePassword = () => {
             return;
         }
 
-        setLoading(true); // Activa el estado de carga
+        setLoading(true); 
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:5000/api/auth/change-password", {
+            const response = await fetch(`${API_URL}/api/auth/change-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -56,7 +58,7 @@ const ChangePassword = () => {
             console.error("Error al cambiar la contraseña:", error);
             setAlert({ type: "danger", message: "Error de conexión" });
         } finally {
-            setLoading(false); // Desactiva el estado de carga
+            setLoading(false); 
         }
     };
 
@@ -107,7 +109,7 @@ const ChangePassword = () => {
                                         size="sm"
                                         role="status"
                                         aria-hidden="true"
-                                        style={{ marginRight: '8px', color: '#ffffff' }} // Color del spinner en blanco
+                                        style={{ marginRight: '8px', color: '#ffffff' }} 
                                     />
                                     
                                 </>

@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
+
+const API_URL = 'http://localhost:5000';
 
 const ActividadReciente = () => {
     const [actividadReciente, setActividadReciente] = useState({ proyectos: [], cursos: [] });
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
         const token = localStorage.getItem('token');
 
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_URL}/actividad/reciente`, {
+                const response = await fetch(`${API_URL}/api/metricas/actividad/reciente`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

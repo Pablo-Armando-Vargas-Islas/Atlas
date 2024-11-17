@@ -3,6 +3,8 @@ import '../styles/ConfiguracionCorreo.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import { Spinner } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000';
+
 const ConfiguracionCorreo = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -10,10 +12,9 @@ const ConfiguracionCorreo = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Obtener la configuración de correo actual al cargar el componente
         const fetchEmailConfig = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/admin/correo", {
+                const response = await fetch(`${API_URL}/api/admin/correo`, {
                     headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
                 });
                 const data = await response.json();
@@ -36,7 +37,7 @@ const ConfiguracionCorreo = () => {
         setLoading(true); 
 
         try {
-            const response = await fetch("http://localhost:5000/api/admin/correo/actualizar", {
+            const response = await fetch(`${API_URL}/api/admin/correo/actualizar`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -55,7 +56,7 @@ const ConfiguracionCorreo = () => {
             console.error("Error al actualizar la configuración de correo:", error);
             alert("Error al actualizar la configuración de correo");
         } finally {
-            setLoading(false); // Desactiva el spinner al finalizar
+            setLoading(false);
         }
     };
 

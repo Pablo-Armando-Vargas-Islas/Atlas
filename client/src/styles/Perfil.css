@@ -4,7 +4,7 @@ html, body {
     background-color: #e8f0ff; 
 }
 
-.register-container {
+.profile-container {
     height: 100vh;
     display: flex;
     align-items: center;
@@ -12,8 +12,8 @@ html, body {
     margin-top: -30px; 
 }
 
-.register-box {
-    max-width: 600px;
+.profile-box {
+    max-width: 600px; 
     width: 100%;
     border-radius: 25px;
     background: #ffffff;
@@ -21,18 +21,18 @@ html, body {
     padding: 50px; 
 }
 
-.register-form-group {
+.profile-form-group {
     margin-bottom: 15px;
 }
 
-.register-form-control {
+.profile-form-control {
     padding: 15px;
     font-size: 1rem;
     border-radius: 50px;
     border: 1px solid #dcdcdc; 
 }
 
-.register-btn-primary {
+.profile-btn-primary {
     background-color: #91cb1b; 
     color: #ffffff;
     border: none;
@@ -41,16 +41,23 @@ html, body {
     transition: background-color 0.3s, transform 0.2s;
 } 
 
-.register-btn-primary:hover {
+.profile-btn-primary:hover {
     background-color: #91cb1b;
     color: #ffffff;
     transform: scale(1.01);
 }
 
-.register-btn-primary:focus {
+.profile-btn-primary:focus {
     background-color: #91cb1b;
     color: #ffffff;
     transform: scale(1.01);
+}
+
+button.profile-btn-primary:disabled {
+    background-color: #91cb1b;
+    color: #eaeaea;
+    cursor: not-allowed;
+    border: 1px solid #ccc;
 }
 
 .btn-link {

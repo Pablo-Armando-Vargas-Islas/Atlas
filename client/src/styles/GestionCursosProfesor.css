@@ -51,7 +51,6 @@
 .ver-proyectos-btn {
     border-radius: 15px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    margin-left: 5px;
     margin-top: 1px;
 }
 
@@ -123,23 +122,76 @@
 .crear-curso-button {
     display: flex;
     align-items: center;
-    gap: 8px;  /* Espacio entre el ícono y el texto */
+    gap: 8px;
     background-color: #5DB85C;
     color: #ffffff;
     border: none;
     padding: 10px 15px;
     font-weight: bold;
-    border-radius: 5px;  /* Bordes redondeados */
+    border-radius: 5px;
     transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.4);  /* Sombra para destacar el botón */
+    box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.4);
 }
 
 .crear-curso-button:hover {
-    background-color: #449D44;  /* Cambia el color al pasar el mouse */
-    transform: translateY(-2px);  /* Efecto de elevar el botón al pasar el mouse */
+    background-color: #4aab4a!important;  
+    transform: translateY(-2px); 
 }
 
 .crear-curso-button:active {
-    background-color: #449D44;  /* Más oscuro cuando se presiona */
-    transform: translateY(1px);  /* Efecto de hundir al presionar */
+    background-color: #4aab4a!important; 
+    transform: translateY(1px);
+}
+
+.crear-curso-button:focus {
+    background-color: #4aab4a!important;
+    transform: translateY(1px); 
+}
+
+.rechazar-solicitud-btn {
+    background-color: #D9534F!important;
+    border-color: #D9534F;
+    color: #ffffff;
+}
+
+.rechazar-solicitud-btn:hover {
+    background-color: #C9302C!important;
+    border-color: #C9302C!important;
+    color: #ffffff;
+}
+
+.rechazar-solicitud-btn:active {
+    background-color: #C9302C!important;
+    border-color: #C9302C!important;
+    color: #ffffff;
+}
+
+.rechazar-solicitud-btn:focus {
+    background-color: #C9302C!important;
+    border-color: #C9302C!important;
+    color: #ffffff;
+}
+
+.aceptar-solicitud-btn {
+    background-color: #91cb1b!important;
+    border-color: #91cb1b;
+    color: #ffffff;
+}
+
+.aceptar-solicitud-btn:hover {
+    background-color: #5DB85C!important;
+    border-color: #5DB85C!important;
+    color: #ffffff;
+}
+
+.aceptar-solicitud-btn:active {
+    background-color: #449D44!important;
+    border-color: #449D44!important;
+    color: #ffffff;
+}
+
+.aceptar-solicitud-btn:focus {
+    background-color: #449D44!important;
+    border-color: #449D44!important;
+    color: #ffffff;
 }

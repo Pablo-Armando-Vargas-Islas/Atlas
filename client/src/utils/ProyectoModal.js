@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import BotonDescargaAdmin from '../utils/BotonDescargaAdmin'; 
 import '../styles/ProyectoModal.css';
 
-
+ 
 const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetails = false }) => {
     const { rol: userRole, userId } = useContext(AuthContext); 
     const [isMotivoStage, setIsMotivoStage] = useState(omitDetails);
@@ -41,7 +41,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
             
             if (userRole === 1) {
                 setPuedeEditar(true);
-            } else if (usuarioIdProyecto === idUsuarioAutenticado || userRole === 2 && proyecto.codigo_curso) {
+            } else if (usuarioIdProyecto === idUsuarioAutenticado || (userRole === 2 && proyecto.codigo_curso)) {
                 setPuedeDescargar(true);
             } else {
                 setPuedeDescargar(false);
@@ -50,7 +50,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
         }
     }, [userRole, userId, proyecto]);
 
-    // Verificar el rol y mostrar el modal correspondiente
+    // Modal para administradores
     if (puedeEditar) {
         return (
             <Modal show={show} onHide={handleClose} centered size="lg">
@@ -76,18 +76,18 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
                     </>
                 </Modal.Body>
                 <Modal.Footer>
+                    <Button variant="primary" className='btn-primary-editar' onClick={() => navigate(`/admin/editar-proyecto/${proyecto.id}`)}>
+                        Editar
+                    </Button>
                     {proyecto.ruta_archivo_comprimido && (
                         <BotonDescargaAdmin id={proyecto.id} />
                     )}
-                    <Button variant="primary" onClick={() => navigate(`/admin/editar-proyecto/${proyecto.id}`)}>
-                        Editar
-                    </Button>
                 </Modal.Footer>
             </Modal>
         );
     }
     
-    // Verificar el rol y mostrar el modal correspondiente
+    // Modal para dueños del proyecto y docentes
     if (puedeDescargar) {
         return (
             <Modal show={show} onHide={handleClose} centered size="lg">
@@ -124,7 +124,7 @@ const ProyectoModal = ({ show, handleClose, proyecto, enviarSolicitud, omitDetai
         );
     }
 
-    // Modal para roles que no son administradores
+    // Modal para usuarios que no tienen acceso al proyecto
     return (
         <Modal show={show} onHide={handleClose} centered size="lg">
             <Modal.Header closeButton>

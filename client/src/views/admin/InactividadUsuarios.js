@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import '../../styles/EditarUsuarios.css';
 
+const API_URL = 'http://localhost:5000';
+
 const UsuariosInactivos = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBusqueda] = useState(""); 
@@ -18,7 +20,7 @@ const UsuariosInactivos = () => {
     const fetchUsuariosInactivos = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/metricas/usuarios/inactivos', {
+            const response = await fetch(`${API_URL}/api/metricas/usuarios/inactivos`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -34,7 +36,7 @@ const UsuariosInactivos = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handleSearchChange = (e) => {
@@ -42,7 +44,6 @@ const UsuariosInactivos = () => {
         setCurrentPage(1); 
     };
 
-    // Cambiar de página
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -56,15 +57,12 @@ const UsuariosInactivos = () => {
         (usuario.codigo_estudiante || "").toLowerCase().includes(busqueda.toLowerCase())
     );
 
-    // Calcular los usuarios a mostrar en la página actual
     const indexOfLastUser = currentPage * usuariosPorPagina;
     const indexOfFirstUser = indexOfLastUser - usuariosPorPagina;
     const currentUsuarios = filteredUsuarios.slice(indexOfFirstUser, indexOfLastUser);
 
-    // Calcular el número total de páginas
     const totalPages = Math.ceil(filteredUsuarios.length / usuariosPorPagina);
 
-    // Función para resaltar coincidencias en el texto
     const highlightMatch = (text) => {
         if (!busqueda) return text;
         const regex = new RegExp(`(${busqueda})`, 'gi');
@@ -77,10 +75,9 @@ const UsuariosInactivos = () => {
         );
     };
 
-    // Manejar la activación del usuario
     const handleActivateUser = async (userId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/metricas/usuarios/${userId}/activar`, {
+            const response = await fetch(`${API_URL}/api/metricas/usuarios/${userId}/activar`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -89,7 +86,7 @@ const UsuariosInactivos = () => {
 
             if (response.ok) {
                 alert('Usuario activado correctamente');
-                fetchUsuariosInactivos(); // Refrescar la lista de usuarios
+                fetchUsuariosInactivos(); 
             } else {
                 const data = await response.json();
                 console.error('Error al activar el usuario:', data.error);

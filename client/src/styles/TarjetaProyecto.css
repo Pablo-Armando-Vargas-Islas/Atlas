@@ -32,7 +32,7 @@
 }
 
 .highlight {
-  background-color: rgba(129, 129, 129, 0.249);
+  background-color: #ffff00cd;
   font-weight: bold;
 }
 
@@ -53,11 +53,16 @@
 }
 
 .badge-tecnologia {
-  background-color: #15bce2b8 !important; 
+  background-color: #28547ed8 !important; 
   color: white !important;
 }
 
 .badge-categoria {
-  background-color: #ffbf00b8 !important; 
+  background-color: #287e4dd8 !important; 
   color: rgb(255, 255, 255) !important;
+}
+
+.tipo-trabajo {
+  color: #28537E; 
+  font-weight: bold; 
 }

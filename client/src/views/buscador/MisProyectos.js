@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/MisProyectos.css';
 
+const API_URL = 'http://localhost:5000';
+
 const MisProyectos = () => {
     const [proyectos, setProyectos] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -18,7 +20,6 @@ const MisProyectos = () => {
     const navigate = useNavigate();
     const ITEMS_PER_PAGE = 10; 
 
-    // Obtener el id del usuario del token
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -31,38 +32,36 @@ const MisProyectos = () => {
         }
     }, []);
 
-    // Fetch para obtener los proyectos del usuario
     useEffect(() => {
-        const fetchProyectos = async () => {
-            if (userId) {
-                const token = localStorage.getItem('token');
-                if (token) {
-                    try {
-                        const response = await fetch(`http://localhost:5000/api/proyectos`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`,
-                            }
-                        });
-    
-                        if (!response.ok) {
-                            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        fetchProyectos();
+    }, [userId, searchTerm]);    
+
+    const fetchProyectos = async () => {
+        if (userId) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch(`${API_URL}/api/proyectos`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
                         }
-    
-                        const data = await response.json();
-                        setProyectos(data);
-                    } catch (err) {
-                        console.error("Error al obtener los proyectos:", err);
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
                     }
+
+                    const data = await response.json();
+                    setProyectos(data);
+                } catch (err) {
+                    console.error("Error al obtener los proyectos:", err);
                 }
             }
-        };
-    
-        fetchProyectos();
-    }, [userId]);    
+        }
+    };
 
-    // Función para mostrar el modal con el formulario de solicitud de acceso directamente
     const verDetalles = (proyecto) => {
         if (userId && proyecto && proyecto.usuario_id) {
             setProyectoSeleccionado(proyecto);
@@ -71,7 +70,7 @@ const MisProyectos = () => {
     };
       
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const cerrarModal = () => {
@@ -79,7 +78,6 @@ const MisProyectos = () => {
         setProyectoSeleccionado(null);
     };
 
-    // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
         try {
             const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -89,7 +87,7 @@ const MisProyectos = () => {
             }
 
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+            const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -116,7 +114,7 @@ const MisProyectos = () => {
     const verificarSolicitudPendiente = async (proyectoId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -137,25 +135,12 @@ const MisProyectos = () => {
         }
     };
 
-    // Filtrar y ordenar proyectos por búsqueda en "Mis Proyectos"
     const filteredProyectos = proyectos
-        .filter((proyecto) => {
-            if (searchTerm.trim() === "") {
-                return true;
-            }
-            const searchTerms = searchTerm.toLowerCase().split(" ").filter(term => term.trim() !== "");
-            return searchTerms.some((term) => {
-                return (
-                    proyecto.titulo.toLowerCase().includes(term) ||
-                    proyecto.autores.some((autor) => autor.toLowerCase().includes(term)) ||
-                    proyecto.tecnologias.some((tecnologia) => tecnologia.toLowerCase().includes(term)) ||
-                    proyecto.tipo.toLowerCase().includes(term)
-                );
-            });
-        })
         .sort((a, b) => {
             if (sortCriterion === "reciente") {
-                return new Date(b.fecha_hora) - new Date(a.fecha_hora);
+                return new Date(b.fecha_hora) - new Date(a.fecha_hora); 
+            } else if (sortCriterion === "antiguo") {
+                return new Date(a.fecha_hora) - new Date(b.fecha_hora);
             } else if (sortCriterion === "popularidad") {
                 return b.popularidad - a.popularidad;
             } else if (sortCriterion === "relevancia") {
@@ -174,6 +159,27 @@ const MisProyectos = () => {
         }
     };
 
+    const handleBuscar = () => {
+        const filteredProyectos = proyectos.filter((proyecto) => {
+            if (searchTerm.trim() === "") {
+                return true;
+            }
+
+            const searchTerms = searchTerm.toLowerCase().split(" ").filter(term => term.trim() !== "");
+            return searchTerms.some((term) => {
+                return (
+                    proyecto.titulo.toLowerCase().includes(term) ||
+                    proyecto.autores.some((autor) => autor.toLowerCase().includes(term)) ||
+                    proyecto.tecnologias.some((tecnologia) => tecnologia.toLowerCase().includes(term)) ||
+                    proyecto.tipo.toLowerCase().includes(term) ||
+                    new Date(proyecto.fecha_hora).toISOString().split("T")[0].includes(term)
+                );
+            });
+        });
+
+        setProyectos(filteredProyectos); 
+    };
+
     return (
         <div className="mis-proyectos-box d-flex flex-column align-items-center">
             <div className="navegar-atras-buscador" onClick={handleGoBack}>
@@ -188,8 +194,13 @@ const MisProyectos = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleBuscar();
+                        }
+                    }}
                 />
-                <Button variant="primary" className="search-button-misProyectos">
+                <Button variant="primary" onClick={handleBuscar} className="search-button-misProyectos">
                     Buscar
                 </Button>
             </InputGroup>
@@ -215,8 +226,9 @@ const MisProyectos = () => {
                             key={proyecto.id}
                             proyecto={proyecto}
                             query={searchTerm}
+                            scope="global"
                             onVerDetalles={() => verDetalles(proyecto)}
-                            enviarSolicitud={enviarSolicitud} // Pasar la función enviarSolicitud a TarjetaProyecto
+                            enviarSolicitud={enviarSolicitud} 
                         />
                     ))
                 )}
@@ -248,7 +260,7 @@ const MisProyectos = () => {
                 handleClose={cerrarModal}
                 proyecto={proyectoSeleccionado}
                 enviarSolicitud={enviarSolicitud}
-                userId={userId} // Asegúrate de pasar el userId correctamente
+                userId={userId} 
             />
             )}
         </div>

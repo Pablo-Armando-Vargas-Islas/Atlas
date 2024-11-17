@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
+const API_URL = 'http://localhost:5000';
+
 const AlertasYNotificaciones = () => {
     const [alertas, setAlertas] = useState([]);
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
         const token = localStorage.getItem('token');
 
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_URL}/alertas`, {
+                const response = await fetch(`${API_URL}/api/metricas/alertas`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

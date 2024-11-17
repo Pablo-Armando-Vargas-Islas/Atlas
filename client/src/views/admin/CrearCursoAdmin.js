@@ -4,6 +4,8 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import '../../styles/CrearCursoAdmin.css';
 import { FaArrowLeft } from 'react-icons/fa';
 
+const API_URL = 'http://localhost:5000'; 
+
 const CrearCursoAdmin = () => {
     const [nombreCurso, setNombreCurso] = useState('');
     const [periodo, setPeriodo] = useState('');
@@ -15,7 +17,7 @@ const CrearCursoAdmin = () => {
     const [copied, setCopied] = useState(false);
     const navigate = useNavigate();
 
-    // Generar código de curso de 6 caracteres
+    // Generar código de curso de 6 caracteres para identificar los cursos.
     const generarCodigoCurso = () => {
         const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let codigo = '';
@@ -26,7 +28,7 @@ const CrearCursoAdmin = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     // Función para copiar el código al portapapeles
@@ -56,7 +58,7 @@ const CrearCursoAdmin = () => {
             const codigo = generarCodigoCurso();
             const body = { nombreCurso, periodo, fechaLimite, entregasLibres, codigoCurso: codigo };
 
-            const response = await fetch('http://localhost:5000/api/cursos/crearCurso', {
+            const response = await fetch(`${API_URL}/api/cursos/crearCurso`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,7 +79,6 @@ const CrearCursoAdmin = () => {
         }
     };
 
-    // Función del cierre del modal
     const handleCloseModal = () => {
         setShowModal(false);
         setNombreCurso('');
@@ -156,7 +157,7 @@ const CrearCursoAdmin = () => {
                 </Form>
             </div>
 
-            {/* Modal para mostrar el código del curso */}
+            {/* Modal de confirmación para mostrar el código del curso */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Código del Curso</Modal.Title>

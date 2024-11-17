@@ -77,6 +77,7 @@ const Navbar = () => {
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
                             <Link className="nav-link" to="/profesor/cursos" onClick={handleLinkClick}>Mis Cursos</Link>
                             <Link className="nav-link" to="/MisSolicitudes" onClick={handleLinkClick}>Mis Solicitudes</Link>
+                            <Link className="nav-link" to="/Perfil" onClick={handleLinkClick}>Mis Datos</Link>
                             <Link className="nav-link" to="/Buscador" onClick={handleLinkClick}>Buscador</Link>
                         </>
                     )}
@@ -87,6 +88,7 @@ const Navbar = () => {
                             <Link className="nav-link" to="/admin/dashboard" onClick={handleLinkClick}>Dashboard</Link>
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
                             <Link className="nav-link" to="/profesor/cursos" onClick={handleLinkClick}>Mis Cursos</Link>
+                            <Link className="nav-link" to="/Perfil" onClick={handleLinkClick}>Mi Datos</Link>
                             <Link className="nav-link" to="/Buscador" onClick={handleLinkClick}>Buscador</Link>
                         </>
                     )}
@@ -96,6 +98,7 @@ const Navbar = () => {
                             <Link className="nav-link" to="/SubirProyecto" onClick={handleLinkClick}>Subir Proyecto</Link>
                             <Link className="nav-link" to="/MisSolicitudes" onClick={handleLinkClick}>Mis Solicitudes</Link>
                             <Link className="nav-link" to="/alumno/mis-cursos" onClick={handleLinkClick}>Mis cursos</Link>
+                            <Link className="nav-link" to="/Perfil" onClick={handleLinkClick}>Mis Datos</Link>
                             <Link className="nav-link" to="/Buscador" onClick={handleLinkClick}>Buscador</Link>
                         </>
                     )}

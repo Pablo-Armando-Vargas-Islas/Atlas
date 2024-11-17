@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaEye} from 'react-icons/fa';
+import { FaFileCode } from 'react-icons/fa';
 import '../../styles/GestionCursosProfesor.css';
+
+const API_URL = 'http://localhost:5000';
 
 const GestionCursosAlumno = () => {
     const [cursos, setCursos] = useState([]);
@@ -12,11 +14,10 @@ const GestionCursosAlumno = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch para obtener los cursos donde el alumno ha subido proyectos
         const fetchCursos = async () => {
             try {
-                const token = localStorage.getItem('token'); // Usar token para autenticación
-                const response = await fetch('http://localhost:5000/api/cursos/alumno/cursos', {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/api/cursos/alumno/cursos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -83,6 +84,7 @@ const GestionCursosAlumno = () => {
                                     <th className="text-center">Periodo Escolar</th>
                                     <th className="text-center">Código del Curso</th>
                                     <th className="text-center">Estado</th>
+                                    <th className="text-center">Fecha de Cierre</th>
                                     <th className="text-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -100,6 +102,7 @@ const GestionCursosAlumno = () => {
                                             <td className="text-center">{curso.periodo}</td>
                                             <td className="text-center">{curso.codigo_curso}</td>
                                             <td className="text-center">{curso.estado === 'abierto' ? 'Abierto' : 'Cerrado'}</td>
+                                            <td className="text-center">{curso.fecha_fin ? curso.fecha_fin.split('T')[0] : 'N/A'}</td>
                                             <td className="text-center">
                                                 <OverlayTrigger placement="top" overlay={<Tooltip>Ver Proyectos</Tooltip>}>
                                                     <Button
@@ -107,7 +110,7 @@ const GestionCursosAlumno = () => {
                                                         className="p-0 ver-proyectos-btn align-middle"
                                                         onClick={() => navigate(`/alumno/curso/${curso.id}/proyectos`)}
                                                     >
-                                                        <FaEye />
+                                                        <FaFileCode />
                                                     </Button>
                                                 </OverlayTrigger>
                                             </td>

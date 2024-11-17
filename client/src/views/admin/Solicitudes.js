@@ -5,14 +5,18 @@ import { Modal, Button, Form} from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Spinner } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000';
+
 const Solicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
     const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showRechazoModal, setShowRechazoModal] = useState(false);
     const [motivoRechazo, setMotivoRechazo] = useState('');
-    const [loadingAccept, setLoadingAccept] = useState(false);
+    const [loadingAccept, setLoadingAccept] = useState(false); 
     const [loadingReject, setLoadingReject] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 15;
 
     const navigate = useNavigate();
 
@@ -20,7 +24,7 @@ const Solicitudes = () => {
         const fetchSolicitudes = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/solicitudes', {
+                const response = await fetch(`${API_URL}/api/solicitudes`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -41,7 +45,7 @@ const Solicitudes = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handleRechazoClose = () => {
@@ -54,11 +58,42 @@ const Solicitudes = () => {
         setShowModal(true);
     };
 
+    // Filtrar solicitudes pendientes
+    const solicitudesPendientes = solicitudes.filter(
+        (solicitud) => solicitud.status_solicitud === 'pendiente'
+    );
+
+    const totalPages = Math.ceil(solicitudesPendientes.length / itemsPerPage);
+    const currentSolicitudes = solicitudesPendientes.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const renderPagination = () => (
+        <div className="paginacion"> 
+            {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                    key={index}
+                    className={`boton-pagina ${currentPage === index + 1 ? 'activo' : ''}`}
+                    onClick={() => handlePageChange(index + 1)}
+                >
+                    {index + 1}
+                </button>
+            ))}
+        </div>
+    ); 
+
     const aceptarSolicitud = async (solicitudId) => {
         setLoadingAccept(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/solicitud/aceptar/${solicitudId}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/solicitud/aceptar/${solicitudId}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -86,7 +121,7 @@ const Solicitudes = () => {
         setLoadingReject(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/solicitud/rechazar/${solicitudSeleccionada.id}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/solicitud/rechazar/${solicitudSeleccionada.id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -136,9 +171,7 @@ const Solicitudes = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {solicitudes
-                                .filter(solicitud => solicitud.status_solicitud === 'pendiente') // Filtrar solo las pendientes
-                                .map((solicitud) => (
+                            {currentSolicitudes.map((solicitud) => (
                                     <tr key={solicitud.id}>
                                         <td>{solicitud.titulo}</td>
                                         <td>{solicitud.nombre}</td>
@@ -156,7 +189,11 @@ const Solicitudes = () => {
                         </tbody>
                     </table>
                 )}
+                <div>
+                {renderPagination()}
+                </div>
             </div>
+
 
             {/* Modal para ver la solicitud */}
             <Modal show={showModal} onHide={handleClose}>
@@ -173,31 +210,30 @@ const Solicitudes = () => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                <Button
-                    className='aceptar-solicitud-btn'
-                    onClick={() => aceptarSolicitud(solicitudSeleccionada.id)}
-                    disabled={loadingAccept} // Desactiva el botón cuando está cargando
-                >
-                    {loadingAccept ? (
-                        <>
-                            Aceptando {' '}
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                            />
-                        </>
-                    ) : (
-                        'Aceptar'
-                    )}
-                </Button>
                     <Button
                         className='rechazar-solicitud-btn'
                         onClick={handleRechazoModal}
                     >
                         Rechazar
+                    </Button>
+                    <Button
+                        className='aceptar-solicitud-btn'
+                        onClick={() => aceptarSolicitud(solicitudSeleccionada.id)}
+                        disabled={loadingAccept} // Desactiva el botón cuando está cargando
+                    >
+                        {loadingAccept ? (
+                            <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                            </>
+                        ) : (
+                            'Aceptar'
+                        )}
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -228,7 +264,6 @@ const Solicitudes = () => {
                 >
                     {loadingReject ? (
                         <>
-                            Confirmando{' '}
                             <Spinner
                                 as="span"
                                 animation="border"

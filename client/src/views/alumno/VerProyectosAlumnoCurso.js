@@ -5,6 +5,8 @@ import ProyectoModal from '../../utils/ProyectoModal';
 import { FaArrowLeft, FaList } from 'react-icons/fa';
 import '../../styles/GestionCursosProfesor.css';
 
+const API_URL = 'http://localhost:5000';
+
 const VerProyectosAlumnoCurso = () => {
     const { cursoId } = useParams();
     const [proyectos, setProyectos] = useState([]);
@@ -17,14 +19,12 @@ const VerProyectosAlumnoCurso = () => {
         const fetchProyectos = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:5000/api/cursos/curso/${cursoId}/proyectos/alumno`, {
+                const response = await fetch(`${API_URL}/api/cursos/curso/${cursoId}/proyectos/alumno`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
                 const data = await response.json();
-                console.log("Datos del curso obtenidos:", data.curso); // Depuración
-                console.log("Proyectos obtenidos:", data.proyectos);   // Depuración
                 setProyectos(data.proyectos);
                 setCurso(data.curso);
             } catch (error) {
@@ -37,17 +37,15 @@ const VerProyectosAlumnoCurso = () => {
     
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1);
     };
 
-    // Función para abrir el modal con los detalles del proyecto seleccionado
     const verDetalles = (proyecto) => {
         const proyectoConCurso = { ...proyecto, nombre_curso: curso.nombre_curso };
         setProyectoSeleccionado(proyectoConCurso);
         setShowModal(true);
     };
 
-    // Función para cerrar el modal
     const cerrarModal = () => {
         setShowModal(false);
         setProyectoSeleccionado(null);
@@ -61,12 +59,10 @@ const VerProyectosAlumnoCurso = () => {
         return (
             <div>
                 <h2>{curso.nombre_curso}</h2>
-                {/* Renderizar los proyectos aquí */}
             </div>
         );
     }    
 
-    // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
         try {
             const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -76,7 +72,7 @@ const VerProyectosAlumnoCurso = () => {
             }
 
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+            const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -99,11 +95,10 @@ const VerProyectosAlumnoCurso = () => {
         }
     };
 
-    // Función para verificar si ya existe una solicitud pendiente antes de enviar una nueva solicitud
     const verificarSolicitudPendiente = async (proyectoId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

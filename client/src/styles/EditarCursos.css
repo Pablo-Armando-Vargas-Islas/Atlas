@@ -73,7 +73,7 @@
 
 .icono-accion-editar-curso{
     cursor: pointer;
-    color: #2a76c8; /* Color azul para editar */
+    color: #2a76c8;
 }
 
 .buscador-y-boton {
@@ -102,19 +102,12 @@
     background-color: #449D44;
 }
 
-
-
-
-
-
-
-
 .paginacion {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
-    gap: 10px; /* Más espacio entre los botones */
+    gap: 10px; 
 }
 
 .boton-pagina {
@@ -124,14 +117,14 @@
     padding: 5px 13px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, color 0.3s;
-    border-radius: 5px; /* Bordes redondeados para un mejor aspecto */
+    border-radius: 5px; 
 }
 
 .boton-pagina:hover {
     background-color: #28537ea2;
     border: 1px solid #1f3e5e;
     color: #ffffff;
-    transform: translateY(-2px); /* Efecto de desplazamiento hacia arriba al pasar el mouse */
+    transform: translateY(-2px); 
 }
 
 .boton-pagina.activo {
@@ -139,7 +132,7 @@
     color: #ffffff;
     border-color: #28537E;
     cursor: default;
-    font-weight: bold; /* Resaltar el botón activo */
+    font-weight: bold;
 }
 
 .navegar-atras {

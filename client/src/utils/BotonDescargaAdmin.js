@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Spinner } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000'; 
+
 const BotonDescargaAdmin = ({ id }) => {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -15,17 +17,17 @@ const BotonDescargaAdmin = ({ id }) => {
                 return;
             }
 
-            const response = await axios.get(`http://localhost:5000/api/admin/descargar/${id}`, {
+            const response = await axios.get(`${API_URL}/api/admin/descargar/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
-                responseType: 'blob' // Importante para manejar archivos binarios
+                responseType: 'blob' 
             });
 
             // Crear un enlace temporal para descargar el archivo con el nombre correcto
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const contentDisposition = response.headers['content-disposition'];
-            let fileName = 'proyecto.zip'; // Valor predeterminado
+            let fileName = 'proyecto.zip'; 
 
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
@@ -50,7 +52,7 @@ const BotonDescargaAdmin = ({ id }) => {
 
     return (
         <div>
-            <button onClick={handleDownload} className="btn btn-primary" disabled={isLoading}>
+            <button onClick={handleDownload} className="btn btn-solicitar-acceso" disabled={isLoading}>
                 {isLoading ? (
                     <>
                         <Spinner

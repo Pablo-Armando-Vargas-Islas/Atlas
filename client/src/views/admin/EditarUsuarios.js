@@ -4,6 +4,8 @@ import "../../styles/EditarUsuarios.css";
 import { FaEdit, FaCheck, FaTimes, FaUserSlash, FaArrowLeft, FaPlus } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000';
+
 const AdminUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBusqueda] = useState("");
@@ -19,7 +21,7 @@ const AdminUsuarios = () => {
 
     const fetchUsuarios = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/admin/usuarios", {
+            const response = await fetch(`${API_URL}/api/admin/usuarios`, {
                 headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
             });
             const data = await response.json();
@@ -34,7 +36,7 @@ const AdminUsuarios = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handleSearchChange = (e) => {
@@ -57,7 +59,6 @@ const AdminUsuarios = () => {
         setEditingUser((prevUser) => {
             let updatedUser = { ...prevUser, rol_id: newRoleId };
 
-            // Lógica para transferir cédula/código según el nuevo rol
             if (prevUser.rol_id !== newRoleId) {
                 if (newRoleId === 3) {
                     // Cambió a Alumno - mover cédula a código de estudiante
@@ -76,7 +77,7 @@ const AdminUsuarios = () => {
 
     const handleSave = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/admin/usuarios/${editingUser.id}`, {
+            const response = await fetch(`${API_URL}/api/admin/usuarios/${editingUser.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -105,17 +106,14 @@ const AdminUsuarios = () => {
     const handleEdit = (index) => {
         setEditIndex(index);
     
-        // Clonar el usuario y asegurarse de que los valores de rol y cédula/código se establezcan correctamente
         const selectedUser = { ...usuarios[index] };
         
         if (selectedUser.rol_id === 3) {
-            // Si el rol es de Alumno, asegúrate de que `codigo_estudiante` tenga un valor
             selectedUser.codigo_estudiante = selectedUser.codigo_estudiante || "";
-            selectedUser.cedula = ""; // Asegúrate de que `cedula` esté vacío
+            selectedUser.cedula = ""; 
         } else if (selectedUser.rol_id === 1 || selectedUser.rol_id === 2) {
-            // Si el rol es de Administrador o Docente, asegúrate de que `cedula` tenga un valor
             selectedUser.cedula = selectedUser.cedula || "";
-            selectedUser.codigo_estudiante = ""; // Asegúrate de que `codigo_estudiante` esté vacío
+            selectedUser.codigo_estudiante = ""; 
         }
     
         setEditingUser(selectedUser);
@@ -124,7 +122,7 @@ const AdminUsuarios = () => {
 
     const handleInactivate = async (userId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/admin/usuarios/${userId}/inactivar`, {
+            const response = await fetch(`${API_URL}/api/admin/usuarios/${userId}/inactivar`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -132,7 +130,7 @@ const AdminUsuarios = () => {
             });
 
             if (response.ok) {
-                alert("Usuario inactivado correctamente");
+                alert("Se dió de baja al usuario correctamente");
                 fetchUsuarios();
             } else {
                 const data = await response.json();
@@ -155,7 +153,7 @@ const AdminUsuarios = () => {
         return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
     };
 
-    // Filtrar usuarios según la búsqueda
+    // Filtrar usuarios según su búsqueda
     const filteredUsuarios = usuarios.filter(usuario =>
         usuario.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
         usuario.correo_institucional.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -187,7 +185,7 @@ const AdminUsuarios = () => {
                         className="buscador-usuarios"
                     />
                     <OverlayTrigger
-                        placement="top" // Ubicación del tooltip
+                        placement="top" 
                         overlay={<Tooltip>Registrar nuevo usuario</Tooltip>}
                     >
                         <button
@@ -265,32 +263,32 @@ const AdminUsuarios = () => {
                                             <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.nombre_rol) }}></td>
                                             <td dangerouslySetInnerHTML={{ __html: highlightText(usuario.cedula || usuario.codigo_estudiante) }}></td>
                                             <td>
-    <OverlayTrigger
-        placement="top" // Ubicación del tooltip
-        overlay={<Tooltip>Editar usuario</Tooltip>} // Texto del tooltip para FaEdit
-    >
-        <span>
-            <FaEdit
-                onClick={() => handleEdit(index + indexOfFirstUser)}
-                className="icono-accion-editar"
-                style={{ cursor: "pointer" }}
-            />
-        </span>
-    </OverlayTrigger>
-    
-    <OverlayTrigger
-        placement="top" // Ubicación del tooltip
-        overlay={<Tooltip>{usuario.status_usuario !== 'inactivo' ? 'Baja de usuario' : 'Usuario inactivo'}</Tooltip>}
-    >
-        <span>
-            <FaUserSlash
-                onClick={usuario.status_usuario !== 'inactivo' ? () => handleInactivate(usuario.id) : null}
-                className={`icono-accion-inactivar ${usuario.status_usuario === 'inactivo' ? 'icono-desactivado' : ''}`}
-                style={{ cursor: usuario.status_usuario === 'inactivo' ? 'not-allowed' : 'pointer' }}
-            />
-        </span>
-    </OverlayTrigger>
-</td>
+                                                <OverlayTrigger
+                                                    placement="top" 
+                                                    overlay={<Tooltip>Editar usuario</Tooltip>}
+                                                >
+                                                    <span>
+                                                        <FaEdit
+                                                            onClick={() => handleEdit(index + indexOfFirstUser)}
+                                                            className="icono-accion-editar"
+                                                            style={{ cursor: "pointer" }}
+                                                        />
+                                                    </span>
+                                                </OverlayTrigger>
+                                                
+                                                <OverlayTrigger
+                                                    placement="top" 
+                                                    overlay={<Tooltip>{usuario.status_usuario !== 'inactivo' ? 'Baja de usuario' : 'Usuario inactivo'}</Tooltip>}
+                                                >
+                                                    <span>
+                                                        <FaUserSlash
+                                                            onClick={usuario.status_usuario !== 'inactivo' ? () => handleInactivate(usuario.id) : null}
+                                                            className={`icono-accion-inactivar ${usuario.status_usuario === 'inactivo' ? 'icono-desactivado' : ''}`}
+                                                            style={{ cursor: usuario.status_usuario === 'inactivo' ? 'not-allowed' : 'pointer' }}
+                                                        />
+                                                    </span>
+                                                </OverlayTrigger>
+                                            </td>
                                         </>
                                     )}
                                 </tr>

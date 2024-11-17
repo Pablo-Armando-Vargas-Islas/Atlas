@@ -5,6 +5,8 @@ import ProyectoModal from '../../../utils/ProyectoModal';
 import { FaArrowLeft, FaList } from 'react-icons/fa';
 import '../../../styles/GestionCursosProfesor.css';
 
+const API_URL = 'http://localhost:5000';
+
 const VerProyectosCurso = () => {
     const { cursoId } = useParams();
     const [proyectos, setProyectos] = useState([]);
@@ -17,7 +19,7 @@ const VerProyectosCurso = () => {
         const fetchProyectos = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:5000/api/cursos/curso/${cursoId}/proyectos`, {
+                const response = await fetch(`${API_URL}/api/cursos/curso/${cursoId}/proyectos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -34,17 +36,15 @@ const VerProyectosCurso = () => {
     }, [cursoId]);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
-    // Función para abrir el modal con los detalles del proyecto seleccionado
     const verDetalles = (proyecto) => {
         const proyectoConCurso = { ...proyecto, nombre_curso: curso.nombre_curso };
         setProyectoSeleccionado(proyectoConCurso);
         setShowModal(true);
     };
 
-    // Función para cerrar el modal
     const cerrarModal = () => {
         setShowModal(false);
         setProyectoSeleccionado(null);
@@ -60,7 +60,7 @@ const VerProyectosCurso = () => {
             }
 
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+            const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -87,7 +87,7 @@ const VerProyectosCurso = () => {
     const verificarSolicitudPendiente = async (proyectoId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -155,7 +155,7 @@ const VerProyectosCurso = () => {
                     show={showModal}
                     handleClose={cerrarModal}
                     proyecto={proyectoSeleccionado}
-                    enviarSolicitud={enviarSolicitud} // Pasando enviarSolicitud como prop
+                    enviarSolicitud={enviarSolicitud} 
                 />
             )}
         </div>

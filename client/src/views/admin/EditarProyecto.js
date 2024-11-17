@@ -6,6 +6,8 @@ import { Spinner } from 'react-bootstrap';
 import JSZip from "jszip";
 import "../../styles/SubirProyecto.css";
 
+const API_URL = 'http://localhost:5000';
+
 const EditarProyecto = () => {
     const { id: proyectoId } = useParams();
     const [userId, setUserId] = useState(null);
@@ -68,7 +70,7 @@ const EditarProyecto = () => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    const response = await fetch(`http://localhost:5000/api/proyectos/proyecto/${proyectoId}`, {
+                    const response = await fetch(`${API_URL}/api/proyectos/proyecto/${proyectoId}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -107,7 +109,7 @@ const EditarProyecto = () => {
     useEffect(() => {
         const fetchTecnologias = async () => {
           try {
-            const response = await fetch("http://localhost:5000/api/proyectos/tecnologias");
+            const response = await fetch(`${API_URL}/api/proyectos/tecnologias`);
             const data = await response.json();
             setTecnologias(data);
           } catch (error) {
@@ -117,7 +119,7 @@ const EditarProyecto = () => {
       
         const fetchCategorias = async () => {
           try {
-            const response = await fetch("http://localhost:5000/api/proyectos/categorias");
+            const response = await fetch(`${API_URL}/api/proyectos/categorias`);
             const data = await response.json();
             setCategorias(data);
           } catch (error) {
@@ -247,10 +249,9 @@ const EditarProyecto = () => {
         // Validar los campos antes de proceder
         if (!validateFields()) {
             setLoading(false);
-            return; // Si la validación falla, no procedemos
+            return; 
         }
     
-        // Obtener el token JWT almacenado en localStorage
         const token = localStorage.getItem('token');
     
         if (!token) {
@@ -279,7 +280,7 @@ const EditarProyecto = () => {
                 return;
             }
     
-            // Validar contenido del archivo .zip usando jszip
+            // Validar contenido del archivo .zip
             const zip = new JSZip();
             try {
                 const zipData = await zip.loadAsync(archivoComprimido);
@@ -296,7 +297,7 @@ const EditarProyecto = () => {
     
                 let containsForbiddenFile = false;
                 
-                // Revisar si alguna ruta empieza con una carpeta prohibida
+                // Revisar si alguna ruta tiene una carpeta prohibida
                 zipData.forEach((relativePath) => {
                     forbiddenFolders.forEach((folder) => {
                         if (relativePath.includes(`/${folder}/`) || relativePath.startsWith(`${folder}/`)) {
@@ -304,7 +305,6 @@ const EditarProyecto = () => {
                         }
                     });
     
-                    // Verificar extensiones prohibidas
                     forbiddenExtensions.forEach((ext) => {
                         if (relativePath.endsWith(ext)) {
                             containsForbiddenFile = true;
@@ -318,7 +318,6 @@ const EditarProyecto = () => {
                     return;
                 }
     
-                // Mostrar el modal de confirmación si todas las validaciones pasan
                 setShowModal(true);
             } catch (error) {
                 setErrorMessage("Error al leer el archivo .zip: " + error.message);
@@ -351,16 +350,16 @@ const EditarProyecto = () => {
             formData.append("categorias", JSON.stringify(validCategorias));
             formData.append("autores", JSON.stringify(autores));
     
-            // Enviar la solicitud con el token en el encabezado Authorization
-            const response = await fetch(`http://localhost:5000/api/proyectos/proyecto/actualizar/${proyectoId}`, {
+            const response = await fetch(`${API_URL}/api/proyectos/proyecto/actualizar/${proyectoId}`, {
                 method: "PUT",
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Agregar el token aquí
+                    'Authorization': `Bearer ${token}`, 
                 },
                 body: formData
             });
     
             if (response.ok) {
+                setLoading(false);
                 alert("Proyecto actualizado correctamente");
                 navigate("/Buscador");
             } else {
@@ -372,7 +371,7 @@ const EditarProyecto = () => {
             console.error("Error en la solicitud:", err);
             setErrorMessage("Error en la solicitud: " + err.message);
         } finally {
-            setLoading(false); // Desactiva el spinner al finalizar
+            setLoading(false); 
         }
     };        
 
@@ -552,7 +551,7 @@ const EditarProyecto = () => {
                                     />
                                 </>
                             ) : (
-                                'Registrar'
+                                'Guardar'
                             )}
                         </button>
                     </div>

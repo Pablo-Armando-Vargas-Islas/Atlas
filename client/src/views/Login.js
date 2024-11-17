@@ -18,7 +18,7 @@ const Login = () => {
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
-        setAlert({ type: "", message: "" }); // Resetear alertas previas
+        setAlert({ type: "", message: "" });
 
         try {
             const body = { usuario, contraseña };
@@ -28,7 +28,6 @@ const Login = () => {
                 const token = response.token;
                 localStorage.setItem("token", token);
 
-                // Decodificar el token
                 const decoded = jwtDecode(token);
 
                 // Verificar si el usuario debe cambiar la contraseña

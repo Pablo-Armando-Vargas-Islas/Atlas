@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/EditarUsuarios.css';  // Usamos los mismos estilos
+import '../../styles/EditarUsuarios.css';  
 import { FaEdit, FaCheck, FaTimes, FaTrash, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+
+const API_URL = 'http://localhost:5000';
 
 const GestionTecnologias = () => {
     const [tecnologias, setTecnologias] = useState([]);
@@ -13,16 +15,15 @@ const GestionTecnologias = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Obtener tecnologías desde la base de datos
         fetchTecnologias();
     }, []);
 
     const fetchTecnologias = async () => {
         try {
-            const token = localStorage.getItem('token'); // Obtener el token almacenado
-            const response = await fetch('http://localhost:5000/api/admin/tecnologias', {
+            const token = localStorage.getItem('token'); 
+            const response = await fetch(`${API_URL}/api/admin/tecnologias`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Pasar el token en el encabezado
+                    'Authorization': `Bearer ${token}`, 
                 },
             });
             const data = await response.json();
@@ -36,11 +37,11 @@ const GestionTecnologias = () => {
         if (nuevaTecnologia.trim()) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/admin/add/tecnologias', {
+                const response = await fetch(`${API_URL}/api/admin/add/tecnologias`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`, // Pasar el token en el encabezado
+                        'Authorization': `Bearer ${token}`, 
                     },
                     body: JSON.stringify({ nombre: nuevaTecnologia }),
                 });
@@ -49,10 +50,10 @@ const GestionTecnologias = () => {
     
                 if (response.ok) {
                     setTecnologias([...tecnologias, data]);
-                    setNuevaTecnologia("");  // Limpiar el campo de texto
-                    setError("");  // Limpiar cualquier error previo
+                    setNuevaTecnologia("");  
+                    setError(""); 
                 } else {
-                    setError(data.error);  // Guardar el error en el estado
+                    setError(data.error); 
                 }
     
             } catch (error) {
@@ -65,11 +66,11 @@ const GestionTecnologias = () => {
     const handleSave = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/admin/edit/tecnologias/${id}`, {
+            const response = await fetch(`${API_URL}/api/admin/edit/tecnologias/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Pasar el token en el encabezado
+                    'Authorization': `Bearer ${token}`, 
                 },
                 body: JSON.stringify({ nombre: nombreEditar }),
             });
@@ -77,12 +78,10 @@ const GestionTecnologias = () => {
             const data = await response.json();
     
             if (!response.ok) {
-                // Si la respuesta no es exitosa, mostramos el error
-                alert(data.error);  // Mostrar el mensaje de error de la respuesta del servidor
+                alert(data.error); 
                 return;
             }
     
-            // Si la actualización fue exitosa, actualizamos el estado
             setTecnologias(tecnologias.map(tec => tec.id === id ? data : tec));
             setEditIndex(null);
     
@@ -96,7 +95,7 @@ const GestionTecnologias = () => {
     const handleDelete = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/admin/delete/tecnologias/${id}`, {
+            const response = await fetch(`${API_URL}/api/admin/delete/tecnologias/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -106,7 +105,6 @@ const GestionTecnologias = () => {
             const data = await response.json();
     
             if (!response.ok) {
-                // Si hay un error en la respuesta, mostramos la alerta con el mensaje de error
                 if (data.error) {
                     alert(data.error);
                 } else {
@@ -115,7 +113,6 @@ const GestionTecnologias = () => {
                 return;
             }
     
-            // Actualizar el estado solo si la eliminación fue exitosa
             setTecnologias(tecnologias.filter(tec => tec.id !== id));
         } catch (error) {
             console.error("Error al eliminar tecnología:", error);

@@ -35,7 +35,7 @@ h2 {
 }
 
 .login-btn-primary {
-    background-color: #91cb1b; /* Verde de la universidad */
+    background-color: #91cb1b; 
     color: #ffffff;
     border: none;
     transition: background-color 0.3s, transform 0.2s;
@@ -58,13 +58,13 @@ h2 {
 }
 
 .login-form-control {
-    border: 0.5px solid #0855a25c; /* Borde azul predominante */
+    border: 0.5px solid #0855a25c; 
     padding: 10px;
     font-size: 1rem;
 }
 
 .login-form-control:focus {
-    border-color: #1D84F3; /* Azul brillante para indicar el enfoque */
+    border-color: #1D84F3;
     box-shadow: 0 0 5px rgba(29, 132, 243, 0.5);
 }
 
@@ -103,17 +103,14 @@ h2 {
     margin-bottom: 20px; 
 }
 
-
-/* Estilos para el botón en estado de carga */
 .loading-button {
-    background-color: #a5d6a7!important; /* Color de fondo diferente */
-    cursor: not-allowed; /* Cambiar el cursor a "no permitido" */
-    color: #ffffff; /* Color del texto */
-    opacity: 0.8; /* Transparencia para dar un efecto visual */
-    border-color: #a5d6a7; /* Cambia el color del borde si quieres que coincida */
+    background-color: #a5d6a7!important; 
+    cursor: not-allowed; 
+    color: #ffffff; 
+    opacity: 0.8; 
+    border-color: #a5d6a7; 
 }
 
-/* Opcional: animación de brillo */
 .loading-button {
     animation: pulsate 1.5s infinite;
 }

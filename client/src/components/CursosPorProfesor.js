@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/DashboardAdmin.css';
 
+const API_URL = 'http://localhost:5000';
+
 const CursosPorProfesor = () => {
     const [profesores, setProfesores] = useState([]);
-    const [cara, setCara] = useState('mas'); // Estado para controlar la cara de la tarjeta
-    const API_URL = 'http://localhost:5000/api/metricas';
+    const [cara, setCara] = useState('mas');
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
 
@@ -13,7 +14,7 @@ const CursosPorProfesor = () => {
         const fetchProfesores = async () => {
             try {
                 const endpoint = cara === 'mas' ? '/cursos/profesores/mas' : '/cursos/profesores/menos';
-                const response = await fetch(`${API_URL}${endpoint}`, {
+                const response = await fetch(`${API_URL}/api/metricas${endpoint}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -31,14 +32,12 @@ const CursosPorProfesor = () => {
         fetchProfesores();
     }, [cara]);
 
-    // Manejar el clic en la tarjeta para redirigir a la vista correspondiente
     const handleCardClick = () => {
         navigate('/admin/profesor-mas-cursos');
     };
 
-    // Cambiar entre "más cursos" y "menos cursos"
     const toggleCara = (e) => {
-        e.stopPropagation(); // Evitar que el clic en el botón propague el evento al contenedor
+        e.stopPropagation();
         setCara((prevCara) => (prevCara === 'mas' ? 'menos' : 'mas'));
     };
 

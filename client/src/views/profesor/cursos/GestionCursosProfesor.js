@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table, OverlayTrigger, Tooltip, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaClipboard, FaEye, FaLock, FaUnlock, FaPlusCircle } from 'react-icons/fa';
+import { FaClipboard, FaFileCode, FaLock, FaUnlock, FaPlusCircle } from 'react-icons/fa';
 import '../../../styles/GestionCursosProfesor.css';
+
+const API_URL = 'http://localhost:5000';
 
 const GestionCursosProfesor = () => {
     const [cursos, setCursos] = useState([]);
@@ -15,11 +17,10 @@ const GestionCursosProfesor = () => {
     const navigate = useNavigate();
 
     useEffect(() => { 
-        // Fetch para obtener los cursos activos del profesor
         const fetchCursos = async () => {
             try {
-                const token = localStorage.getItem('token'); // Usar token para autenticación
-                const response = await fetch('http://localhost:5000/api/cursos/cursos', {
+                const token = localStorage.getItem('token'); 
+                const response = await fetch(`${API_URL}/api/cursos/cursos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -27,7 +28,6 @@ const GestionCursosProfesor = () => {
                 const data = await response.json();
                 setCursos(data);
 
-                // Inicializar el texto del tooltip con "Copiar Código" para cada curso
                 const initialTooltipText = {};
                 data.forEach((curso) => {
                     initialTooltipText[curso.id] = 'Copiar Código';
@@ -43,18 +43,15 @@ const GestionCursosProfesor = () => {
         fetchCursos();
     }, []);
 
-     // Función para copiar el código del curso al portapapeles
      const copiarCodigo = (curso) => {
         const mensaje = `Hola este es el código del curso de *${curso.nombre_curso}*:\n${curso.codigo_curso}`;
         navigator.clipboard.writeText(mensaje);
 
-        // Actualizar el texto del Tooltip a "Copiado"
         setTooltipText((prevState) => ({
             ...prevState,
             [curso.id]: 'Copiado!'
         }));
 
-        // Volver a cambiar el texto del Tooltip a "Copiar Código" después de 2 segundos
         setTimeout(() => {
             setTooltipText((prevState) => ({
                 ...prevState,
@@ -63,19 +60,16 @@ const GestionCursosProfesor = () => {
         }, 1500);
     };
 
-    // Función para manejar la creación de un nuevo curso
     const irACrearCurso = () => {
         navigate('/profesor/crearCurso');
     };
 
-    // Función para manejar la apertura del modal de confirmación de acción
     const abrirModalAccionCurso = (cursoId, accion) => {
         setCursoIdModificar(cursoId);
         setAccion(accion);
         setMostrarModal(true);
     };
 
-    // Función para manejar el cierre del modal
     const cerrarModal = () => {
         setMostrarModal(false);
         setCursoIdModificar(null);
@@ -84,7 +78,6 @@ const GestionCursosProfesor = () => {
         setFechaInvalida(false);
     };
 
-    // Función para modificar el estado de un curso (abrir o cerrar)
     const modificarEstadoCurso = async () => {
 
         if (accion === 'abrir' && !nuevaFechaLimite) {
@@ -98,7 +91,7 @@ const GestionCursosProfesor = () => {
                 const endpoint = accion === 'cerrar' ? 'cerrarCurso' : 'abrirCurso';
                 const body = accion === 'abrir' ? JSON.stringify({ nuevaFechaLimite }) : null;
 
-                const response = await fetch(`http://localhost:5000/api/cursos/${endpoint}/${cursoIdModificar}`, {
+                const response = await fetch(`${API_URL}/api/cursos/${endpoint}/${cursoIdModificar}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -107,7 +100,6 @@ const GestionCursosProfesor = () => {
                     body: body,
                 });
                 if (response.ok) {
-                    // Actualizar el estado del curso según la acción realizada
                     setCursos(cursos.map(curso =>
                         curso.id === cursoIdModificar
                             ? { 
@@ -128,7 +120,6 @@ const GestionCursosProfesor = () => {
         }
     };
 
-    // Función para manejar el cambio de fecha límite y validar que no sea anterior a hoy
     const handleFechaLimiteChange = (e) => {
         const fechaSeleccionada = e.target.value;
         const hoy = new Date().toISOString().split('T')[0];
@@ -198,7 +189,7 @@ const GestionCursosProfesor = () => {
                                                 className="p-0 ver-proyectos-btn align-middle"
                                                 onClick={() => navigate(`/profesor/curso/${curso.id}/proyectos`)}
                                             >
-                                                <FaEye />
+                                                <FaFileCode />
                                             </Button>
                                         </OverlayTrigger>{' '}
                                         <OverlayTrigger placement="top" overlay={<Tooltip>{tooltipText[curso.id]}</Tooltip>}>

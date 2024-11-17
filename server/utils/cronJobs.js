@@ -67,7 +67,7 @@ cron.schedule('0 2 1 * *', async () => {
             `UPDATE usuarios 
              SET inactividad = TRUE 
              WHERE status_usuario = 'activo' 
-             AND (ultima_actividad IS NULL OR ultima_actividad < NOW() - INTERVAL '5 days')`
+             AND (ultima_actividad IS NULL OR ultima_actividad < NOW() - INTERVAL '3 years')`
         );
 
         console.log(`Usuarios inactivos: ${resultInactividad.rowCount}`);
@@ -76,7 +76,7 @@ cron.schedule('0 2 1 * *', async () => {
     }
 });
 
-// Tarea diaria a las 10:10 AM para marcar usuarios inactivos por más de 5 días
+// Tarea diaria de prueba a las 10:16 AM para marcar usuarios inactivos por más de 5 días
 cron.schedule('16 10 * * *', async () => {
     try {
         console.log("Revisando usuarios con inactividad prolongada...");

@@ -11,7 +11,6 @@ import UsuariosInactivos from '../../components/UsuariosInactivos';
 import ProyectosMasSolicitados from '../../components/ProyectosMasSolicitados';
 import CursosPorProfesor from '../../components/CursosPorProfesor';
 import ProyectosPorCurso from '../../components/ProyectosPorCurso';
-import AlertasYNotificaciones from '../../components/AlertasYNotificaciones';
 
 const DashboardAdministrador = () => {
     return (
@@ -29,9 +28,9 @@ const DashboardAdministrador = () => {
                     <ProyectosMasSolicitados />
                     <CursosPorProfesor />
                     <ProyectosPorCurso />
-                    {/* <AlertasYNotificaciones /> */}
                 </div>
                 <div className="admin-graficas-container">
+                    {/* Gráficas */}
                     <EstadoSolicitudes />
                     <ActividadReciente />
                 </div>

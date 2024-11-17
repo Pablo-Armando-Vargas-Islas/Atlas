@@ -5,20 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/GestionCursosProfesor.css';
 import '../../styles/EditarUsuarios.css';
 
+const API_URL = 'http://localhost:5000';
+
 const CursosProyectos = () => {
     const [cursos, setCursos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [cara, setCara] = useState('mas'); // Estado para controlar la cara de la tabla
+    const [cara, setCara] = useState('mas'); 
     const cursosPorPagina = 10;
     const navigate = useNavigate();
-    const API_URL = 'http://localhost:5000/api/metricas';
     const token = localStorage.getItem('token');
 
     useEffect(() => {
         const fetchCursos = async () => {
             try {
                 const endpoint = cara === 'mas' ? '/cursos/mas-proyectos' : '/cursos/menos-proyectos';
-                const response = await fetch(`${API_URL}${endpoint}`, {
+                const response = await fetch(`${API_URL}/api/metricas${endpoint}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -37,7 +38,7 @@ const CursosProyectos = () => {
     }, [cara]);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     // Calcular los cursos a mostrar en la página actual
@@ -45,18 +46,16 @@ const CursosProyectos = () => {
     const indexOfFirstCurso = indexOfLastCurso - cursosPorPagina;
     const currentCursos = cursos.slice(indexOfFirstCurso, indexOfLastCurso);
 
-    // Cambiar de página
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
 
-    // Calcular el número total de páginas
     const totalPages = Math.ceil(cursos.length / cursosPorPagina);
 
     // Cambiar entre "más proyectos" y "menos proyectos"
     const toggleCara = () => {
         setCara((prevCara) => (prevCara === 'mas' ? 'menos' : 'mas'));
-        setCurrentPage(1); // Reiniciar a la primera página al cambiar de cara
+        setCurrentPage(1); 
     };
 
     return (

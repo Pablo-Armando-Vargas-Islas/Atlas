@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorTitulo.css';
 
+const API_URL = 'http://localhost:5000';
+
 const NavegarPorTitulo = () => {
   const [proyectos, setProyectos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,7 +20,6 @@ const NavegarPorTitulo = () => {
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
-    // Fetch inicial de todos los proyectos
     const fetchTodosLosProyectos = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -27,7 +28,7 @@ const NavegarPorTitulo = () => {
       }
   
       try {
-        const response = await fetch('http://localhost:5000/api/proyectos/todos', {
+        const response = await fetch(`${API_URL}/api/proyectos/todos`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -51,43 +52,41 @@ const NavegarPorTitulo = () => {
   }, []);
 
   const handleGoBack = () => {
-    navigate(-1); // Regresar a la vista anterior
+    navigate(-1); 
   };
 
-  // Manejar la búsqueda
   const handleBuscar = async () => {
     if (!searchTerm) {
       setFilteredProyectos(proyectos);
       return;
     }
-
+  
     const token = localStorage.getItem('token');
     if (!token) {
       console.error("No se encontró el token de autenticación.");
       return;
     }
-
+  
     try {
-      const response = await fetch(`http://localhost:5000/api/proyectos/titulo?query=${searchTerm}`, {
+      const response = await fetch(`${API_URL}/api/proyectos/titulo?query=${encodeURIComponent(searchTerm)}&orden=${orden}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
-
+  
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
-
+  
       const data = await response.json();
-      setFilteredProyectos(data);
+      setFilteredProyectos(data); 
     } catch (error) {
-      console.error("Error al obtener proyectos:", error);
+      console.error("Error al realizar la búsqueda:", error);
     }
-  };
+  };  
 
-  // Función para enviar la solicitud de acceso
   const enviarSolicitud = async (proyectoId, motivo) => {
     try {
         const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -97,7 +96,7 @@ const NavegarPorTitulo = () => {
         }
 
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+        const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -124,7 +123,7 @@ const NavegarPorTitulo = () => {
   const verificarSolicitudPendiente = async (proyectoId) => {
       try {
           const token = localStorage.getItem('token');
-          const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+          const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
               method: 'GET',
               headers: {
                   'Authorization': `Bearer ${token}`,
@@ -145,12 +144,10 @@ const NavegarPorTitulo = () => {
       }
   };
 
-  // Manejar el cambio de orden
   const handleOrderChange = (e) => {
     const nuevoOrden = e.target.value;
     setOrden(nuevoOrden);
 
-    // Ordenar resultados localmente
     const sortedProyectos = [...filteredProyectos].sort((a, b) => {
       if (nuevoOrden === "reciente") {
         return new Date(b.fecha_hora) - new Date(a.fecha_hora);
@@ -200,6 +197,11 @@ const NavegarPorTitulo = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+                handleBuscar();
+            }
+        }}
         />
         <Button variant="primary" onClick={handleBuscar} className="search-button-titulo">
           Buscar
@@ -221,11 +223,12 @@ const NavegarPorTitulo = () => {
         {filteredProyectos.length === 0 && searchTerm ? (
           <p>No se encontraron proyectos con el título especificado.</p>
         ) : (
-          paginatedProyectos.map(proyecto => (
+          filteredProyectos.map(proyecto => (
             <TarjetaProyecto
               key={proyecto.id}
               proyecto={proyecto}
               query={searchTerm}
+              scope="titulo"
               verDetalles={verDetalles}
               enviarSolicitud={enviarSolicitud}
             />

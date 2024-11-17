@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorCategoria.css';
 
+const API_URL = 'http://localhost:5000';
+
 const NavegarPorCategoria = () => {
   const [proyectos, setProyectos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +28,7 @@ const NavegarPorCategoria = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/proyectos/categoria', {
+        const response = await fetch(`${API_URL}/api/proyectos/categoria`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -50,7 +52,7 @@ const NavegarPorCategoria = () => {
   }, []);
 
   const handleGoBack = () => {
-    navigate(-1); // Regresar a la vista anterior
+    navigate(-1);
   };
 
   const handleBuscar = async () => {
@@ -66,7 +68,7 @@ const NavegarPorCategoria = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/proyectos/categoria?query=${searchTerm}`, {
+      const response = await fetch(`${API_URL}/api/proyectos/categoria?query=${searchTerm}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +87,6 @@ const NavegarPorCategoria = () => {
     }
   };
 
-  // Función para enviar la solicitud de acceso
   const enviarSolicitud = async (proyectoId, motivo) => {
     try {
         const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -95,7 +96,7 @@ const NavegarPorCategoria = () => {
         }
 
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+        const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -122,7 +123,7 @@ const NavegarPorCategoria = () => {
   const verificarSolicitudPendiente = async (proyectoId) => {
       try {
           const token = localStorage.getItem('token');
-          const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+          const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
               method: 'GET',
               headers: {
                   'Authorization': `Bearer ${token}`,
@@ -196,6 +197,11 @@ const NavegarPorCategoria = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+                handleBuscar();
+            }
+        }}
         />
         <Button variant="primary" onClick={handleBuscar} className="search-button-categoria">
           Buscar
@@ -221,7 +227,8 @@ const NavegarPorCategoria = () => {
             <TarjetaProyecto
               key={proyecto.id}
               proyecto={proyecto}
-              query={searchTerm} // Resaltar coincidencias en la tarjeta
+              query={searchTerm}
+              scope="categorias"
               verDetalles={verDetalles}
               enviarSolicitud={enviarSolicitud}
             />

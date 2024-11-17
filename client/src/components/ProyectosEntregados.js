@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
+const API_URL = 'http://localhost:5000';
+
 const ProyectosEntregados = () => {
     const [proyectos, setProyectos] = useState([]);
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
         const token = localStorage.getItem('token');
 
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_URL}/proyectos/total`, {
+                const response = await fetch(`${API_URL}/api/metricas/proyectos/total`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

@@ -116,9 +116,12 @@ router.get('/actividad/reciente', verifyToken, async (req, res) => {
 router.get('/usuarios/activos', verifyToken, async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id, nombre, correo_institucional AS email, rol_id, ultima_actividad, codigo_estudiante, cedula
+            `SELECT usuarios.id, usuarios.nombre, usuarios.correo_institucional AS email,
+                roles.nombre_rol AS nombre_rol, usuarios.ultima_actividad,
+                usuarios.codigo_estudiante, usuarios.cedula
              FROM usuarios 
-             WHERE ultima_actividad >= NOW() - INTERVAL '7 days' AND (rol_id = 2 OR rol_id = 3)`
+             JOIN roles ON usuarios.rol_id = roles.id
+             WHERE ultima_actividad >= NOW() - INTERVAL '7 days'`
         );
         res.json(result.rows);
     } catch (err) {
@@ -157,6 +160,21 @@ router.get('/profesores/activos', verifyToken, async (req, res) => {
     }
 });
 
+// Nueva ruta para obtener la cantidad de administradores activos
+router.get('/administradores/activos', verifyToken, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT COUNT(*) AS cantidad 
+             FROM usuarios 
+             WHERE rol_id = 1 AND ultima_actividad >= NOW() - INTERVAL '7 days'`
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Error al obtener administradores activos:', err.message);
+        res.status(500).json({ error: 'Error al obtener administradores activos' });
+    }
+});
+
 // Ruta para obtener información completa de estudiantes y profesores inactivos
 router.get('/usuarios/inactivos', verifyToken, async (req, res) => {
     try {
@@ -166,7 +184,7 @@ router.get('/usuarios/inactivos', verifyToken, async (req, res) => {
                     usuarios.codigo_estudiante, usuarios.cedula
              FROM usuarios
              JOIN roles ON usuarios.rol_id = roles.id
-             WHERE usuarios.status_usuario = 'inactivo' AND (usuarios.rol_id = 2 OR usuarios.rol_id = 3)`
+             WHERE usuarios.status_usuario = 'inactivo'`
         );
         
         res.json(result.rows);
@@ -227,6 +245,21 @@ router.get('/profesores/inactivos', verifyToken, async (req, res) => {
     } catch (err) {
         console.error('Error al obtener profesores inactivos:', err.message);
         res.status(500).json({ error: 'Error al obtener profesores inactivos' });
+    }
+});
+
+// Nueva ruta para obtener la cantidad de administradores inactivos
+router.get('/administradores/inactivos', verifyToken, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT COUNT(*) AS cantidad 
+             FROM usuarios 
+             WHERE rol_id = 1 AND status_usuario = 'inactivo'`
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Error al obtener administradores inactivos:', err.message);
+        res.status(500).json({ error: 'Error al obtener administradores inactivos' });
     }
 });
 

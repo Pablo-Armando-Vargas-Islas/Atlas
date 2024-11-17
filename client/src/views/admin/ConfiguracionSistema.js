@@ -10,7 +10,6 @@ const ConfiguracionSistema = () => {
         <div className="buscador-box d-flex flex-column align-items-center">
             <h1 className="buscador-title mb-4">Configuración del Sistema</h1>
             
-            {/* Menú de Configuración */}
             <div className="buttons-container d-flex flex-wrap justify-content-center">
                 {[
                     { title: "Correo Institucional", route: "/configuracion/configurar-correo" },

@@ -7,6 +7,7 @@ import ProyectoModal from '../../utils/ProyectoModal';
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/BusquedaGlobal.css';
 
+const API_URL = 'http://localhost:5000';
 const ITEMS_PER_PAGE = 10;
 
 const BusquedaGlobal = () => {
@@ -33,7 +34,7 @@ const BusquedaGlobal = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handlePageChange = (page) => {
@@ -53,7 +54,6 @@ const BusquedaGlobal = () => {
         setProyectoSeleccionado(null);
     };
 
-    // Función para enviar la solicitud de acceso
     const enviarSolicitud = async (proyectoId, motivo) => {
         try {
             const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
@@ -63,7 +63,7 @@ const BusquedaGlobal = () => {
             }
 
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
+            const response = await fetch(`${API_URL}/api/solicitudes/crear`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -90,7 +90,7 @@ const BusquedaGlobal = () => {
     const verificarSolicitudPendiente = async (proyectoId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
+            const response = await fetch(`${API_URL}/api/solicitudes/verificar/${proyectoId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -161,6 +161,7 @@ const BusquedaGlobal = () => {
                             key={proyecto.id}
                             proyecto={proyecto}
                             query={consultaLocal}
+                            scope="global"
                             verDetalles={handleVerDetalles}
                             enviarSolicitud={enviarSolicitud}
                         />

@@ -151,7 +151,7 @@ router.get('/alumno/cursos', verifyToken, async (req, res) => {
 
     try {
         const result = await pool.query(
-            `SELECT DISTINCT c.id, c.nombre_curso, c.codigo_curso, c.periodo, c.estado
+            `SELECT DISTINCT c.id, c.nombre_curso, c.codigo_curso, c.periodo, c.estado, c.fecha_fin
              FROM cursos c
              INNER JOIN proyectos p ON p.codigo_curso = c.codigo_curso
              WHERE p.usuario_id = $1`,

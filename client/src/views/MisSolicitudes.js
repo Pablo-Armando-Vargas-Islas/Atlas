@@ -4,6 +4,8 @@ import { FaList } from 'react-icons/fa';
 import '../styles/MisSolicitudes.css';
 import BotonDescarga from '../utils/BotonDescarga';
 
+const API_URL = 'http://localhost:5000';
+
 const MisSolicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);
     const [error, setError] = useState(null);
@@ -17,7 +19,7 @@ const MisSolicitudes = () => {
         const fetchSolicitudes = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/solicitudes/misSolicitudes', {
+                const response = await fetch(`${API_URL}/api/solicitudes/misSolicitudes`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -57,7 +59,7 @@ const MisSolicitudes = () => {
     };
 
     const renderPagination = () => (
-        <div className="paginacion">
+        <div className="paginacion"> 
             {Array.from({ length: totalPages }, (_, index) => (
                 <button
                     key={index}
@@ -100,22 +102,22 @@ const MisSolicitudes = () => {
                             {currentSolicitudes.map((solicitud) => (
                                 <tr key={solicitud.id}>
                                     <td className="text-center">
-                                        {expandedRows.includes(solicitud.id) ? (
-                                            solicitud.titulo
+                                        {solicitud.titulo.length > 50 && !expandedRows.includes(solicitud.id) ? (
+                                            `${solicitud.titulo.slice(0, 50)}...`
                                         ) : (
-                                            `${solicitud.titulo.slice(0, 50)} ...`
+                                            solicitud.titulo
                                         )}
                                         {solicitud.titulo.length > 50 && (
-                                        <div className="text-center">
-                                            <Button
-                                                variant="link"
-                                                onClick={() => handleToggleExpand(solicitud.id)}
-                                                className="p-0 d-block mx-auto"
-                                            >
-                                                {expandedRows.includes(solicitud.id) ? 'Ver menos' : 'Ver más'}
-                                            </Button>
-                                        </div>
-                                    )}
+                                            <div className="text-center">
+                                                <Button
+                                                    variant="link"
+                                                    onClick={() => handleToggleExpand(solicitud.id)}
+                                                    className="p-0 d-block mx-auto"
+                                                >
+                                                    {expandedRows.includes(solicitud.id) ? 'Ver menos' : 'Ver más'}
+                                                </Button>
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="text-center">{new Date(solicitud.fecha_solicitud).toLocaleDateString()}</td>
                                     <td className="text-center">

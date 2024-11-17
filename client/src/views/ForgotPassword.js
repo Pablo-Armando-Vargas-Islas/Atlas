@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000';
+
 const ForgotPassword = () => {
     const [correo, setCorreo] = useState("");
     const [alert, setAlert] = useState({ type: "", message: "" });
@@ -10,11 +12,11 @@ const ForgotPassword = () => {
 
     const onSubmitForm = async (e) => {
         e.preventDefault();
-        setAlert({ type: "", message: "" }); // Resetear alertas previas
+        setAlert({ type: "", message: "" }); 
         setLoading(true); 
 
         try {
-            const response = await fetch("http://localhost:5000/api/auth/forgot-password", {
+            const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -26,7 +28,7 @@ const ForgotPassword = () => {
 
             if (response.ok) {
                 setAlert({ type: "success", message: data.message });
-                setTimeout(() => navigate("/login"), 2000); // Redirige al login después de 5 segundos
+                setTimeout(() => navigate("/login"), 2000); 
             } else {
                 setAlert({ type: "danger", message: data.error });
             }
@@ -34,7 +36,7 @@ const ForgotPassword = () => {
             console.error(err.message);
             setAlert({ type: "danger", message: "Error de conexión" });
         } finally {
-            setLoading(false); // Desactiva el spinner al finalizar
+            setLoading(false); 
         }
     };
 

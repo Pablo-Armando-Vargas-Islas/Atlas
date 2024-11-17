@@ -374,7 +374,7 @@ router.put('/correo/actualizar', verifyToken, async (req, res) => {
     try {
         // Crear el transporte con los datos ingresados
         const transporter = nodemailer.createTransport({
-            service: 'Outlook', // Asegúrate de configurar el servicio correctamente
+            service: 'Outlook', 
             auth: {
                 user: email,
                 pass: password

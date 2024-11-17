@@ -90,5 +90,9 @@
  
 .icono-accion-editar-proyecto{
     cursor: pointer;
-    color: #2a76c8; /* Color azul para editar */
+    color: #2a76c8; 
+}
+
+.ver-proyectos-admin-btn{
+    margin-right: 10px;
 }

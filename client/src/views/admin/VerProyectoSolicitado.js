@@ -5,17 +5,19 @@ import { FaArrowLeft, FaDownload, FaChevronDown, FaChevronUp } from 'react-icons
 import axios from 'axios';
 import '../../styles/VerProyectoSolicitado.css';
 
+const API_URL = 'http://localhost:5000';
+
 const VerProyectosMasSolicitados = () => {
     const [proyectos, setProyectos] = useState([]);
-    const [isLoading, setIsLoading] = useState(null); // Track loading status for each project
-    const [showFullFields, setShowFullFields] = useState({}); // Estado para controlar qué campos muestran la descripción completa
+    const [isLoading, setIsLoading] = useState(null); 
+    const [showFullFields, setShowFullFields] = useState({}); 
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProyectos = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/metricas/proyectos/mas-solicitados', {
+                const response = await fetch(`${API_URL}/api/metricas/proyectos/mas-solicitados`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -34,7 +36,7 @@ const VerProyectosMasSolicitados = () => {
     }, []);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handleDownload = async (id) => {
@@ -47,17 +49,17 @@ const VerProyectosMasSolicitados = () => {
                 return;
             }
 
-            const response = await axios.get(`http://localhost:5000/api/admin/descargar/${id}`, {
+            const response = await axios.get(`${API_URL}/api/admin/descargar/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
-                responseType: 'blob' // Importante para manejar archivos binarios
+                responseType: 'blob' 
             });
 
             // Crear un enlace temporal para descargar el archivo con el nombre correcto
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const contentDisposition = response.headers['content-disposition'];
-            let fileName = 'proyecto.zip'; // Valor predeterminado
+            let fileName = 'proyecto.zip'; // Nombre del archivo descaargado
 
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="(.+)"/);

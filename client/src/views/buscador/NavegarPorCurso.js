@@ -1,62 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, InputGroup } from 'react-bootstrap';
 import ProyectoModal from '../../utils/ProyectoModal';
 import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft} from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa';
 import '../../styles/NavegarPorCurso.css';
+
+const API_URL = 'http://localhost:5000';
 
 const NavegarPorCurso = () => {
   const [proyectos, setProyectos] = useState([]);
-  const [selectedCurso, setSelectedCurso] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sugerencias, setSugerencias] = useState([]);
   const [filteredProyectos, setFilteredProyectos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
   const [orden, setOrden] = useState("reciente");
   const [currentPage, setCurrentPage] = useState(1);
-  const [cursos, setCursos] = useState([]);
   const navigate = useNavigate();
   const ITEMS_PER_PAGE = 10;
-  
 
   useEffect(() => {
-    // Obtener los nombres y códigos de los cursos disponibles
-    const fetchCursosDisponibles = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error("No se encontró el token de autenticación.");
-        return;
-      }
-
-      try {
-        const response = await fetch('http://localhost:5000/api/proyectos/cursos/nombres', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setCursos(data);
-      } catch (error) {
-        console.error("Error al obtener los cursos:", error);
-      }
-    };
-
-    fetchCursosDisponibles();
-  }, []);
-
-  const handleGoBack = () => {
-    navigate(-1); // Regresar a la vista anterior
-  };
-
-  useEffect(() => {
-    // Obtener todos los proyectos al cargar la vista o cuando no se seleccione curso
     const fetchTodosLosProyectos = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -65,7 +29,7 @@ const NavegarPorCurso = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/proyectos/todos', {
+        const response = await fetch(`${API_URL}/api/proyectos/todos`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -88,139 +52,64 @@ const NavegarPorCurso = () => {
     fetchTodosLosProyectos();
   }, []);
 
-  useEffect(() => {
-    // Realizar la búsqueda cuando se seleccione un curso
-    const fetchProyectosPorCurso = async () => {
-      if (!selectedCurso) {
-        setFilteredProyectos(proyectos);
-        return;
-      }
+  const fetchSugerencias = async (term) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error("No se encontró el token de autenticación.");
-        return;
-      }
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/proyectos/curso?curso=${selectedCurso}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setFilteredProyectos(data);
-      } catch (error) {
-        console.error("Error al obtener proyectos:", error);
-      }
-    };
-
-    if (selectedCurso) {
-      fetchProyectosPorCurso();
-    } else {
-      setFilteredProyectos(proyectos);
-    }
-  }, [selectedCurso, proyectos]);
-
-  // Función para enviar la solicitud de acceso
-  const enviarSolicitud = async (proyectoId, motivo) => {
     try {
-        const solicitudPendiente = await verificarSolicitudPendiente(proyectoId);
-        if (solicitudPendiente) {
-            alert('Ya existe una solicitud pendiente para este proyecto.');
-            return;
+      const response = await fetch(`${API_URL}/api/proyectos/cursos/sugerencias?query=${encodeURIComponent(term)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
+      });
 
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/solicitudes/crear', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                proyecto_id: proyectoId,
-                motivo: motivo,
-            }),
-        });
+      if (!response.ok) throw new Error("Error al obtener sugerencias.");
 
-        if (response.ok) {
-            alert('Solicitud enviada con éxito');
-            cerrarModal();
-        } else {
-            alert('Error al enviar la solicitud');
-        }
+      const data = await response.json();
+      setSugerencias(data.slice(0, 5)); // Limitar a 5 sugerencias
     } catch (error) {
-        console.error('Error al enviar la solicitud:', error);
+      console.error("Error al buscar sugerencias:", error);
     }
   };
 
-  // Función para verificar si ya existe una solicitud pendiente antes de enviar una nueva solicitud
-  const verificarSolicitudPendiente = async (proyectoId) => {
-      try {
-          const token = localStorage.getItem('token');
-          const response = await fetch(`http://localhost:5000/api/solicitudes/verificar/${proyectoId}`, {
-              method: 'GET',
-              headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-              },
-          });
+  const handleBuscar = async (curso) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-          if (response.ok) {
-              const data = await response.json();
-              return data.pendiente;
-          } else {
-              console.error('Error al verificar la solicitud pendiente');
-              return false;
-          }
-      } catch (error) {
-          console.error('Error al verificar la solicitud pendiente:', error);
-          return false;
-      }
+    try {
+      const response = await fetch(`${API_URL}/api/proyectos/curso?curso=${encodeURIComponent(curso)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error("Error al realizar la búsqueda.");
+
+      const data = await response.json();
+      setFilteredProyectos(data);
+    } catch (error) {
+      console.error("Error al realizar la búsqueda:", error);
+    }
   };
 
-  // Función para manejar el cambio de curso seleccionado
-  const handleCursoChange = (e) => {
-    const codigoCursoSeleccionado = e.target.value.trim();
-    setSelectedCurso(codigoCursoSeleccionado);
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value.length > 0) {
+      fetchSugerencias(value);
+    } else {
+      setSugerencias([]);
+    }
   };
 
-  const handleOrderChange = (e) => {
-    const nuevoOrden = e.target.value;
-    setOrden(nuevoOrden);
-
-    const sortedProyectos = [...filteredProyectos].sort((a, b) => {
-      if (nuevoOrden === "reciente") {
-        return new Date(b.fecha_hora) - new Date(a.fecha_hora);
-      } else if (nuevoOrden === "antiguo") {
-        return new Date(a.fecha_hora) - new Date(b.fecha_hora);
-      } else if (nuevoOrden === "popularidad") {
-        return b.popularidad - a.popularidad;
-      } else if (nuevoOrden === "relevancia") {
-        return b.relevancia - a.relevancia;
-      }
-      return 0;
-    });
-
-    setFilteredProyectos(sortedProyectos);
-  };
-
-  const verDetalles = (proyecto) => {
-    setProyectoSeleccionado(proyecto);
-    setShowModal(true);
-  };
-
-  const cerrarModal = () => {
-    setShowModal(false);
-    setProyectoSeleccionado(null);
+  const handleSuggestionClick = (curso) => {
+    setSearchTerm(curso); 
+    setSugerencias([]); 
+    handleBuscar(curso); 
   };
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -228,50 +117,47 @@ const NavegarPorCurso = () => {
   const totalPages = Math.ceil(filteredProyectos.length / ITEMS_PER_PAGE);
 
   const handlePageChange = (page) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page > 0 && page <= totalPages) setCurrentPage(page);
   };
 
   return (
     <div className="navegar-por-curso-container d-flex flex-column align-items-center">
-      <div className="navegar-atras-buscador" onClick={handleGoBack}>
-          <FaArrowLeft className="icono-navegar-atras" /> Volver
+      <div className="navegar-atras-buscador" onClick={() => navigate(-1)}>
+        <FaArrowLeft className="icono-navegar-atras" /> Volver
       </div>
       <h1 className="navegar-curso-title mb-4">Buscar Proyectos por Curso</h1>
-      <Form.Select
-        value={selectedCurso}
-        onChange={handleCursoChange} 
-        className="curso-select mb-4"
-      >
-        <option value="">Seleccione un Curso</option>
-        {cursos.map((curso, index) => (
-          <option key={index} value={curso.codigo_curso}>{curso.nombre_curso}</option>
-        ))}
-      </Form.Select>
-
-      <Form.Select
-        value={orden}
-        onChange={handleOrderChange}
-        className="sort-select mb-4"
-      >
-        <option value="reciente">Reciente</option>
-        <option value="antiguo">Más Antiguo</option>
-        <option value="relevancia">Relevancia</option>
-        <option value="popularidad">Popularidad</option>
-      </Form.Select>
-
+      <div className="search-bar-curso">
+        <Form.Control
+          type="text"
+          placeholder="Buscar por nombre de curso"
+          value={searchTerm}
+          onChange={handleInputChange}
+          className="search-input"
+        />
+        {sugerencias.length > 0 && (
+          <ul className="sugerencias-list">
+            {sugerencias.map((sug, idx) => (
+              <li
+                key={idx}
+                className="sugerencia-item"
+                onClick={() => handleSuggestionClick(sug)}
+              >
+                {sug}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <div className="projects-container">
-        {filteredProyectos.length === 0 && selectedCurso ? (
-          <p>No se encontraron proyectos para el curso seleccionado.</p>
+        {filteredProyectos.length === 0 && searchTerm ? (
+          <p>No se encontraron proyectos para el curso especificado.</p>
         ) : (
-          paginatedProyectos.map(proyecto => (
+          paginatedProyectos.map((proyecto) => (
             <TarjetaProyecto
               key={proyecto.id}
               proyecto={proyecto}
-              query={selectedCurso} // Resaltar coincidencias si corresponde
-              verDetalles={verDetalles}
-              enviarSolicitud={enviarSolicitud}
+              query={searchTerm}
+              verDetalles={() => setProyectoSeleccionado(proyecto)}
             />
           ))
         )}
@@ -279,19 +165,11 @@ const NavegarPorCurso = () => {
 
       {filteredProyectos.length > 0 && (
         <div className="pagination mt-4 d-flex justify-content-center">
-          <Button
-            variant="secondary"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
+          <Button variant="secondary" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
             Anterior
           </Button>
           <span className="mx-3">Página {currentPage} de {totalPages}</span>
-          <Button
-            variant="secondary"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
+          <Button variant="secondary" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
             Siguiente
           </Button>
         </div>
@@ -299,10 +177,9 @@ const NavegarPorCurso = () => {
 
       {proyectoSeleccionado && (
         <ProyectoModal
-          show={showModal}
-          handleClose={cerrarModal}
+          show={true}
+          handleClose={() => setProyectoSeleccionado(null)}
           proyecto={proyectoSeleccionado}
-          enviarSolicitud={enviarSolicitud}
         />
       )}
     </div>

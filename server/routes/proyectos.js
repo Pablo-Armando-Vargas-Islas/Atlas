@@ -255,11 +255,13 @@ router.get("/atlas", verifyToken, async (req, res) => {
             searchConditions = keywords.map((keyword, index) => {
                 queryParams.push(`%${keyword}%`);
                 return `(
-                    p.titulo ILIKE $${queryParams.length}
-                    OR a.nombre_autor ILIKE $${queryParams.length}
-                    OR t.nombre ILIKE $${queryParams.length}
-                    OR c.nombre ILIKE $${queryParams.length}
-                    OR p.descripcion ILIKE $${queryParams.length}
+                    unaccent(p.titulo) ILIKE unaccent($${queryParams.length})
+                    OR unaccent(p.tipo) ILIKE unaccent($${queryParams.length})
+                    OR p.fecha_hora::text ILIKE unaccent($${queryParams.length})
+                    OR unaccent(a.nombre_autor) ILIKE unaccent($${queryParams.length})
+                    OR unaccent(t.nombre) ILIKE unaccent($${queryParams.length})
+                    OR unaccent(c.nombre) ILIKE unaccent($${queryParams.length})
+                    OR unaccent(p.descripcion) ILIKE unaccent($${queryParams.length})
                 )`;
             }).join(' AND ');
         }
@@ -282,7 +284,7 @@ router.get("/atlas", verifyToken, async (req, res) => {
                 break;
         }
 
-        // Consulta SQL que devuelve todos los proyectos, incluyendo el nombre del curso si aplica
+        // Consulta SQL que devuelve todos los proyectos
         const proyectos = await pool.query(
             `WITH proyecto_filtrado AS (
                 SELECT DISTINCT p.id
@@ -512,10 +514,13 @@ router.get("/titulo", verifyToken, async (req, res) => {
         // Dividir la consulta en palabras clave
         const keywords = query.split(' ').filter(Boolean);
 
-        // Crear una expresión para buscar cada palabra clave usando ILIKE en el título
+        // Crear una expresión para buscar cada palabra clave usando LIKE (discriminando mayúsculas y minúsculas) y usando unaccent para los acentos
         const searchConditions = keywords.length > 0 
-            ? keywords.map(keyword => `p.titulo ILIKE '%${keyword}%'`).join(' AND ')
-            : 'TRUE'; // Si no hay keywords, se pone TRUE para que coincida con todo
+        ? keywords.map(keyword => `unaccent(p.titulo) LIKE unaccent('%${keyword}%')`).join(' AND ')
+        : 'TRUE';
+
+
+
 
         // Determinar columna de orden
         let orderBy = 'p.fecha_hora DESC'; // Por defecto, ordenar por fecha reciente
@@ -738,6 +743,30 @@ try {
 }
 });
 
+router.get("/cursos/sugerencias", verifyToken, async (req, res) => {
+    try {
+        const query = req.query.query?.trim().toLowerCase();
+        if (!query) {
+            return res.status(400).send("Falta el parámetro de búsqueda.");
+        }
+
+        const cursos = await pool.query(
+            `SELECT DISTINCT LOWER(nombre_curso) AS nombre_curso
+            FROM cursos
+            WHERE LOWER(nombre_curso) LIKE $1
+            ORDER BY nombre_curso ASC
+            LIMIT 5`,
+            [`%${query}%`]
+        );
+
+        const nombresUnicos = [...new Set(cursos.rows.map(curso => curso.nombre_curso))];
+        res.json(nombresUnicos);
+    } catch (err) {
+        console.error("Error en el servidor al obtener sugerencias de cursos:", err.message);
+        res.status(500).send("Error del servidor");
+    }
+});
+
 // Ruta para obtener los nombres y códigos de los cursos disponibles
 router.get("/cursos/nombres", verifyToken, async (req, res) => {
     try {
@@ -754,10 +783,10 @@ router.get("/cursos/nombres", verifyToken, async (req, res) => {
     }
 });
 
-// Ruta para la búsqueda de proyectos por curso
+// Ruta para la búsqueda de proyectos por curso (adaptada para nombres)
 router.get("/curso", verifyToken, async (req, res) => {
     try {
-        const curso = req.query.curso?.trim(); // Eliminar espacios adicionales del valor de curso
+        const curso = req.query.curso?.trim().toLowerCase();
         if (!curso) {
             console.log("No se recibió el parámetro de curso.");
             return res.status(400).send("Falta el parámetro de curso.");
@@ -769,23 +798,19 @@ router.get("/curso", verifyToken, async (req, res) => {
                     array_agg(DISTINCT a.nombre_autor) AS autores, 
                     array_agg(DISTINCT t.nombre) AS tecnologias,
                     array_agg(DISTINCT c.nombre) AS categorias,
-                    cu.nombre_curso  -- Obtener el nombre del curso si aplica
+                    cu.nombre_curso
             FROM proyectos p
             LEFT JOIN proyectos_autores a ON p.id = a.proyecto_id
             LEFT JOIN proyectos_tecnologias pt ON p.id = pt.proyecto_id
             LEFT JOIN tecnologias t ON pt.tecnologia_id = t.id
             LEFT JOIN proyectos_categorias pc ON p.id = pc.proyecto_id
             LEFT JOIN categorias c ON pc.categoria_id = c.id
-            LEFT JOIN cursos cu ON cu.codigo_curso = p.codigo_curso  -- Unión con la tabla cursos
-            WHERE p.codigo_curso = $1
+            LEFT JOIN cursos cu ON cu.codigo_curso = p.codigo_curso
+            WHERE LOWER(cu.nombre_curso) = $1
             GROUP BY p.id, cu.nombre_curso
             ORDER BY p.fecha_hora DESC`,
             [curso]
         );
-
-        if (proyectos.rows.length === 0) {
-            console.log("No se encontraron proyectos con el código de curso proporcionado.");
-        }
 
         res.json(proyectos.rows);
     } catch (err) {

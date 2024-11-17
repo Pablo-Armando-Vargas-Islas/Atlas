@@ -66,8 +66,8 @@
     background-color: #91cb1b; 
     color: #ffffff;
     border: none;
-    width: 900px;
-    padding: 8px 40px;
+    width: 1000px;
+    padding: 6px 40px;
     border-radius: 25px;
     font-size: 1.1rem;
     transition: background-color 0.3s, transform 0.2s;
@@ -122,7 +122,6 @@
 }
 
 
-/* en tu archivo CSS */
 .texto-azul {
-    color: rgba(1, 68, 122, 0.723); /* o cualquier color que prefieras */
+    color: rgba(1, 68, 122, 0.723); 
 }

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/GestionCursosProfesor.css';
 import '../../styles/EditarUsuarios.css';
 
+const API_URL = 'http://localhost:5000';
+
 const ActividadUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +17,7 @@ const ActividadUsuarios = () => {
         const fetchUsuarios = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/metricas/usuarios/activos', {
+                const response = await fetch(`${API_URL}/api/metricas/usuarios/activos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -34,7 +36,7 @@ const ActividadUsuarios = () => {
     }, []);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     // Calcular los usuarios a mostrar en la página actual
@@ -42,12 +44,10 @@ const ActividadUsuarios = () => {
     const indexOfFirstUser = indexOfLastUser - usuariosPorPagina;
     const currentUsuarios = usuarios.slice(indexOfFirstUser, indexOfLastUser);
 
-    // Cambiar de página
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
 
-    // Calcular el número total de páginas
     const totalPages = Math.ceil(usuarios.length / usuariosPorPagina);
 
     return (
@@ -62,6 +62,7 @@ const ActividadUsuarios = () => {
                         <Table responsive bordered hover className="gestion-cursos-table mt-4">
                             <thead>
                                 <tr>
+                                    <th className="text-center">Rol</th>
                                     <th className="text-center">Nombre</th>
                                     <th className="text-center">Correo Electrónico</th>
                                     <th className="text-center">Usuario (Cédula o Código de Estudiante)</th>
@@ -70,6 +71,7 @@ const ActividadUsuarios = () => {
                             <tbody>
                                 {currentUsuarios.map((usuario) => (
                                     <tr key={usuario.id}>
+                                        <td className="text-center">{usuario.nombre_rol}</td>
                                         <td className="text-center">{usuario.nombre}</td>
                                         <td className="text-center">{usuario.email}</td>
                                         <td className="text-center">{usuario.cedula || usuario.codigo_estudiante}</td>

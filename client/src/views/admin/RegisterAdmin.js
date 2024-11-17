@@ -4,6 +4,8 @@ import '../../styles/RegisterAdmin.css';
 import { FaArrowLeft } from 'react-icons/fa'; 
 import { Spinner } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000';
+
 const RegisterAdmin = () => {
     const [nombre, setNombre] = useState("");
     const [correoInstitucional, setCorreoInstitucional] = useState("");
@@ -19,7 +21,7 @@ const RegisterAdmin = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const validateNombre = (nombre) => {
@@ -30,11 +32,11 @@ const RegisterAdmin = () => {
     const getRolId = (rol) => {
         switch (rol) {
             case "admin":
-                return 1; // Admin
+                return 1; 
             case "docente":
-                return 2; // Profesor
+                return 2; 
             case "alumno":
-                return 3; // Alumno
+                return 3; 
             default:
                 return null;
         }
@@ -45,7 +47,6 @@ const RegisterAdmin = () => {
         setLoading(true); 
         setAlert({ type: "", message: "" });
 
-        // Validaciones
         if (!validateNombre(nombre)) {
             setAlert({ type: "warning", message: "El nombre no puede contener caracteres especiales." });
             setLoading(false);
@@ -79,7 +80,7 @@ const RegisterAdmin = () => {
                 cedula
             };
 
-            const response = await fetch("http://localhost:5000/api/auth/registerAdmin", {
+            const response = await fetch(`${API_URL}/api/auth/registerAdmin`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
@@ -98,7 +99,7 @@ const RegisterAdmin = () => {
             console.error(err.message);
             setAlert({ type: "danger", message: "Error de conexión" });
         } finally {
-            setLoading(false); // Desactiva el spinner al finalizar
+            setLoading(false);
         }
     };
 

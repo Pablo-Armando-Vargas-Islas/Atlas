@@ -6,6 +6,8 @@ import { Spinner } from 'react-bootstrap';
 import JSZip from "jszip";
 import "../styles/SubirProyecto.css";
 
+const API_URL = 'http://localhost:5000';
+
 const SubirProyectoProfesor = () => {
     const [userId, setUserId] = useState(null);
     const [titulo, setTitulo] = useState("");
@@ -34,37 +36,34 @@ const SubirProyectoProfesor = () => {
     const [cursoValidado, setCursoValidado] = useState(false);
     const navigate = useNavigate();
 
-    // Aquí se realiza el desplazamiento cuando errorMessage cambia
     useEffect(() => {
         if (errorMessage) {
-          // Desplazar la página hasta el inicio cuando haya un error
+          // Desplazar la página hasta el inicio cuando haya un error para poder leer el error
           window.scrollTo({
-            top: 0, // Desplazamos hacia la parte superior
-            behavior: 'smooth' // Desplazamiento suave
+            top: 0, 
+            behavior: 'smooth' 
           });
         }
       }, [errorMessage]);
 
-    // Recuperar el token del localStorage y decodificarlo
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                setUserId(decodedToken.id); // Establecer el userId decodificado desde el token
+                setUserId(decodedToken.id); 
             } catch (error) {
                 console.error("Error al decodificar el token:", error);
             }
         }
     }, []);
 
-    // Fetch para obtener las tecnologías y categorías
     useEffect(() => {
         const fetchTecnologias = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/proyectos/tecnologias");
+                const response = await fetch(`${API_URL}/api/proyectos/tecnologias`);
                 const data = await response.json();
-                setTecnologias(data); // Guardar las tecnologías en el estado
+                setTecnologias(data); 
             } catch (error) {
                 console.error("Error al obtener las tecnologías:", error);
             }
@@ -72,9 +71,9 @@ const SubirProyectoProfesor = () => {
 
         const fetchCategorias = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/proyectos/categorias");
+                const response = await fetch(`${API_URL}/api/proyectos/categorias`);
                 const data = await response.json();
-                setCategorias(data); // Guardar las categorías en el estado
+                setCategorias(data); 
             } catch (error) {
                 console.error("Error al obtener las categorías:", error);
             }
@@ -179,18 +178,18 @@ const SubirProyectoProfesor = () => {
         setErrorMessage("");
         setCursoModalMessage("");
         try {
-            const response = await fetch(`http://localhost:5000/api/cursos/validarCodigo/${codigoCurso}`);
+            const response = await fetch(`${API_URL}/api/cursos/validarCodigo/${codigoCurso}`);
             const data = await response.json();
     
             if (response.ok) {
                 setCursoNombre(data.nombre_curso);
-                setCursoEstado(data.estado); // Guardar el estado del curso (abierto o cerrado)
+                setCursoEstado(data.estado); 
     
                 if (data.estado === "cerrado") {
-                    setCursoValido(false); // El curso no es válido para subir proyectos
+                    setCursoValido(false); 
                     setCursoModalMessage(`El curso "${data.nombre_curso}" ya no está recibiendo más trabajos.`);
                 } else {
-                    setCursoValido(true); // El curso está abierto y permite entregas
+                    setCursoValido(true); 
                     setCursoModalMessage(`Muy bien! Tu proyecto se subirá en el curso "${data.nombre_curso}"`);
                     setCursoValidado(true);
                 }
@@ -210,15 +209,12 @@ const SubirProyectoProfesor = () => {
         e.preventDefault();
         setLoading(true);
     
-        // Validar si el título ya existe en la base de datos
         try {
 
-            // Validar los campos antes de proceder
             if (!validateFields()) {
-                return; // Si la validación falla, no procedemos
+                return; 
             }
         
-            // Obtener el token JWT almacenado en localStorage
             const token = localStorage.getItem('token');
         
             if (!token) {
@@ -226,23 +222,21 @@ const SubirProyectoProfesor = () => {
                 return;
             }
 
-            const checkResponse = await fetch(`http://localhost:5000/api/proyectos/titulo-existe?titulo=${encodeURIComponent(titulo)}`, {
+            const checkResponse = await fetch(`${API_URL}/api/proyectos/titulo-existe?titulo=${encodeURIComponent(titulo)}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             
-            // Verificar si la respuesta fue exitosa
             if (!checkResponse.ok) {
                 throw new Error("Error en la respuesta al validar el título.");
             }
     
             const checkData = await checkResponse.json();
     
-            // Revisar la respuesta del backend
             if (checkData.exists) {
                 setErrorMessage("El título del proyecto ya está registrado. Por favor, elige otro título.");
-                return; // Si el título ya existe, no procedemos
+                return; 
             }
 
             if (archivoComprimido) {
@@ -262,7 +256,7 @@ const SubirProyectoProfesor = () => {
                     return;
                 }
         
-                // Validar contenido del archivo .zip usando jszip
+                // Validar contenido del archivo .zip 
                 const zip = new JSZip();
                 try {
                     const zipData = await zip.loadAsync(archivoComprimido);
@@ -305,7 +299,6 @@ const SubirProyectoProfesor = () => {
                         return;
                     }
 
-                    // Mostrar el modal de confirmación si todas las validaciones pasan
                     setShowModal(true);
                 } catch (error) {
                     setErrorMessage("Error al leer el archivo .zip: " + error.message);
@@ -317,10 +310,9 @@ const SubirProyectoProfesor = () => {
             setErrorMessage("Error al validar el título del proyecto: " + err.message);
             return;
         } finally {
-            setLoading(false); // Desactiva el spinner al finalizar
+            setLoading(false); 
         }
     
-        // Si todo está validado correctamente y el título no existe, mostramos el modal de confirmación
         setShowModal(true);
     };
 
@@ -340,19 +332,16 @@ const SubirProyectoProfesor = () => {
             formData.append("categorias", JSON.stringify(selectedCategorias.map(categoria => categoria.id)));
             formData.append("autores", JSON.stringify(autores));
     
-            // Obtener el token JWT almacenado en localStorage
             const token = localStorage.getItem('token');
     
-            // Verificar si el token está presente
             if (!token) {
                 throw new Error('No token provided');
             }
     
-            // Enviar la solicitud con el token en el encabezado Authorization
-            const response = await fetch("http://localhost:5000/api/proyectos/subir", {
+            const response = await fetch(`${API_URL}/api/proyectos/subir`, {
                 method: "POST",
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Agregar el token aquí
+                    'Authorization': `Bearer ${token}`, 
                 },
                 body: formData
             });
@@ -397,7 +386,7 @@ const SubirProyectoProfesor = () => {
                         </select>
                     </div>
 
-                    {/* Campo para validar el código del curso si es aula */}
+                    {/* Campo para validar el código del curso si es de tipo aula */}
                     {tipo === "aula" && (
                         <div className="form-group">
                             <label>Curso</label>
@@ -491,7 +480,7 @@ const SubirProyectoProfesor = () => {
                                         name="licencia"
                                         value="si"
                                         checked={necesitaLicencia === true}
-                                        onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
+                                        onChange={() => setNecesitaLicencia(true)} 
                                     />
                                     <label className="form-check-label" htmlFor="licenciaSi">
                                         Sí
@@ -505,7 +494,7 @@ const SubirProyectoProfesor = () => {
                                         name="licencia"
                                         value="no"
                                         checked={necesitaLicencia === false}
-                                        onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
+                                        onChange={() => setNecesitaLicencia(false)}  
                                     />
                                     <label className="form-check-label" htmlFor="licenciaNo">
                                         No
@@ -594,7 +583,7 @@ const SubirProyectoProfesor = () => {
                                     type="file"
                                     className={`form-control ${missingFields.includes("formatoAprobacion") ? "border-danger" : ""}`}
                                     onChange={(e) => setFormatoAprobacion(e.target.files[0])}
-                                    accept=".png,.jpg,.jpeg" // Para aceptar solo archivos de imagen
+                                    accept=".png,.jpg,.jpeg" 
                                 />
                             </div>
                             <div className="form-group">
@@ -644,7 +633,7 @@ const SubirProyectoProfesor = () => {
                                         name="licencia"
                                         value="si"
                                         checked={necesitaLicencia === true}
-                                        onChange={() => setNecesitaLicencia(true)} // Establece "true" cuando se selecciona "Sí"
+                                        onChange={() => setNecesitaLicencia(true)} 
                                     />
                                     <label className="form-check-label" htmlFor="licenciaSi">
                                         Sí
@@ -658,7 +647,7 @@ const SubirProyectoProfesor = () => {
                                         name="licencia"
                                         value="no"
                                         checked={necesitaLicencia === false}
-                                        onChange={() => setNecesitaLicencia(false)}  // Establece "false" cuando se selecciona "No"
+                                        onChange={() => setNecesitaLicencia(false)}  
                                     />
                                     <label className="form-check-label" htmlFor="licenciaNo">
                                         No
@@ -682,7 +671,7 @@ const SubirProyectoProfesor = () => {
                                     type="file"
                                     className={`form-control ${missingFields.includes("archivoComprimido") ? "border-danger" : ""}`}
                                     onChange={(e) => setArchivoComprimido(e.target.files[0])}
-                                    accept=".zip" // Para aceptar solo archivos comprimidos
+                                    accept=".zip" 
                                 />
                             </div>
                             <div className="form-group">
@@ -773,10 +762,6 @@ const SubirProyectoProfesor = () => {
                     <Modal.Body>
                         <p>{cursoModalMessage}</p>
                     </Modal.Body>
-
-                    {/* <Modal.Footer>
-                        <Button variant="primary" onClick={() => setShowCursoModal(false)}>Cerrar</Button>
-                    </Modal.Footer> */}
                 </Modal>
 
             </div>

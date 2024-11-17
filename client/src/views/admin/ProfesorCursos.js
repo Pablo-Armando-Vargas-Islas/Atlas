@@ -5,20 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/GestionCursosProfesor.css';
 import '../../styles/EditarUsuarios.css';
 
+const API_URL = 'http://localhost:5000';
+
 const ProfesorCursos = () => {
     const [profesores, setProfesores] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [cara, setCara] = useState('mas'); // Estado para controlar la cara de la tabla
+    const [cara, setCara] = useState('mas');
     const profesoresPorPagina = 20;
     const navigate = useNavigate();
-    const API_URL = 'http://localhost:5000/api/metricas';
     const token = localStorage.getItem('token');
 
     useEffect(() => {
         const fetchProfesores = async () => {
             try {
                 const endpoint = cara === 'mas' ? '/cursos/profesores/mas' : '/cursos/profesores/menos';
-                const response = await fetch(`${API_URL}${endpoint}`, {
+                const response = await fetch(`${API_URL}/api/metricas${endpoint}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -37,7 +38,7 @@ const ProfesorCursos = () => {
     }, [cara]);
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     // Calcular los profesores a mostrar en la página actual
@@ -56,7 +57,7 @@ const ProfesorCursos = () => {
     // Cambiar entre "más cursos" y "menos cursos"
     const toggleCara = () => {
         setCara((prevCara) => (prevCara === 'mas' ? 'menos' : 'mas'));
-        setCurrentPage(1); // Reiniciar a la primera página al cambiar de cara
+        setCurrentPage(1); 
     };
 
     return (

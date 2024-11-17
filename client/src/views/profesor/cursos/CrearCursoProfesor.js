@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 import '../../../styles/CrearCursoProfesor.css';
+
+const API_URL = 'http://localhost:5000';
  
 const CrearCursoProfesor = () => {
     const [nombreCurso, setNombreCurso] = useState('');
@@ -15,7 +17,7 @@ const CrearCursoProfesor = () => {
     const [copied, setCopied] = useState(false);
     const navigate = useNavigate();
 
-    // Generar código de curso de 6 caracteres
+    // Generar el código del curso de 6 caracteres
     const generarCodigoCurso = () => {
         const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let codigo = '';
@@ -33,7 +35,6 @@ const CrearCursoProfesor = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
     };
 
     const crearCurso = async (e) => {
@@ -56,7 +57,7 @@ const CrearCursoProfesor = () => {
             const codigo = generarCodigoCurso();
             const body = { nombreCurso, periodo, fechaLimite, entregasLibres, codigoCurso: codigo };
 
-            const response = await fetch('http://localhost:5000/api/cursos/crearCurso', {
+            const response = await fetch(`${API_URL}/api/cursos/crearCurso`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,7 +78,6 @@ const CrearCursoProfesor = () => {
         }
     };
 
-    // Función del cierre del modal
     const handleCloseModal = () => {
         setShowModal(false);
         setNombreCurso('');
@@ -90,7 +90,7 @@ const CrearCursoProfesor = () => {
         navigate('/profesor/cursos');
     };
 
-    // Obtener periodos segun el año
+    // Obtener periodos segun el año actual
     const obtenerOpcionesPeriodo = () => {
         const currentYear = new Date().getFullYear();
         return [

@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 
+const API_URL = 'http://localhost:5000'; 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -9,9 +10,9 @@ export const AuthProvider = ({ children }) => {
     const [rol, setRol] = useState(null);
     const [userId, setUserId] = useState(null);
     const navigate = useNavigate();
-    const inactivityTimer = useRef(null); 
+    const inactivityTimer = useRef(null);
+    
 
-    // Cargar el token y la información del usuario al montar el componente
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (storedToken) {
@@ -19,14 +20,14 @@ export const AuthProvider = ({ children }) => {
                 const { exp, rol_id, id } = jwtDecode(storedToken);
                 const currentTime = Math.floor(Date.now() / 1000);
                 if (currentTime > exp) {
-                    logout(); // Si el token ha expirado, se realiza el logout
+                    logout();
                 } else {
                     setToken(storedToken);
                     setRol(rol_id);
                     setUserId(id);
                 }
             } catch (e) {
-                logout(); // Si el token no es válido, se relaiza el logout
+                logout();
             }
         }
     }, []);
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     // Función para manejar el login
     const login = async (credentials) => {
         try {
-            const response = await fetch("http://localhost:5000/api/auth/login", {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(credentials),
@@ -67,7 +68,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
     
-    // Función para manejar el logout
     const logout = () => {
         setToken(null);
         setRol(null);
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
     // Función para restablecer el temporizador de inactividad
     const resetInactivityTimer = () => {
-        if (token) { // Se verifica si hay un token presente
+        if (token) { 
             if (inactivityTimer.current) {
                 clearTimeout(inactivityTimer.current);
             }
@@ -94,14 +94,11 @@ export const AuthProvider = ({ children }) => {
 
     // useEffect para iniciar la vigilancia de inactividad
     useEffect(() => {
-        // Escuchar eventos de actividad del usuario
         window.addEventListener("mousemove", resetInactivityTimer);
         window.addEventListener("keypress", resetInactivityTimer);
 
-        // Establecer el temporizador la primera vez
         resetInactivityTimer();
 
-        // Limpiar los eventos al desmontar el componente
         return () => {
             if (inactivityTimer.current) {
                 clearTimeout(inactivityTimer.current);

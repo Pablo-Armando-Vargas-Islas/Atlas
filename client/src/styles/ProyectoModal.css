@@ -1,31 +1,31 @@
 .btn-solicitar-acceso {
     border-radius: 10px;
     color: #ffffff;
-    background-color: #ec881d;
-    border-color: #ec881d;
+    background-color: #91cb1b;
+    border-color: #91cb1b;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .btn-solicitar-acceso:hover {
-    color: #ffffff;
-    background-color: #ce771a;
-    border-color: #ce771a;
+    color: #ffffff; 
+    background-color: #85c10e;
+    border-color: #85c10e;
     opacity: 0.9;
 }
 
 .btn-solicitar-acceso:active {
     color: #ffffff!important;
-    background-color: #ce771a!important;
-    border-color: #ce771a!important;
+    background-color: #85c10e!important;
+    border-color: #85c10e!important;
 }
 
 .btn-solicitar-acceso:disabled {
     border-radius: 10px;
     color: #ffffff;
-    background-color: #ec881d;
-    border-color: #ec881d;
+    background-color: #91cb1b;
+    border-color: #91cb1b;
     transition: background-color 0.3s ease, color 0.3s ease;
-}
+} 
 
 .btn-enviar {
     border-radius: 10px;
@@ -54,4 +54,28 @@
     color: #ffffff!important;
     background-color: #81b518!important;
     border-color: #81b518!important;
+}
+
+.btn-primary-editar{
+    background-color:#EC6E1D!important;
+    color: #ffffff;
+    border-color: #EC6E1D;
+}
+
+.btn-primary-editar:hover {
+    background-color:#d36019!important;
+    color: #ffffff;
+    border-color: #EC6E1D;
+}
+
+.btn-primary-editar:active {
+    background-color:#EC6E1D!important;
+    color: #ffffff;
+    border-color: #EC6E1D;
+}
+
+.btn-primary-editar:focus {
+    background-color:#EC6E1D!important;
+    color: #ffffff;
+    border-color: #EC6E1D;
 }

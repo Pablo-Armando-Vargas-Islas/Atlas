@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/SolicitudesPendientes.css'; 
 
+const API_URL = 'http://localhost:5000';
+
 const SolicitudesPendientes = () => {
     const [solicitudes, setSolicitudes] = useState(0);
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
         const token = localStorage.getItem('token');
 
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_URL}/solicitudes/pendientes`, {
+                const response = await fetch(`${API_URL}/api/metricas/solicitudes/pendientes`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -29,12 +30,11 @@ const SolicitudesPendientes = () => {
         fetchData();
     }, []);
 
-    // Determinar el color de fondo en función del número de solicitudes
     let cardStyle = "admin-card";
     if (solicitudes >= 5 && solicitudes <= 10) {
-        cardStyle += " admin-card-warning"; // Se agrega clase de advertencia (amarillo)
+        cardStyle += " admin-card-warning"; 
     } else if (solicitudes > 10) {
-        cardStyle += " admin-card-danger"; // Se agrega clase de peligro (rojo)
+        cardStyle += " admin-card-danger";
     }
 
     return (

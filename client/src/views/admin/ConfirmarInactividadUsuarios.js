@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import '../../styles/EditarUsuarios.css';
 
+const API_URL = 'http://localhost:5000';
+
 const ConfirmarInactividadUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBusqueda] = useState(""); 
@@ -18,7 +20,7 @@ const ConfirmarInactividadUsuarios = () => {
     const fetchConfirmarInactividadUsuarios = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/metricas/usuarios-inactivos', {
+            const response = await fetch(`${API_URL}/api/metricas/usuarios-inactivos`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -34,7 +36,7 @@ const ConfirmarInactividadUsuarios = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handleSearchChange = (e) => {
@@ -42,7 +44,6 @@ const ConfirmarInactividadUsuarios = () => {
         setCurrentPage(1); 
     };
 
-    // Cambiar de página
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -77,10 +78,9 @@ const ConfirmarInactividadUsuarios = () => {
         );
     };
 
-    // Manejar la activación del usuario
     const handleActivateUser = async (userId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/metricas/usuarios/${userId}/aceptar`, {
+            const response = await fetch(`${API_URL}/api/metricas/usuarios/${userId}/aceptar`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -88,7 +88,7 @@ const ConfirmarInactividadUsuarios = () => {
             });
 
             if (response.ok) {
-                fetchConfirmarInactividadUsuarios(); // Refrescar la lista de usuarios
+                fetchConfirmarInactividadUsuarios(); 
             } else {
                 const data = await response.json();
                 console.error('Error al bloquear el usuario:', data.error);
@@ -100,10 +100,9 @@ const ConfirmarInactividadUsuarios = () => {
         }
     };
 
-    // Manejar la activación del usuario
     const handleCancelarUser = async (userId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/metricas/usuarios/${userId}/cancelar`, {
+            const response = await fetch(`${API_URL}/api/metricas/usuarios/${userId}/cancelar`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -111,7 +110,7 @@ const ConfirmarInactividadUsuarios = () => {
             });
 
             if (response.ok) {
-                fetchConfirmarInactividadUsuarios(); // Refrescar la lista de usuarios
+                fetchConfirmarInactividadUsuarios(); 
             } else {
                 const data = await response.json();
                 console.error('Error al cancelar inactividad:', data.error);

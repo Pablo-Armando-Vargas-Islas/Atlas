@@ -4,6 +4,8 @@ import "../../styles/EditarCursos.css";
 import { FaEdit, FaCheck, FaTimes, FaArrowLeft, FaPlus } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+const API_URL = 'http://localhost:5000';
+
 const EditarCursos = () => {
     const [cursos, setCursos] = useState([]);
     const [profesores, setProfesores] = useState([]);
@@ -21,7 +23,7 @@ const EditarCursos = () => {
 
     const fetchCursos = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/admin/cursos", {
+            const response = await fetch(`${API_URL}/api/admin/cursos`, {
                 headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
             });
             const data = await response.json();
@@ -42,7 +44,7 @@ const EditarCursos = () => {
 
     const fetchProfesores = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/admin/usuariosRol?roles=1,2", {
+            const response = await fetch(`${API_URL}/api/admin/usuariosRol?roles=2`, {
                 headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
             });
             const data = await response.json();
@@ -61,7 +63,7 @@ const EditarCursos = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Regresar a la vista anterior
+        navigate(-1); 
     };
 
     const handleEdit = (index) => {
@@ -82,13 +84,12 @@ const EditarCursos = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
     
-        // Validar el cambio de estado y la fecha de cierre
         if (name === "estado" && value === "abierto") {
             // Si se cambia a "abierto", limpiar la fecha de cierre y obligar a seleccionar una nueva fecha
             setEditingCurso((prev) => ({
                 ...prev,
                 [name]: value,
-                fecha_fin: ""  // Limpiar la fecha de cierre actual
+                fecha_fin: ""  
             }));
         } else {
             setEditingCurso((prev) => ({
@@ -101,7 +102,7 @@ const EditarCursos = () => {
     
 
     const handleSave = async () => {
-        const hoy = new Date().toISOString().split("T")[0]; // Obtener la fecha de hoy en formato "aaaa-mm-dd"
+        const hoy = new Date().toISOString().split("T")[0]; 
         
         // Validar que ningún campo sea nulo
         if (!editingCurso.nombre_curso || !editingCurso.profesor_id || !editingCurso.periodo || !editingCurso.fecha_inicio || !editingCurso.fecha_fin || !editingCurso.codigo_curso) {
@@ -116,7 +117,7 @@ const EditarCursos = () => {
     
         // Actualizar la fecha de cierre si el curso se cierra antes de la fecha establecida
         if (editingCurso.estado === "cerrado" && editingCurso.fecha_fin && editingCurso.fecha_fin > hoy) {
-            editingCurso.fecha_fin = hoy; // Actualizar la fecha de cierre
+            editingCurso.fecha_fin = hoy; 
         }
     
         try {
@@ -131,7 +132,7 @@ const EditarCursos = () => {
                 estado: editingCurso.estado
             };
     
-            const response = await fetch(`http://localhost:5000/api/admin/cursos/${editingCurso.id}`, {
+            const response = await fetch(`${API_URL}/api/admin/cursos/${editingCurso.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -212,7 +213,7 @@ const EditarCursos = () => {
                         className="buscador-cursos"
                     />
                     <OverlayTrigger
-                        placement="top" // Ubicación del tooltip
+                        placement="top" 
                         overlay={<Tooltip>Crear nuevo curso</Tooltip>}
                     >
                         <button
@@ -281,7 +282,7 @@ const EditarCursos = () => {
                                                     type="date"
                                                     name="fecha_fin"
                                                     value={editingCurso.fecha_fin}
-                                                    min={new Date().toISOString().split("T")[0]} // Establecer la fecha mínima como la fecha de hoy
+                                                    min={new Date().toISOString().split("T")[0]} 
                                                     onChange={handleInputChange}
                                                 />
                                             </td>
@@ -319,8 +320,8 @@ const EditarCursos = () => {
                                             <td>{resaltarCoincidencias(capitalize(curso.estado))}</td>
                                             <td>
                                                 <OverlayTrigger
-                                                    placement="top" // Ubicación del tooltip
-                                                    overlay={<Tooltip>Ver proyectos</Tooltip>} // Texto del tooltip
+                                                    placement="top" 
+                                                    overlay={<Tooltip>Ver proyectos</Tooltip>} 
                                                 >
                                                     <a href={`/proyectos-curso/${curso.id}`} className="link-proyectos">
                                                         {resaltarCoincidencias(curso.cantidad_proyectos.toString())}
@@ -329,8 +330,8 @@ const EditarCursos = () => {
                                             </td>
                                             <td>
                                                 <OverlayTrigger
-                                                    placement="top" // Ubicación del tooltip
-                                                    overlay={<Tooltip>Editar curso</Tooltip>} // Texto del tooltip
+                                                    placement="top" 
+                                                    overlay={<Tooltip>Editar curso</Tooltip>} 
                                                 >
                                                     <span>
                                                         <FaEdit

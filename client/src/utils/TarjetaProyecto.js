@@ -3,7 +3,7 @@ import { Card, Badge } from 'react-bootstrap';
 import ProyectoModal from '../utils/ProyectoModal';
 import '../styles/TarjetaProyecto.css';
 
-const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
+const TarjetaProyecto = ({ proyecto, query, scope, enviarSolicitud }) => {
   const [showModal, setShowModal] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
 
@@ -20,14 +20,16 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
   // Dividir la consulta en palabras clave
   const keywords = query ? query.split(' ').filter(Boolean) : [];
 
-  // Función para resaltar cada palabra clave en un texto dado
-  const highlightText = (text) => {
+  // Función para resaltar coincidencias en un texto según el ámbito de búsqueda
+  const highlightText = (text, scope, field) => {
     if (!keywords.length) return text;
 
-    // Crear una expresión regular con cada palabra clave
+    if (scope !== "global" && scope !== field) {
+      return text;
+    }
+
     const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
 
-    // Dividir el texto en partes, resaltando cada coincidencia
     return text.split(regex).map((part, index) =>
       keywords.some(keyword => part.toLowerCase() === keyword.toLowerCase()) ? (
         <span key={index} className="highlight">{part}</span>
@@ -37,20 +39,8 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
     );
   };
 
-  /* Definir el formato del tipo de trabajo (Aula o Grado)
-  const renderTipoTrabajo = () => {
-    if (tipo === "grado") {
-      return <p>Trabajo de Grado</p>
-    } else if (tipo === "aula") {
-      return <p>Trabajo de Aula</p>
-    } else {
-      return <p>Desconocido</p>
-    }
-  };*/
-
   const tipoTrabajo = tipo === "grado" ? "Grado" : "Aula";
 
-  // Manejar el clic en la tarjeta para abrir el modal
   const handleCardClick = () => {
     if (proyecto && proyecto.usuario_id) {
       setProyectoSeleccionado(proyecto);
@@ -68,17 +58,28 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
       <Card className="tarjeta-proyecto mb-4" onClick={handleCardClick}>
         <Card.Body>
           <Card.Title>
-            {highlightText(titulo)}
-            {/*renderTipoTrabajo()*/}
+            <span className="tipo-trabajo">
+              {highlightText(`Proyecto de ${tipoTrabajo}`, scope, "tipoTrabajo")}
+            </span>
+            <br />
+            <br />
+            {highlightText(titulo, scope, "titulo")}
           </Card.Title>
           <div className="tarjeta-info">
-            <p><strong>Proyecto de {highlightText(tipoTrabajo)}</strong></p>
-            <p><strong>Descripción:</strong> {highlightText(descripcion)}</p>
-            <p><strong>Fecha de Creación:</strong> {fecha_hora ? new Date(fecha_hora).toLocaleDateString() : 'Fecha no disponible'}</p>
+            <p><strong>Descripción:</strong> {highlightText(descripcion, scope, "descripcion")}</p>
+            <p>
+              <strong>Fecha de Creación: </strong> 
+              {fecha_hora 
+                ? highlightText(new Date(fecha_hora).toLocaleDateString(), scope, "fecha_hora") 
+                : 'Fecha no disponible'}
+            </p>
+            {proyecto.tipo === 'aula' && (
+                <p><strong>Curso:</strong> {proyecto.nombre_curso}</p>
+            )}
             <p><strong>Autores:</strong> {
               autores.map((autor, idx) => (
                 <span key={idx}>
-                  {highlightText(autor)}
+                  {highlightText(autor, scope, "autor")}
                   {idx < autores.length - 1 ? ', ' : ''}
                 </span>
               ))
@@ -89,7 +90,7 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
               {tecnologias.length > 0 ? (
                 tecnologias.map((tec, idx) => (
                   <Badge key={idx} className="badge-tecnologia me-2">
-                    {highlightText(tec)}
+                    {highlightText(tec, scope, "tecnologias")}
                   </Badge>
                 ))
               ) : (
@@ -102,14 +103,13 @@ const TarjetaProyecto = ({ proyecto, query, enviarSolicitud }) => {
               {categorias.length > 0 ? (
                 categorias.map((cat, idx) => (
                   <Badge key={idx} className="badge-categoria me-2">
-                    {highlightText(cat)}
+                    {highlightText(cat, scope, "categorias")}
                   </Badge>
                 ))
               ) : (
                 <span className="text-muted"> No especificadas</span>
               )}
             </div>
-
           </div>
         </Card.Body>
       </Card>

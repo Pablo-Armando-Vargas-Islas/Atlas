@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const API_URL = 'http://localhost:5000';
+
 const ProyectosMasSolicitados = () => {
     const [proyectos, setProyectos] = useState([]);
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
         const token = localStorage.getItem('token');
 
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_URL}/proyectos/mas-solicitados`, {
+                const response = await fetch(`${API_URL}/api/metricas/proyectos/mas-solicitados`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

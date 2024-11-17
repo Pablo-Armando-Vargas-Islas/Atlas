@@ -39,6 +39,7 @@ import GestionTecnologias from "./views/admin/GestionTecnologias";
 import GestionCategorias from "./views/admin/GestionCategorias";
 import ConfirmarInactividadUsuarios from "./views/admin/ConfirmarInactividadUsuarios";
 import EditarProyecto from "./views/admin/EditarProyecto";
+import Perfil from "./views/Perfil";
 import Navbar from "./views/Navbar";
 
 function App() {
@@ -52,20 +53,13 @@ function App() {
 }
 
 function AppContent() {
-    const { token } = useContext(AuthContext); // Obtén el token del contexto de autenticación
+    const { token } = useContext(AuthContext); 
 
     return (
         <>
             <Navbar />
             
             <Routes>
-                {/* Ruta predeterminada que redirige al login si no está autenticado */}
-                <Route
-                    path="/"
-                    element={
-                        token ? <Navigate to="/Buscador" /> : <Navigate to="/login" />
-                    }
-                />
 
                 {/* Rutas públicas */}
                 <Route path="/login" element={<Login />} />
@@ -79,6 +73,14 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <Buscador />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/perfil"
+                    element={
+                        <ProtectedRoute>
+                            <Perfil />
                         </ProtectedRoute>
                     }
                 />
@@ -346,8 +348,6 @@ function AppContent() {
                         </ProtectedRoute>
                     }
                 />
-                
-                {/* Repite la lógica para cada ruta protegida */}
             </Routes>
         </>
     );

@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const API_URL = 'http://localhost:5000';
+
 const UsuariosInactivos = () => {
     const [estudiantesInactivos, setEstudiantesInactivos] = useState(0);
     const [profesoresInactivos, setProfesoresInactivos] = useState(0);
+    const [administradoresInactivos, setAdministradoresInactivos] = useState(0);
     const [mostrarRevisar, setMostrarRevisar] = useState(false);
 
     useEffect(() => {
-        const API_URL = 'http://localhost:5000/api/metricas';
         const token = localStorage.getItem('token');
 
         const fetchData = async () => {
             try {
                 // Solicitar estudiantes inactivos
-                const responseEstudiantes = await fetch(`${API_URL}/estudiantes/inactivos`, {
+                const responseEstudiantes = await fetch(`${API_URL}/api/metricas/estudiantes/inactivos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -25,7 +27,7 @@ const UsuariosInactivos = () => {
                 setEstudiantesInactivos(dataEstudiantes.cantidad);
 
                 // Solicitar profesores inactivos
-                const responseProfesores = await fetch(`${API_URL}/profesores/inactivos`, {
+                const responseProfesores = await fetch(`${API_URL}/api/metricas/profesores/inactivos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -36,8 +38,20 @@ const UsuariosInactivos = () => {
                 const dataProfesores = await responseProfesores.json();
                 setProfesoresInactivos(dataProfesores.cantidad);
 
+                // Solicitar administradores inactivos
+                const responseAdministradores = await fetch(`${API_URL}/api/metricas/administradores/inactivos`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!responseAdministradores.ok) {
+                    throw new Error('Error en la autenticación o en la solicitud de administradores inactivos');
+                }
+                const dataAdministradores = await responseAdministradores.json();
+                setAdministradoresInactivos(dataAdministradores.cantidad);
+
                 // Consultar usuarios con inactividad prolongada
-                const responseUsuariosInactivos = await fetch(`${API_URL}/usuarios-inactivos`, {
+                const responseUsuariosInactivos = await fetch(`${API_URL}/api/metricas/usuarios-inactivos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -78,6 +92,7 @@ const UsuariosInactivos = () => {
             <Link to="/admin/usuarios-inactivos" className="admin-card-link">
                 <div className="admin-card">
                     <h3 className="admin-card-title">Usuarios Inactivos</h3>
+                    <p className="admin-card-text">Administradores Inactivos: {administradoresInactivos}</p>
                     <p className="admin-card-text">Estudiantes Inactivos: {estudiantesInactivos}</p>
                     <p className="admin-card-text">Profesores Inactivos: {profesoresInactivos}</p>
                 </div>
