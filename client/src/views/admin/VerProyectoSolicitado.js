@@ -4,8 +4,7 @@ import { Table, Button, Spinner } from 'react-bootstrap';
 import { FaArrowLeft, FaDownload, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import axios from 'axios';
 import '../../styles/VerProyectoSolicitado.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const VerProyectosMasSolicitados = () => {
     const [proyectos, setProyectos] = useState([]);

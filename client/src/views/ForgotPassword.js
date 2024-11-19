@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from 'react-bootstrap';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const ForgotPassword = () => {
     const [correo, setCorreo] = useState("");

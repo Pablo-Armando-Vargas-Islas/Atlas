@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Spinner } from 'react-bootstrap';
 import '../styles/ProyectoModal.css';
-
-const API_URL = 'http://localhost:5000'; 
+import API_URL from '../Server';
 
 const BotonDescarga = ({ id }) => {
     const [isLoading, setIsLoading] = useState(false);

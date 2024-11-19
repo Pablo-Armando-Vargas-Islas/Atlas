@@ -4,8 +4,7 @@ import '../../styles/GestionCursosProfesor.css';
 import { Modal, Button, Form} from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Spinner } from 'react-bootstrap';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const Solicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);

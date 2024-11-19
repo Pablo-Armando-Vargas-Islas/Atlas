@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/ConfiguracionCorreo.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import { Spinner } from 'react-bootstrap';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const ConfiguracionCorreo = () => {
     const [email, setEmail] = useState('');

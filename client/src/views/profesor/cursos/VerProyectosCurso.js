@@ -4,8 +4,7 @@ import { Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import ProyectoModal from '../../../utils/ProyectoModal';
 import { FaArrowLeft, FaList } from 'react-icons/fa';
 import '../../../styles/GestionCursosProfesor.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../../Server';
 
 const VerProyectosCurso = () => {
     const { cursoId } = useParams();

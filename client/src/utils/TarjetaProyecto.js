@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Badge } from 'react-bootstrap';
 import ProyectoModal from '../utils/ProyectoModal';
 import '../styles/TarjetaProyecto.css';
+import API_URL from '../Server';
 
 const TarjetaProyecto = ({ proyecto, query, scope, enviarSolicitud }) => {
   const [showModal, setShowModal] = useState(false);

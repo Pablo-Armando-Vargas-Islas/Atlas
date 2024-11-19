@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import '../../styles/RegisterAdmin.css';
 import { FaArrowLeft } from 'react-icons/fa'; 
 import { Spinner } from 'react-bootstrap';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const RegisterAdmin = () => {
     const [nombre, setNombre] = useState("");

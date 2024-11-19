@@ -1,8 +1,8 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
+import API_URL from '../Server';
 
-const API_URL = 'http://localhost:5000'; 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {

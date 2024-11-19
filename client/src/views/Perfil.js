@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Perfil.css";
 import { Spinner } from "react-bootstrap";
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const Perfil = () => {
     const [nombre, setNombre] = useState("");
@@ -95,7 +94,7 @@ const Perfil = () => {
     return (
         <div className="profile-container">
             <div className="profile-box col-md-6 shadow p-5 rounded-4 bg-white">
-                <h1 className="text-center mb-4">Mi Perfil</h1>
+                <h1 className="text-center mb-4">Mis Datos</h1>
                 {alert.message && (
                     <div className={`alert alert-${alert.type}`} role="alert">
                         {alert.message}

@@ -743,6 +743,7 @@ try {
 }
 });
 
+// Ruta para obtener las  sugerencias de los cursos disponibles junto al nombre del profesor
 router.get("/cursos/sugerencias", verifyToken, async (req, res) => {
     try {
         const query = req.query.query?.trim().toLowerCase();
@@ -751,15 +752,15 @@ router.get("/cursos/sugerencias", verifyToken, async (req, res) => {
         }
 
         const cursos = await pool.query(
-            `SELECT DISTINCT LOWER(nombre_curso) AS nombre_curso
+            `SELECT DISTINCT nombre_curso
             FROM cursos
-            WHERE LOWER(nombre_curso) LIKE $1
+            WHERE nombre_curso ILIKE $1
             ORDER BY nombre_curso ASC
             LIMIT 5`,
-            [`%${query}%`]
+            [`${query}%`]
         );
 
-        const nombresUnicos = [...new Set(cursos.rows.map(curso => curso.nombre_curso))];
+        const nombresUnicos = cursos.rows.map(curso => curso.nombre_curso);
         res.json(nombresUnicos);
     } catch (err) {
         console.error("Error en el servidor al obtener sugerencias de cursos:", err.message);

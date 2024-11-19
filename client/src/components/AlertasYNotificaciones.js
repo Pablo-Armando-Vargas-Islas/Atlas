@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const AlertasYNotificaciones = () => {
     const [alertas, setAlertas] = useState([]);

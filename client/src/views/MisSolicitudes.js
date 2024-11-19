@@ -3,8 +3,7 @@ import { Table, Button, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FaList } from 'react-icons/fa';
 import '../styles/MisSolicitudes.css';
 import BotonDescarga from '../utils/BotonDescarga';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const MisSolicitudes = () => {
     const [solicitudes, setSolicitudes] = useState([]);

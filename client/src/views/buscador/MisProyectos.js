@@ -6,8 +6,7 @@ import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/MisProyectos.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const MisProyectos = () => {
     const [proyectos, setProyectos] = useState([]);

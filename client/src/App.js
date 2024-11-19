@@ -61,6 +61,14 @@ function AppContent() {
             
             <Routes>
 
+                {/* Ruta predeterminada que redirige al login si no está autenticado */}
+                <Route
+                    path="/"
+                    element={
+                        token ? <Navigate to="/Buscador" /> : <Navigate to="/login" />
+                    }
+                />
+                
                 {/* Rutas públicas */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Register />} />

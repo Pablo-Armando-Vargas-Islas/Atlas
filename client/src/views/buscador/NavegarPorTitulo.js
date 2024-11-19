@@ -5,8 +5,7 @@ import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/NavegarPorTitulo.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const NavegarPorTitulo = () => {
   const [proyectos, setProyectos] = useState([]);

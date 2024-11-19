@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/EditarUsuarios.css';
 import { FaEdit, FaCheck, FaTimes, FaTrash, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const GestionCategorias = () => {
     const [categorias, setCategorias] = useState([]);

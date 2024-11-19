@@ -6,8 +6,8 @@ import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import ProyectoModal from '../../utils/ProyectoModal';
 import { FaArrowLeft} from 'react-icons/fa';
 import '../../styles/BusquedaGlobal.css';
+import API_URL from '../../Server';
 
-const API_URL = 'http://localhost:5000';
 const ITEMS_PER_PAGE = 10;
 
 const BusquedaGlobal = () => {

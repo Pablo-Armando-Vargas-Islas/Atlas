@@ -3,8 +3,7 @@ import { Button, Table, OverlayTrigger, Tooltip, Modal, Form } from 'react-boots
 import { useNavigate } from 'react-router-dom';
 import { FaClipboard, FaFileCode, FaLock, FaUnlock, FaPlusCircle } from 'react-icons/fa';
 import '../../../styles/GestionCursosProfesor.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../../Server';
 
 const GestionCursosProfesor = () => {
     const [cursos, setCursos] = useState([]);

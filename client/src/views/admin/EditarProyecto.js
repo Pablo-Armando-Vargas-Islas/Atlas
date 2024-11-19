@@ -5,8 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { Spinner } from 'react-bootstrap';
 import JSZip from "jszip";
 import "../../styles/SubirProyecto.css";
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const EditarProyecto = () => {
     const { id: proyectoId } = useParams();

@@ -3,8 +3,7 @@ import { FaArrowLeft, FaCheck, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import '../../styles/EditarUsuarios.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const ConfirmarInactividadUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);

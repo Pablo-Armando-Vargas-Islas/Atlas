@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
+import API_URL from '../Server';
 
 const BuscadorContext = createContext();
-const API_URL = 'http://localhost:5000';
 
 export const BuscadorProvider = ({ children }) => {
   const [query, setQuery] = useState('');

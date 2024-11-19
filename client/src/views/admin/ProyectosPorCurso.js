@@ -4,8 +4,7 @@ import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import BotonDescargaAdmin from "../../utils/BotonDescargaAdmin";
 import { FaList, FaCheck, FaTimes, FaEdit, FaArrowLeft } from 'react-icons/fa';
 import "../../styles/ProyectosPorCurso.css";
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const ProyectosPorCurso = () => {
     const { id: cursoId } = useParams();

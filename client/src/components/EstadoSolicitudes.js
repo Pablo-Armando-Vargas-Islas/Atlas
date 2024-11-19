@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-
-const API_URL = 'http://localhost:5000';
+import Chart from 'chart.js/auto';
+import API_URL from '../Server';
 
 const EstadoSolicitudes = () => {
     const [solicitudesPorEstado, setSolicitudesPorEstado] = useState([]);

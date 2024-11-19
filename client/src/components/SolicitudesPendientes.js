@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/SolicitudesPendientes.css'; 
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const SolicitudesPendientes = () => {
     const [solicitudes, setSolicitudes] = useState(0);

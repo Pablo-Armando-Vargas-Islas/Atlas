@@ -107,3 +107,15 @@
   background-color: #f0f0f0;
 }
 
+.sugerencia-item {
+  padding: 10px;
+  cursor: pointer;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.sugerencia-item.active {
+  background-color: #f0f0f0; /* Fondo resaltado */
+  font-weight: bold;
+}
+

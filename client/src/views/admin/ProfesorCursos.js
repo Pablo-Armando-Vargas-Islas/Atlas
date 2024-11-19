@@ -4,8 +4,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/GestionCursosProfesor.css';
 import '../../styles/EditarUsuarios.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const ProfesorCursos = () => {
     const [profesores, setProfesores] = useState([]);

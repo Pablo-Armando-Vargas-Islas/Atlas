@@ -5,8 +5,7 @@ import TarjetaProyecto from '../../utils/TarjetaProyecto';
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from 'react-icons/fa';
 import '../../styles/NavegarPorCurso.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../Server';
 
 const NavegarPorCurso = () => {
   const [proyectos, setProyectos] = useState([]);
@@ -17,6 +16,7 @@ const NavegarPorCurso = () => {
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
   const [orden, setOrden] = useState("reciente");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const navigate = useNavigate();
   const ITEMS_PER_PAGE = 10;
 
@@ -89,20 +89,57 @@ const NavegarPorCurso = () => {
 
       if (!response.ok) throw new Error("Error al realizar la búsqueda.");
 
-      const data = await response.json();
+      const data = await response.json(); 
       setFilteredProyectos(data);
     } catch (error) {
       console.error("Error al realizar la búsqueda:", error);
     }
   };
 
+  let debounceTimer;
   const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    if (value.length > 0) {
-      fetchSugerencias(value);
-    } else {
-      setSugerencias([]);
+      const value = e.target.value.trim();
+      setSearchTerm(value);
+
+      if (debounceTimer) clearTimeout(debounceTimer);
+
+      debounceTimer = setTimeout(() => {
+          if (value.length > 0) {
+              fetchSugerencias(value);
+          } else {
+              setSugerencias([]);
+          }
+      }, 300); // 300 ms de debounce
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+        handleBuscar(searchTerm.trim());
+        setSugerencias([]); // Ocultar sugerencias después de buscar
+    } else if (e.key === "ArrowDown") {
+        navigateSuggestions("down");
+    } else if (e.key === "ArrowUp") {
+        navigateSuggestions("up");
+    }
+  };
+
+  const navigateSuggestions = (direction) => {
+    if (sugerencias.length === 0) return;
+
+    setSelectedSuggestionIndex((prevIndex) => {
+        if (direction === "down") {
+            return (prevIndex + 1) % sugerencias.length;
+        } else if (direction === "up") {
+            return (prevIndex - 1 + sugerencias.length) % sugerencias.length;
+        }
+        return prevIndex;
+    });
+  };
+
+  const handleSuggestionSelection = () => {
+    if (selectedSuggestionIndex >= 0) {
+        const selectedCurso = sugerencias[selectedSuggestionIndex];
+        handleSuggestionClick(selectedCurso);
     }
   };
 
@@ -132,6 +169,7 @@ const NavegarPorCurso = () => {
           placeholder="Buscar por nombre de curso"
           value={searchTerm}
           onChange={handleInputChange}
+          onKeyDown={handleKeyPress}
           className="search-input"
         />
         {sugerencias.length > 0 && (
@@ -139,8 +177,9 @@ const NavegarPorCurso = () => {
             {sugerencias.map((sug, idx) => (
               <li
                 key={idx}
-                className="sugerencia-item"
+                className={`sugerencia-item ${idx === selectedSuggestionIndex ? "active" : ""}`}
                 onClick={() => handleSuggestionClick(sug)}
+                onMouseEnter={() => setSelectedSuggestionIndex(idx)}
               >
                 {sug}
               </li>

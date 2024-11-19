@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 import '../../../styles/CrearCursoProfesor.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../../../Server';
  
 const CrearCursoProfesor = () => {
     const [nombreCurso, setNombreCurso] = useState('');

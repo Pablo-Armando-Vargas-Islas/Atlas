@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/DashboardAdmin.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const ProyectosPorCurso = () => {
     const [cursos, setCursos] = useState([]);

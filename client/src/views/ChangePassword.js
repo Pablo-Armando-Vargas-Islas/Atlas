@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Spinner } from 'react-bootstrap'; 
 import '../styles/ChangePassword.css';
-
-const API_URL = 'http://localhost:5000';
+import API_URL from '../Server';
 
 const ChangePassword = () => {
     const [nuevaContrasena, setNuevaContrasena] = useState("");
